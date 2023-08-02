@@ -4,3 +4,8 @@ a multiline
 comment or something*/
 5X32 <= 5i
 
+"Hello $name1 and ${
+    // lol
+    5 == 5
+
+}\n"

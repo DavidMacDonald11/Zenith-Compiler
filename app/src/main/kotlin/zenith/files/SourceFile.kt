@@ -3,40 +3,51 @@ package zenith
 import java.io.File
 import java.io.BufferedReader
 
+private val BUF_SIZE = maxOf(3, Grammar.LONGEST_PUNC_SIZE)
+
 class SourceFile(val path: String) {
-    private val source = File(path).bufferedReader()
-    private val builder = StringBuilder()
-    private val buffer = StringBuilder(80)
-    var charPos = 0u
-        private set
+    private val reader = File(path).bufferedReader()
+    private val buffer = ArrayDeque<Char>(BUF_SIZE)
+    private val readBuffer = StringBuilder()
 
-    init { growBuffer() }
+    val nextChar get() = peek(1).lastOrNull() ?: '\u0000'
+    val atEnd get() = peek(1).isEmpty()
+    var charPos = 0u; private set
 
-    val atEnd get() = buffer.isEmpty()
-    val nextChar get() = buffer.getOrNull(0) ?: '\u0000'
+    fun close() = reader.close()
 
-    fun close() = source.close()
-    fun nextStr(n: Int) = buffer.take(n)
+    fun peek(n: Int): String {
+        while(buffer.count() < n) {
+            val char = reader.readChar()
+            if(char == null) break else buffer.addLast(char)
+        }
 
-    fun readChars(n: Int = -1) = readWhile { builder.length < n }
+        return buffer.take(n).joinToString("")
+    }
+
+    fun readChar() = readChars(1)
+    fun readChars(n: Int) = readWhile { readBuffer.length < n }
     fun readTheseChars(these: String) = readWhile { nextChar in these }
     fun readCharsUntil(until: String) = readWhile { nextChar !in until }
 
     private fun readWhile(condition: () -> Boolean): String {
         while(!atEnd && condition()) {
-            builder.append(nextChar)
-            buffer.deleteCharAt(0)
-            if(buffer.length == 1) growBuffer()
+            val char = buffer.removeFirstOrNull() ?: reader.readChar()
+            if(char == null) break else readBuffer.append(char)
         }
 
-        charPos += builder.length.toUInt()
-
-        val string = "$builder"
-        builder.clear()
-        return string
+        charPos += readBuffer.length.toUInt()
+        return readBuffer.empty()
     }
+}
 
-    private fun growBuffer() {
-        buffer.append(source.readLine()?.plus("\n") ?: "")
-    }
+private fun StringBuilder.empty(): String {
+    val string = "$this"
+    clear()
+    return string
+}
+
+private fun BufferedReader.readChar(): Char? {
+    val char = read()
+    return if(char == -1) null else char.toChar()
 }
