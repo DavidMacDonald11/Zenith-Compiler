@@ -1,18 +1,17 @@
 package zenith
 
 fun main() {
-    val file = SourceFile("../test.zen")
+    val filePath = "../test.zen"
+    val faults = Faults(filePath)
     var tokens: List<Token>? = null
 
     try {
-        tokens = tokenize(file)
-        checkFaults()
-
-        handleFaults()
-    } catch(e: CompilerFailure) {
-        handleFaults()
+        val lexer = Lexer(faults)
+        tokens = lexer.makeTokens()
+        faults.throwIfErrors()
+    } catch(e: Faults.Failure) {
+        faults.print()
     }
 
-    println((tokens?:listOf<Token>()).joinToString(", ", "[", "]"))
-    file.close()
+    tokens?.let { println(it.joinToString(", ", "[", "]")) }
 }

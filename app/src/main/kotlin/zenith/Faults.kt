@@ -2,89 +2,73 @@ package zenith
 
 import java.io.File
 
-class CompilerFailure: Exception() {}
-
-private typealias Fault = Pair<String, Faultable.Position>
-private val warnings = mutableListOf<Fault>()
-private val errors = mutableListOf<Fault>()
-
-interface Faultable {
-    data class Position(val file: String, val start: UInt, val end: UInt) {
-        constructor(start: SourceFile.Position, strLen: UInt) : this(
-            file = start.file,
-            start = start.charPos,
-            end = start.charPos + strLen
-        )
+class Faults(val filePath: String) {
+    data class Position(val start: UInt, val end: UInt) {
+        operator fun contains(value: UInt) = value >= start && value < end
     }
 
-    val faultablePosition: Position
-}
+    class Failure: Exception()
+    interface Faultable { val faultPosition: Position }
+    data class Fault(val message: String, val position: Position)
 
-fun warn(label: String, fault: Faultable, message: String) {
-    warnings += Pair("$label Warning: $message", fault.faultablePosition)
-}
+    private val warnings = mutableListOf<Fault>()
+    private val errors = mutableListOf<Fault>()
 
-fun error(label: String, fault: Faultable, message: String) {
-    errors += Pair("$label Error: $message", fault.faultablePosition)
-}
+    fun warn(label: String, fault: Faultable, message: String) {
+        warnings += Fault("$label Warning: $message", fault.faultPosition)
+    }
 
-fun fail(label: String, fault: Faultable, message: String): CompilerFailure {
-    errors += Pair("$label Failure: $message", fault.faultablePosition)
-    return CompilerFailure()
-}
+    fun error(label: String, fault: Faultable, message: String) {
+        errors += Fault("$label Error: $message", fault.faultPosition)
+    }
 
-fun checkFaults() { if(errors.size > 0) throw CompilerFailure() }
+    fun fail(label: String, fault: Faultable, message: String): Failure {
+        errors += Fault("$label Failure: $message", fault.faultPosition)
+        return Failure()
+    }
 
-fun handleFaults() {
-    val fileFaultMap = (warnings + errors).groupBy { it.second.file }
+    fun throwIfErrors() { if(errors.size > 0) throw Failure() }
 
-    for((filePath, faults) in fileFaultMap) {
-        File(filePath).useLines {
-            println("Faults in \"$filePath\":")
-            handleFileFaults(it, faults)
-            println()
+    fun print() = File(filePath).useLines {
+        println("\nFaults in $filePath:")
+
+        val lines = it.toList().map { "$it\n" }
+
+        for(fault in warnings + errors) {
+            println(fault.message)
+            printFileLines(lines, fault.position)
         }
     }
-}
 
-private fun handleFileFaults(linesSeq: Sequence<String>, faults: List<Fault>) {
-    val lines = linesSeq.toList().map{ "$it\n" }
+    private fun printFileLines(lines: List<String>, position: Position) {
+        var charCount = 0u
+        var lineNum = 0
 
-    for(fault in faults) {
-        println(fault.first)
-        printLines(lines, fault.second)
-    }
-}
-
-private fun printLines(lines: List<String>, position: Faultable.Position) {
-    var charCount = 0u
-    var lineNum = 0
-
-    for(line in lines) {
-        if(charCount + line.length.toUInt() > position.start) break
-        charCount += line.length.toUInt()
-        lineNum += 1
-    }
-
-    do {
-        if(lineNum == lines.size) {
-            println("${"%4d".format(lineNum + 1)}|EOF")
-            println("    |^^^")
-            return
+        for(line in lines) {
+            if(charCount + line.length.toUInt() > position.start) break
+            charCount += line.length.toUInt()
+            lineNum += 1
         }
 
-        val line = lines[lineNum]
-        val marks = StringBuilder()
+        do {
+            if(lineNum == lines.size) {
+                println("${"%4d".format(lineNum + 1)}|EOF")
+                println("    |^^^")
+                return
+            }
 
-        for(i in line.indices) {
-            val inside = charCount >= position.start && charCount < position.end
-            marks.append(if(inside) "^" else " ")
-            charCount += 1u
-        }
+            val line = lines[lineNum]
+            val marks = StringBuilder()
 
-        print("${"%4d".format(lineNum + 1)}|$line")
-        println("    |$marks")
+            for(i in line.indices) {
+                marks.append(if(charCount in position) "^" else " ")
+                charCount += 1u
+            }
 
-        lineNum += 1
-    } while(charCount + 1u < position.end)
+            print("${"%4d".format(lineNum + 1)}|$line")
+            println("    |$marks")
+
+            lineNum += 1
+        } while(charCount + 1u < position.end)
+    }
 }

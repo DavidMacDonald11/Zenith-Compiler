@@ -1,188 +1,275 @@
 package zenith
 
 private const val label = "Lexing"
-private fun fail(token: Token, message: String) = fail(label, token, message)
-private fun error(token: Token, message: String) = error(label, token, message)
 
-private data class LexerCtx(val file: SourceFile) {
-    private var builder = StringBuilder()
-    private var position = file.position
-    var atStringStart = false
+class Lexer(faults: Faults) {
+    private val state = LexerState(faults)
 
-    val atEnd get() = file.atEnd
-    val next get() = file.next
-    fun nextString(n: Int) = file.nextString(n)
+    fun makeTokens(): List<Token> {
+        ignoreSpacesAndComments()
 
-    fun take(num: Int = -1, these: String = "", until: String = ""): String {
-        val taken = file.take(num, these, until)
-        builder.append(taken)
-        return taken
+        while(!state.atEOF) {
+            makeToken()
+            ignoreSpacesAndComments()
+        }
+
+        return state.finish()
     }
 
-    fun skip(num: Int = -1, these: String = "", until: String = ""): String {
-        return file.take(num, these, until)
+    private fun ignoreSpacesAndComments() {
+        while(state.nextChar.isWhitespace()) {
+            if(state.nextChar == '\n') return
+            state.skipChars(1)
+        }
+
+        when(state.nextStr(2)) {
+            "//" -> state.skipCharsUntil("\n")
+            "/*" -> {
+                state.initToken()
+                state.takeChars(2)
+
+                while(!state.atEOF) {
+                    if(state.nextStr(2) == "*/") {
+                        state.takeChars(2)
+                        return ignoreSpacesAndComments()
+                    }
+
+                    state.takeChars(1)
+                    state.takeCharsUntil("*")
+                }
+
+                state.finishToken()
+                throw state.fail("Unterminated multiline comment")
+            }
+        }
     }
+
+    private fun makeToken() {
+        when(state.nextChar) {
+            '\n' -> makeNewline()
+            in Grammar.NUM_START_SYMS -> makeNum()
+            in Grammar.PUNC_SYMS -> makePunc()
+            in Grammar.ID_START_SYMS -> makeKeyOrId()
+            '\'' -> makeChar()
+            '"' -> makeStr()
+            else -> {
+                state.addErrorToken("${state.nextChar}", state.filePos)
+                state.fail("Unrecognized symbol '${state.nextChar}'")
+            }
+        }
+    }
+
+    private fun makeNewline() {
+        state.initToken()
+        state.takeChars(1)
+
+        if(state.lastToken?.has("\n") ?: false) return
+        state.finishToken(Token.Type.PUNC)
+    }
+
+    private fun makeNum() {
+        if(state.nextStr(2).matches(Grammar.NON_NUM_PATTERN)) return makePunc()
+
+        state.initToken()
+        state.takeTheseChars(Grammar.NUM_SYMS)
+        state.finishToken(Token.Type.NUM, state.takenStr.replace("_", ""))
+
+        if(state.lastToken!!.string.matches(Grammar.NUM_PATTERN)) return
+        state.error("Invalid number")
+    }
+
+    private fun makePunc() {
+        state.initToken()
+
+        for(puncSize in Grammar.LONGEST_PUNC_SIZE downTo 1) {
+            if(state.nextStr(puncSize) in Grammar.PUNCS) {
+                state.takeChars(puncSize)
+                break
+            }
+        }
+
+        state.finishToken(Token.Type.PUNC)
+    }
+
+    private fun makeKeyOrId() {
+        state.initToken()
+        state.takeTheseChars(Grammar.ID_SYMS)
+
+        val type = when(state.takenStr) {
+            in Grammar.KEYS -> Token.Type.KEY
+            else -> Token.Type.ID
+        }
+
+        state.finishToken(type)
+    }
+
+    private fun makeChar() {
+        state.initToken()
+        state.takeChars(1)
+
+        when(state.nextChar) {
+            '\'' -> {
+                state.takeChars(1)
+                state.finishToken(Token.Type.CHAR)
+                state.error("Empty character")
+                return
+            }
+            '\\' -> {
+               state.takeChars(2)
+               state.takeCharsUntil("'")
+            }
+            else -> state.takeChars(1)
+        }
+
+        val quote = state.takeChars(1)
+        state.finishToken(Token.Type.CHAR)
+
+        if(quote != "'") throw state.fail("Unterminated characrer")
+        if(state.takenStr.matches(Grammar.CHAR_PATTERN)) return
+        state.error("Invalid character")
+    }
+
+    private fun makeStr() {
+        val multi = (state.nextStr(3) == "\"\"\"")
+        val quotes = if(multi) 3 else 1
+
+        state.initLeadingStrToken()
+        state.takeChars(quotes)
+
+        while(!state.atEOF) {
+            state.takeCharsUntil(if(multi) "$\"" else "$\"\\\n")
+
+            when(state.nextChar) {
+                '$' -> makeStrTemplate()
+                '"' -> {
+                    if(!multi || state.nextStr(3) == "\"\"\"") {
+                        state.takeChars(quotes)
+                        state.finishStrToken(true)
+                        return
+                    }
+                }
+                '\\' -> if(!multi) makeStrEscapeSeq()
+                '\n' -> if(!multi) break
+            }
+        }
+
+        state.finishStrToken(true)
+        val kind = if(multi) "multiline" else ""
+        throw state.fail("Unterminated $kind string literal")
+    }
+
+    private fun makeStrEscapeSeq() {
+        val filePos = state.filePos
+        var escape = state.takeChars(2)
+
+        if(escape == "\\u") escape += state.takeChars(4)
+        if(escape.matches(Grammar.ESCAPE_PATTERN)) return
+
+        state.addErrorToken(escape, filePos)
+        state.error("Invalid escape sequence")
+    }
+
+    private fun makeStrTemplate() {
+        when(state.nextStr(2).last()) {
+            in Grammar.ID_START_SYMS -> {
+                state.finishStrToken()
+                state.skipChars(1)
+                makeKeyOrId()
+                state.initToken()
+            }
+            '{' -> {
+                state.finishStrToken()
+
+                val filePos = state.filePos
+                state.skipChars(2)
+                ignoreSpacesAndComments()
+
+                while(!state.atEOF && state.nextChar != '}') {
+                    makeToken()
+                    ignoreSpacesAndComments()
+                }
+
+                if(state.nextChar != '}') {
+                    state.addErrorToken("${'$'}{", filePos)
+                    throw state.fail("Unterminated string template")
+                }
+
+                state.skipChars(1)
+                state.initToken()
+            }
+            else -> state.takeChars(1)
+        }
+    }
+}
+
+private class LexerState(private val faults: Faults) {
+    private val file = SourceFile(faults.filePath)
+    private val tokens = mutableListOf<Token>()
+    private val builder = StringBuilder()
+    private var tokenPos = filePos
+    private var atStringStart = false
+
+    val takenStr get() = "$builder"
+    val atEOF get() = file.atEnd
+    val filePos get() = UNum.new(file.charPos)
+    val nextChar get() = file.nextChar
+    val lastToken get() = tokens.lastOrNull()
+
+    fun nextStr(n: Int) = file.nextStr(n)
 
     fun initToken() {
         builder.clear()
-        position = file.position
+        tokenPos = UNum.new(file.charPos)
     }
 
-    fun newToken(
+    fun initLeadingStrToken() {
+        atStringStart = true
+        initToken()
+    }
+
+    fun skipChars(n: Int = -1) = file.readChars(n)
+    fun skipTheseChars(these: String) = file.readTheseChars(these)
+    fun skipCharsUntil(until: String) = file.readCharsUntil(until)
+
+    fun takeChars(n: Int = -1) = take(file.readChars(n))
+    fun takeTheseChars(these: String) = take(file.readTheseChars(these))
+    fun takeCharsUntil(until: String) = take(file.readCharsUntil(until))
+
+    fun finishToken(
         type: Token.Type = Token.Type.NONE,
-        string: String = "$builder",
-        isStringEnd: Boolean = false
-    ): Token {
-        val realType = when {
-            atStringStart && isStringEnd -> Token.Type.STR
+        string: String = takenStr
+    ) = tokens.add(Token(type, string, tokenPos))
+
+    fun finishStrToken(isEnd: Boolean = false) {
+        if(takenStr.isEmpty()) return
+
+        val type = when {
+            atStringStart && isEnd -> Token.Type.STR_FULL
             atStringStart -> Token.Type.STR_START
-            isStringEnd -> Token.Type.STR_END
-            else -> type
+            isEnd -> Token.Type.STR_END
+            else -> Token.Type.STR_MIDDLE
         }
 
-        return Token(realType, string, position)
-    }
-}
-
-fun tokenize(file: SourceFile): List<Token> {
-    val ctx = LexerCtx(file)
-    val tokens = mutableListOf<Token>()
-
-    while(true) {
-        ignoreSpacesAndComments(ctx)
-        if(file.atEnd) break
-
-        val token = makeToken(file, tokens.lastOrNull())
-        token?.let { tokens += it }
+        atStringStart = false
+        finishToken(type)
     }
 
-    tokens += Token(Token.Type.PUNC, Token.EOF, file.position)
-    return tokens
-}
-
-private fun ignoreSpacesAndComments(ctx: LexerCtx) {
-    while(ctx.next.isWhitespace()) {
-        if(ctx.next == '\n') return
-        ctx.skip(1)
+    fun addErrorToken(string: String, position: UNum) {
+        tokens.add(Token(Token.Type.NONE, string, position))
     }
 
-    when(file.nextString(2)) {
-        "//" -> file.take(until = "\n")
-        "/*" -> {
-            val (position, builder) = file.tokenInit()
+    fun warn(message: String) = faults.warn(label, lastToken!!, message)
+    fun error(message: String) = faults.error(label, lastToken!!, message)
+    fun fail(message: String) = faults.fail(label, lastToken!!, message)
 
-            file.take(2)
-
-            while(!file.atEnd) {
-                if(file.nextString(2) != "*/") {
-                    file.take(1)
-                    file.take(until = "*")
-                    continue
-                }
-
-                file.take(2)
-                return ignoreSpacesAndComments(file)
-            }
-
-            val token = Token(Token.Type.NONE, "$builder", position)
-            throw fail(token, "Unterminated multiline comment")
-        }
-        else -> return
-    }
-}
-
-private fun makeToken(file: SourceFile, lastToken: Token?): Token? {
-    return when(file.next) {
-        '\n' -> makeNewline(file, lastToken)
-        in Token.NUM_START_SYMS -> makeNum(file)
-        in Token.PUNC_SYMS -> makePunc(file)
-        in Token.ID_SYMS -> makeIdOrKey(file)
-        '\'' -> makeChar(file)
-        else -> {
-            val (position, builder) = file.tokenInit()
-            file.take(1)
-
-            val token = Token(Token.Type.NONE, "$builder", position)
-            throw fail(token, "Unrecognized symbol '${token.string}'")
-        }
-    }
-}
-
-private fun makeNewline(file: SourceFile, lastToken: Token?): Token? {
-    val (position, builder) = file.tokenInit()
-    file.take(1)
-
-    if(lastToken != null && lastToken.has("\n")) return null
-    return Token(Token.Type.PUNC, "$builder", position)
-}
-
-private fun makePunc(file: SourceFile): Token {
-    val (position, builder) = file.tokenInit()
-
-    for(i in Token.LONGEST_PUNC downTo 1) {
-        if(file.nextString(i) in Token.PUNCS) {
-            file.take(i)
-            break
-        }
+    fun finish(): List<Token> {
+        tokens.add(Token(Token.Type.PUNC, Grammar.EOF, filePos))
+        file.close()
+        return tokens
     }
 
-    return Token(Token.Type.PUNC, "$builder", position)
-}
-
-private fun makeNum(file: SourceFile): Token {
-    val (position, builder) = file.tokenInit()
-
-    if(file.nextString(2).matches("\\.[^\\d]".toRegex()))
-        return makePunc(file)
-
-    file.take(these = Token.NUM_SYMS)
-    val token = Token(Token.Type.NUM, "$builder".replace("_", ""), position)
-
-    if(!token.string.matches(Token.NUM_PATTERN))
-        error(token, "Invalid number")
-
-    return token
-}
-
-private fun makeIdOrKey(file: SourceFile): Token {
-    val (position, builder) = file.tokenInit()
-    file.take(these = Token.ID_SYMS)
-
-    val string = "$builder"
-    val type = if(string in Token.KEYS) Token.Type.KEY else Token.Type.ID
-
-    return Token(type, string, position)
-}
-
-private fun makeChar(file: SourceFile): Token {
-    val (position, builder) = file.tokenInit()
-    file.take(1)
-
-    if(file.next == '\'') {
-        file.take(1)
-        val token = Token(Token.Type.CHAR, "$builder", position)
-
-        error(token, "Empty character")
-        return token
+    private fun take(string: String): String {
+        builder.append(string)
+        return string
     }
-
-    if(file.next == '\\') {
-        file.take(2)
-        file.take(until = "'")
-    } else file.take(1)
-
-    val quote = file.take(1)
-    val token = Token(Token.Type.CHAR, "$builder", position)
-
-    if(quote != "'") throw fail(token, "Unterminated character")
-
-    if(!token.string.matches(Token.CHAR_PATTERN))
-        error(token, "Invalid character")
-
-    return token
-}
-
-private data class StrCtx(val file: SourceFile) {
-    val (position, builder) = file.tokenInit()
-    val firstToken = true
 }
