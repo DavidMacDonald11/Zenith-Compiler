@@ -79,10 +79,11 @@ class Lexer(private val faults: Faults) {
         if(file.peek(2).matches(Grammar.NON_NUM_PATTERN)) return makePunc()
 
         newToken.init(Token.Type.NUM, file.charPos)
-        newToken.add(file.readTheseChars(Grammar.NUM_SYMS).replace("_", ""))
+        newToken.add(file.readTheseChars(Grammar.NUM_SYMS))
         add(newToken.finish())
 
-      if(lastToken!!.string.matches(Grammar.NUM_PATTERN)) return
+        val replacedString = lastToken!!.string.replace("_", "")
+        if(replacedString.matches(Grammar.NUM_PATTERN)) return
         error("Invalid number")
     }
 
