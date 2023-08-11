@@ -3,33 +3,24 @@ package zenith
 data class Token(
     val type: Type,
     val string: String,
-    val position: UNum,
+    val position: UNum
 ): Faultable {
     enum class Type {
-        PUNC, ID, KEY, NUM, CHAR, RAW, NONE,
-        STR_START, STR_MIDDLE, STR_END, STR_FULL;
-
-        override fun toString() = when(this) {
-            NONE -> "?"
-            STR_START -> "S{"
-            STR_FULL -> "S{"
-            else -> "${name[0]}"
-        }
+        PUNC, ID, KEY, NUM, CHAR, STR, STR_START, STR_END, RAW, NONE;
+        override fun toString() = if(this == NONE) "?" else "${name[0]}"
     }
 
     override val faultPosition get(): UIntRange {
         val start = position.toUInt()
-        val end = start + string.length.toUInt()
+        val end = start + string.length.toUInt() - 1u
         return UIntRange(start, end)
     }
 
-    override fun toString(): String {
-        if(string == "") return "$type'EOF'"
-
-        var str = "$type'${string.replace("\n", "\\n")}'"
-        if(type in listOf(Token.Type.STR_END, Token.Type.STR_FULL)) str += '}'
-
-        return str
+    override fun toString() = when {
+        of(Type.PUNC) && has("") -> "$type'EOF'"
+        of(Type.STR_START) -> "<S>"
+        of(Type.STR_END) -> "</S>"
+        else -> "$type'${string.replace("\n", "\\n")}'"
     }
 
     fun of(vararg types: Type) = type in types

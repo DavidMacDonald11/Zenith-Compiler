@@ -4,24 +4,15 @@ import java.io.File
 
 interface Faultable { val faultPosition: UIntRange }
 
-sealed interface Fault {
-    val obj: Faultable
-    val message: String
+sealed class Fault(val obj: Faultable, val message: String) {
+    class Warning(label: String, obj: Faultable, message: String)
+        : Fault(obj, "$label Warning: $message")
 
-    class Warning(label: String, obj: Faultable, message: String): Fault {
-        override val obj = obj
-        override val message = "$label Warning: $message"
-    }
+    class Error(label: String, obj: Faultable, message: String)
+        : Fault(obj, "$label Error: $message")
 
-    class Error(label: String, obj: Faultable, message: String): Fault {
-        override val obj = obj
-        override val message = "$label, Error: $message"
-    }
-
-    class Failure(label: String, obj: Faultable, message: String): Fault {
-        override val obj = obj
-        override val message = "$label, Failure: $message"
-    }
+    class Failure(label: String, obj: Faultable, message: String)
+        : Fault(obj, "$label Failure: $message")
 }
 
 fun printFaults(filePath: String, faults: List<Fault>) {
@@ -65,5 +56,5 @@ private fun printFileLines(lines: List<String>, position: UIntRange) {
         println("    |$marks")
 
         lineNum += 1
-    } while(charCount + 1u < position.endInclusive)
+    } while(charCount < position.endInclusive)
 }

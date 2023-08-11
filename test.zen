@@ -4,7 +4,9 @@ a multiline
 comment or something*/
 5X32 <= 5i
 
-0b1101__X33
+if(15 + 0b1101__X33 > 8)
+
+"I am a simple string; don't mind me!"
 
 "Hello $name1 and ${
     // lol
