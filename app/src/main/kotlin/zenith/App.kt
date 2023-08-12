@@ -2,7 +2,6 @@ package zenith
 
 import java.io.File
 import kotlin.system.exitProcess
-import zenith.args.*
 import zenith.lexer.*
 
 private enum class Status(val code: Int) {
