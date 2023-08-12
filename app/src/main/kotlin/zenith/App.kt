@@ -46,16 +46,17 @@ private fun helpCommand(): Status {
         var infoLength = 0
 
         for(word in info.split(" ")) {
+            val oldLength = infoLength
             infoLength += word.length + 1
 
             if(infoLength > USAGE_LINE_MAX) {
-                uprintln(arg, info.substring(0, infoLength - word.length - 1))
-                uprintln("", info.substring(infoLength - word.length - 1))
+                uprintln(arg, info.substring(0, oldLength))
+                uprintln("", info.substring(oldLength))
                 return
             }
         }
 
-        print("  %-20s".format(arg))
+        print("  %-16s".format(arg))
         println("\t%-${USAGE_LINE_MAX}s".format(info))
     }
 
