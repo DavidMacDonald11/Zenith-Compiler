@@ -4,7 +4,16 @@ private val maxUByte = UByte.MAX_VALUE.toUInt()
 private val maxUShort = UShort.MAX_VALUE.toUInt()
 
 sealed interface UNum {
-    fun toUInt(): kotlin.UInt
+    class UByte(val n: kotlin.UByte): UNum
+    class UShort(val n: kotlin.UShort): UNum
+    class UInt(val n: kotlin.UInt): UNum
+
+    fun toUInt() = when(this) {
+        is UByte -> this.n.toUInt()
+        is UShort -> this.n.toUInt()
+        is UInt -> this.n
+    }
+
     operator fun plus(n: UNum) = new(toUInt() + n.toUInt())
     operator fun plus(n: Int) = new(toUInt() + n.toUInt())
 
@@ -14,17 +23,5 @@ sealed interface UNum {
             n <= maxUShort -> UShort(n.toUShort())
             else -> UInt(n)
         }
-    }
-
-    data class UByte(private val n: kotlin.UByte): UNum {
-        override fun toUInt() = n.toUInt()
-    }
-
-    data class UShort(private val n: kotlin.UShort): UNum {
-        override fun toUInt() = n.toUInt()
-    }
-
-    data class UInt(private val n: kotlin.UInt): UNum {
-        override fun toUInt() = n
     }
 }

@@ -16,9 +16,11 @@ sealed class Fault(val obj: Faultable, val message: String) {
 }
 
 fun printFaults(filePath: String, faults: List<Fault>) {
+    if(faults.isEmpty()) return
+
     File(filePath).useLines {
         val lines = it.toList().map { "$it\n" }
-        println("\nFaults in $filePath")
+        println("Faults in $filePath:")
 
         for(fault in faults) {
             println(fault.message)

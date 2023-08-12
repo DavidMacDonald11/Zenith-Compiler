@@ -2,13 +2,19 @@ package zenith.lexer
 
 import zenith.*
 
-class Result(val tokens: List<Token>, val faults: List<Fault>) {
-    constructor(token: Token? = null): this(listOfNotNull(token), listOf())
-    constructor(fault: Fault): this(listOf(fault.obj as Token), listOf(fault))
+class Result(
+    val tokens: NoneOrMore<Token>,
+    val faults: NoneOrMore<Fault>
+) {
+    constructor(token: Token? = null):
+        this(token?.let { One(token) } ?: None(), None())
+
+    constructor(fault: Fault):
+        this(One(fault.obj as Token), One(fault))
 
     val failed get() = faults.any { it is Fault.Failure }
     val errored get() = failed || faults.any { it is Fault.Error }
-    val isEmpty get() = tokens.isEmpty() && faults.isEmpty()
+    val isEmpty get() = tokens is None && faults is None
 
     operator fun plus(result: Result) =
         Result(tokens + result.tokens, faults + result.faults)
@@ -188,7 +194,7 @@ private fun makeStr(file: SourceFile): Result {
                     newToken(file, Token.Type.STR_END, "")
                 )
 
-                return result + Result(tokens, listOf())
+                return result + Result(More(tokens), None())
             }
             '\\' -> {
                 val escapeLength = if(file.peek(2) == "\\u") 6 else 2

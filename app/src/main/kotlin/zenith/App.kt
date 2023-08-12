@@ -107,26 +107,29 @@ private fun buildCommand(): Status {
         val faults = mutableListOf<Fault>()
 
         val tokens = tokenizeFile(file.path).let { result ->
-            faults.addAll(result.faults)
+            when(result.faults) {
+                is None -> Unit
+                is One -> faults.add(result.faults.value)
+                is More -> faults.addAll(result.faults.values)
+            }
 
             if(result.errored) {
-                printTokens(result.tokens)
                 printFaults(file.path, faults)
                 return Status.COMPILER_ERROR
             }
 
-            result.tokens
+            when(result.tokens) {
+                is None -> emptyList()
+                is One -> listOf(result.tokens.value)
+                is More -> result.tokens.values
+            }
         }
 
-        printTokens(tokens)
+        println("Created tokens: \n${tokens.joinToString(",", "[", "]")}")
         printFaults(file.path, faults)
     }
 
     return Status.GOOD
-}
-
-private fun printTokens(tokens: List<Token>) {
-    println(tokens.joinToString(", ", "[", "]"))
 }
 
 private fun cleanCommand(): Status {
