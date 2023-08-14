@@ -13,8 +13,9 @@ class Result(
         this(One(fault.obj as Token), One(fault))
 
     val failed get() = faults.any { it is Fault.Failure }
-    val errored get() = failed || faults.any { it is Fault.Error }
-    val isEmpty get() = tokens is None && faults is None
+    val errored get() = faults.any { it is Fault.Failure || it is Fault.Error }
+    val hasTokens get() = tokens !is None
+    val hasFaults get() = faults !is None
 
     operator fun plus(result: Result) =
         Result(tokens + result.tokens, faults + result.faults)
@@ -28,7 +29,9 @@ fun tokenizeFile(filePath: String): Result {
     val file = SourceFile(filePath)
 
     while(!file.atEnd) {
-        val newResult = makeToken(file, result.lastTokenHas("\n"))
+        val saveNextNewline = result.hasTokens && !result.lastTokenHas("\n")
+        val newResult = makeToken(file, saveNextNewline)
+
         if(newResult.failed) return result + newResult
         result += newResult
     }
@@ -55,12 +58,12 @@ private fun newToken(file: SourceFile, type: Token.Type, string: String) =
 private fun newFaultToken(file: SourceFile, string: String) =
     newToken(file, Token.Type.NONE, string)
 
-private fun makeToken(file: SourceFile, lastWasNewline: Boolean): Result {
+private fun makeToken(file: SourceFile, saveNextNewline: Boolean): Result {
     val result = readSpacesAndComments(file)
     if(result.failed || file.atEnd) return result
 
     return when(file.nextChar) {
-        '\n' -> makeNewline(file, lastWasNewline)
+        '\n' -> makeNewline(file, saveNextNewline)
         in Grammar.NUM_START_SYMS -> makeNum(file)
         in Grammar.PUNC_SYMS -> makePunc(file)
         in Grammar.ID_START_SYMS -> makeIdOrKey(file)
@@ -102,9 +105,9 @@ private fun readSpacesAndComments(file: SourceFile): Result {
     return Result()
 }
 
-private fun makeNewline(file: SourceFile, lastWasNewline: Boolean): Result {
+private fun makeNewline(file: SourceFile, saveNextNewline: Boolean): Result {
     val token = newToken(file, Token.Type.PUNC, file.readChar())
-    return Result(if(lastWasNewline) null else token)
+    return Result(if(saveNextNewline) token else null)
 }
 
 private fun makeNum(file: SourceFile): Result {
@@ -177,7 +180,7 @@ private fun makeStr(file: SourceFile): Result {
                 val token = newToken(file, Token.Type.STR, "$builder")
                 val templateResult = makeStrTemplate(file)
 
-                if(result.isEmpty) {
+                if(!result.hasTokens && !result.hasFaults) {
                     builder.append(file.readChar())
                     continue
                 }
@@ -230,7 +233,7 @@ private fun makeStrExprTemplate(file: SourceFile): Result {
     val faultToken = newFaultToken(file, file.readChars(2))
 
     while(!file.atEnd) {
-        val newResult = makeToken(file, result.lastTokenHas("\n"))
+        val newResult = makeToken(file, false)
 
         when {
             newResult.failed -> return result + newResult
