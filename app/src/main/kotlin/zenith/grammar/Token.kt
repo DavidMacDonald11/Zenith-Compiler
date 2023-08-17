@@ -3,7 +3,7 @@ package zenith
 data class Token(
     val type: Type,
     val string: String,
-    val position: UNum
+    val position: UInt
 ): Faultable {
     enum class Type {
         PUNC, ID, KEY, NUM, CHAR, STR, STR_START, STR_END, RAW, NONE;
@@ -11,7 +11,7 @@ data class Token(
     }
 
     override val faultPosition get(): UIntRange {
-        val start = position.toUInt()
+        val start = position
         val end = start + string.length.toUInt() - 1u
         return UIntRange(start, end)
     }

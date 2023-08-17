@@ -3,19 +3,19 @@ package zenith.lexer
 import zenith.*
 
 class Result(
-    val tokens: NoneOrMore<Token>,
-    val faults: NoneOrMore<Fault>
+    val tokens: List<Token>,
+    val faults: List<Fault>
 ) {
     constructor(token: Token? = null):
-        this(token?.let { One(token) } ?: None(), None())
+        this(token?.let { listOf(token) } ?: listOf(), listOf())
 
     constructor(fault: Fault):
-        this(One(fault.obj as Token), One(fault))
+        this(listOf(fault.obj as Token), listOf(fault))
 
     val failed get() = faults.any { it is Fault.Failure }
     val errored get() = faults.any { it is Fault.Failure || it is Fault.Error }
-    val hasTokens get() = tokens !is None
-    val hasFaults get() = faults !is None
+    val hasTokens get() = !tokens.isEmpty()
+    val hasFaults get() = !faults.isEmpty()
 
     operator fun plus(result: Result) =
         Result(tokens + result.tokens, faults + result.faults)
@@ -32,8 +32,8 @@ fun tokenizeFile(filePath: String): Result {
         val saveNextNewline = result.hasTokens && !result.lastTokenHas("\n")
         val newResult = makeToken(file, saveNextNewline)
 
-        if(newResult.failed) return result + newResult
         result += newResult
+        if(newResult.failed) return result
     }
 
     val EOFToken = newToken(file, Token.Type.PUNC, Grammar.EOF)
@@ -53,7 +53,7 @@ private fun Failure(token: Token, message: String) =
     Fault.Failure(FAULT_LABEL, token, message)
 
 private fun newToken(file: SourceFile, type: Token.Type, string: String) =
-    Token(type, string, UNum.new(file.charPos - string.length.toUInt()))
+    Token(type, string, file.charPos - string.length.toUInt())
 
 private fun newFaultToken(file: SourceFile, string: String) =
     newToken(file, Token.Type.NONE, string)
@@ -197,7 +197,7 @@ private fun makeStr(file: SourceFile): Result {
                     newToken(file, Token.Type.STR_END, "")
                 )
 
-                return result + Result(More(tokens), None())
+                return result + Result(tokens, listOf())
             }
             '\\' -> {
                 val escapeLength = if(file.peek(2) == "\\u") 6 else 2

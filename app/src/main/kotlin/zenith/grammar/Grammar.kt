@@ -25,7 +25,9 @@ object Grammar {
 
     val COMPARE_OPS = setOf("<", ">", "<=", ">=", "==", "!=")
     val PUNCS = COMPARE_OPS + setOf(
-        ";", "(", ")", "{", "}", "[", "]", "+"
+        "^", "*", "/", "%", "+", "-", "<<", ">>", "&", "$", "|",
+        "&&", "$$", "||",
+        ";", "(", ")", "{", "}", "[", "]", ",", ":"
     )
     val PUNC_SYMS = PUNCS.flatMap{ it.asIterable() }.toSet()
     val LONGEST_PUNC_SIZE = PUNCS.maxBy{ it.length }.length

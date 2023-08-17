@@ -5,14 +5,14 @@ import java.io.File
 interface Faultable { val faultPosition: UIntRange }
 
 sealed class Fault(val obj: Faultable, val message: String) {
-    class Warning(label: String, obj: Faultable, message: String)
-        : Fault(obj, "$label Warning: $message")
+    class Warning(label: String, obj: Faultable, message: String):
+        Fault(obj, "$label Warning: $message")
 
-    class Error(label: String, obj: Faultable, message: String)
-        : Fault(obj, "$label Error: $message")
+    class Error(label: String, obj: Faultable, message: String):
+        Fault(obj, "$label Error: $message")
 
-    class Failure(label: String, obj: Faultable, message: String)
-        : Fault(obj, "$label Failure: $message")
+    class Failure(label: String, obj: Faultable, message: String):
+        Fault(obj, "$label Failure: $message")
 }
 
 fun printFaults(filePath: String, faults: List<Fault>) {

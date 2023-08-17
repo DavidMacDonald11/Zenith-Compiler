@@ -2,7 +2,9 @@ package zenith
 
 import java.io.File
 import kotlin.system.exitProcess
-import zenith.lexer.*
+import kotlin.system.measureTimeMillis
+import zenith.lexer.tokenizeFile
+import zenith.parser.parseTokens
 
 private enum class Status(val code: Int) {
     GOOD(0),
@@ -20,7 +22,7 @@ fun main(args: Array<String>) {
         null -> noCommand()
         in listOf("help", "--help", "-h") -> helpCommand()
         "init" -> initCommand(args.getOrNull(1))
-        "build" -> buildCommand()
+        "build" -> printTimeMillis(::buildCommand)
         "clean" -> cleanCommand()
         else -> {
             println("Error: There is no such command '${args[0]}'")
@@ -30,6 +32,17 @@ fun main(args: Array<String>) {
     }
 
     exitProcess(status.code)
+}
+
+private fun<T> printTimeMillis(block: () -> T): T {
+    var result: T
+
+    val time = measureTimeMillis {
+        result = block()
+    }
+
+    println("$time ms")
+    return result
 }
 
 private fun noCommand(): Status {
@@ -107,26 +120,40 @@ private fun buildCommand(): Status {
         val faults = mutableListOf<Fault>()
 
         val tokens = tokenizeFile(file.path).let { result ->
-            when(result.faults) {
-                is None -> Unit
-                is One -> faults.add(result.faults.value)
-                is More -> faults.addAll(result.faults.values)
-            }
+            faults += result.faults
 
             if(result.errored) {
                 printFaults(file.path, faults)
                 return Status.COMPILER_ERROR
             }
 
-            when(result.tokens) {
-                is None -> emptyList()
-                is One -> listOf(result.tokens.value)
-                is More -> result.tokens.values
-            }
+            result.tokens
         }
 
-        println("Created tokens: \n${tokens.joinToString(",", "[", "]")}")
+        val tokenString = tokens.joinToString(", ", "[", "]")
+        println("Created ${tokens.size} tokens: \n$tokenString\n")
+
+        val tree = parseTokens(tokens).let { result ->
+            faults += result.faults
+
+            if(result.errored) {
+                println("Created AST: \n${result.node}\n")
+
+                printFaults(file.path, faults)
+                return Status.COMPILER_ERROR
+            }
+
+            result.node
+        }
+
+        println("Created AST: \n$tree")
         printFaults(file.path, faults)
+
+        val runtime = Runtime.getRuntime()
+        runtime.gc()
+
+        val mem = runtime.totalMemory() - runtime.freeMemory()
+        println("\nCompilation used ${"%,d".format(mem)} bytes of memory")
     }
 
     return Status.GOOD
