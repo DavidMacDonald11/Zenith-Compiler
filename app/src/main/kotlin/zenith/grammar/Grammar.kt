@@ -25,9 +25,10 @@ object Grammar {
 
     val COMPARE_OPS = setOf("<", ">", "<=", ">=", "==", "!=")
     val PUNCS = COMPARE_OPS + setOf(
+        "~", "#", "!", ".",
         "^", "*", "/", "%", "+", "-", "<<", ">>", "&", "$", "|",
-        "&&", "$$", "||",
-        ";", "(", ")", "{", "}", "[", "]", ",", ":"
+        ";", "(", ")", "{", "}", "[", "]", ",", ":",
+        "="
     )
     val PUNC_SYMS = PUNCS.flatMap{ it.asIterable() }.toSet()
     val LONGEST_PUNC_SIZE = PUNCS.maxBy{ it.length }.length
@@ -36,7 +37,10 @@ object Grammar {
     val ID_START_SYMS = "_" + LETTERS + LETTERS.lowercase()
     val ID_SYMS = ID_START_SYMS + "0123456789"
 
-    val KEYS = setOf<String>()
+    val KEYS = setOf(
+        "true", "false", "none", "undefined",
+        "not", "in", "is", "and", "xor", "or", "if", "else"
+    )
 
     val CHAR_PATTERN = """
         '(\\[btnr'"\\$] | \\u[a-fA-F0-9]{4} | [^\\'])'
@@ -48,4 +52,27 @@ object Grammar {
 
     val EOF = ""
     val LINE_END = setOf(";", "\n", EOF)
+
+    /*
+        Three reference types: immutable($), mutable(&), and exclusive(#)
+        Vars are deallocated when block ends unless exclusivity has been given
+            by fun call or assignment
+        Only dynamic vars can give exclusive references
+        Refs cannot be assigned to static vars
+
+        val x = 5
+        var y = 6
+        val xRef: &Int32? = &x
+        val xRef = auto<T>()
+
+        val a_raw = 10
+        val a = &a_raw
+        val b = &a
+        &a = &b
+
+        &Int32?
+
+        var z: &Int32? = none
+        var z2 = none<&Int32>
+    */
 }

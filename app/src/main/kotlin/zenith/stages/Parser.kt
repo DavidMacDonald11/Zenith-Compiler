@@ -30,6 +30,7 @@ private class Context(val tokens: List<Token>) {
     private var n = 0
     val next get() = tokens[n]
 
+    fun peek(n: Int) = tokens[this.n + n]
     fun take() = next.also { n += 1 }
     fun untake() { n -= 1 }
     fun skipNewline() = if(next.has("\n")) take() else null
@@ -74,7 +75,28 @@ private tailrec fun parseLeftRecBinaryExpr(
 }
 
 private fun parseExpr(ctx: Context): ContextResult {
-    return parseAdditiveExpr(ctx)
+    return parseBitOrExpr(ctx)
+}
+
+private fun parseBitOrExpr(ctx: Context): ContextResult {
+    val type = "BitOrExpr"
+    return parseLeftRecBinaryExpr(type, ::parseBitXorExpr, listOf("|"), ctx)
+}
+
+private fun parseBitXorExpr(ctx: Context): ContextResult {
+    val type = "BitXorExpr"
+    return parseLeftRecBinaryExpr(type, ::parseBitAndExpr, listOf("$"), ctx)
+}
+
+private fun parseBitAndExpr(ctx: Context): ContextResult {
+    val type = "BitAndExpr"
+    return parseLeftRecBinaryExpr(type, ::parseBitShiftExpr, listOf("&"), ctx)
+}
+
+private fun parseBitShiftExpr(ctx: Context): ContextResult {
+    val type = "BitShiftExpr"
+    val opList = listOf("<<", ">>")
+    return parseLeftRecBinaryExpr(type, ::parseAdditiveExpr, opList, ctx)
 }
 
 private fun parseAdditiveExpr(ctx: Context): ContextResult {
@@ -87,6 +109,21 @@ private fun parseMultiplicativeExpr(ctx: Context): ContextResult {
     val type = "MultiplicativeExpr"
     val opList = listOf("*", "/", "%")
     return parseLeftRecBinaryExpr(type, ::parsePrimaryExpr, opList, ctx)
+}
+
+private fun parsePrefixExpr(ctx: Context): ContextResult {
+    val opList = listOf("+", "-", "~", "$", "&", "#", "not")
+    if(!ctx.next.has(opList)) return parsePostfixExpr(ctx)
+
+    val op = ctx.take()
+    val right = parsePostfixExpr(ctx.done())
+    val node = Node("PrefixExpr", listOf(op, right.result.node))
+
+    return ContextResult(right.ctx.done(), node, right.result.faults)
+}
+
+private fun parsePostfixExpr(ctx: Context): ContextResult {
+    return parsePrimaryExpr(ctx)
 }
 
 private fun parsePrimaryExpr(ctx: Context): ContextResult {

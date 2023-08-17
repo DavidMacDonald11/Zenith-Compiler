@@ -1,0 +1,48 @@
+// self: the current non-terminal
+// next: the next non-terminal (not including parts)
+
+expr : next ;
+
+conditionalExpr : next ["if" NL? next "else" NL? self]
+
+logicalOrExpr : [self "or" NL?] next ;
+
+logicalXorExpr : [self "xor" NL?] next ;
+
+logicalAndExpr : [self "and" NL?] next ;
+
+compareExpr : next (("<" | ">" | "<=" | ">=" | "==" | "!=") NL? next)* ;
+
+bitwiseOrExpr : [self "|" NL?] next ;
+
+bitwiseXorExpr : [self "$" NL?] next ;
+
+bitwiseAndExpr : [self "&" NL?] next ;
+
+shiftExpr : [self ("<<" | ">>") NL?] next ;
+
+additiveExpr : [self ("+" | "-") NL?] next ;
+
+multiplicativeExpr : [self ("*" | "/" | "%") NL?] next ;
+
+exponentialExpr : next ["^" NL? self] ;
+
+prefixExpr : ("+" | "-" | "~" | "not" | "$" | "&" | "#") NL? self
+           | next
+           ;
+
+postfixExpr : self "!"
+            | self "." ID
+            | self "(" [funArgs] ")"
+            | next
+            ;
+
+primaryExpr : NUM
+            | CHAR
+            | STR
+            | ID
+            | ("true" | "false" | "none" | "undefined")
+            | parenExpr
+            ;
+
+parenExpr : "(" NL? expr NL? ")"
