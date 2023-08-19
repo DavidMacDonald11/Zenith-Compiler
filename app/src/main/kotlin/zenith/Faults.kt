@@ -4,15 +4,23 @@ import java.io.File
 
 interface Faultable { val faultPosition: UIntRange }
 
-sealed class Fault(val obj: Faultable, val message: String) {
-    class Warning(label: String, obj: Faultable, message: String):
-        Fault(obj, "$label Warning: $message")
+class Fault(label: String, val type: Char, val obj: Faultable, msg: String) {
+    val message = "$label ${mapType()}: $msg"
 
-    class Error(label: String, obj: Faultable, message: String):
-        Fault(obj, "$label Error: $message")
+    private fun mapType() = when(type) {
+        'W' -> "Warning"
+        'E' -> "Error"
+        'F' -> "Failure"
+        else -> throw IllegalArgumentException()
+    }
+}
 
-    class Failure(label: String, obj: Faultable, message: String):
-        Fault(obj, "$label Failure: $message")
+class Result<T>(val value: T, val faults: List<Fault> = listOf()) {
+    constructor(value: T, fault: Fault): this(value, listOf(fault))
+
+    val failed get() = faults.any { it.type == 'F' }
+    val errored get() = faults.any { it.type in listOf('F', 'E') }
+    val hasFaults get() = faults.isNotEmpty()
 }
 
 fun printFaults(filePath: String, faults: List<Fault>) {

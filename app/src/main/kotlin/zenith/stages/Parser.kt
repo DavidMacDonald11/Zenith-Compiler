@@ -2,139 +2,152 @@ package zenith.parser
 
 import zenith.*
 
-class Result(val node: Node, val faults: List<Fault>) {
-    val failed get() = faults.any { it is Fault.Failure }
-    val errored get() = faults.any { it is Fault.Failure || it is Fault.Error }
-}
+private typealias NodeResult = Result<Node>
 
-fun parseTokens(tokens: List<Token>): Result {
+fun parseTokens(tokens: List<Token>): NodeResult {
+    val ctx = Context(tokens)
     val stats = mutableListOf<Faultable>()
     val faults = mutableListOf<Fault>()
-    var ctx = Context(tokens)
 
-    while(!ctx.tokens[0].has(Grammar.EOF, "\n")) {
-        val (context, result) = parseExpr(ctx)
-        ctx = context
+    while(!ctx.next.has(Grammar.EOF, "\n")) {
+        val result = parseExpr(ctx)
 
-        stats += result.node
+        stats += result.value
         faults += result.faults
 
         if(result.failed) break
     }
 
     val node = Node("FileStat", stats)
-    return Result(node, faults)
+    return NodeResult(node, faults)
 }
 
-private class Context(val tokens: List<Token>) {
+private class Context(private val tokens: List<Token>) {
     private var n = 0
-    val next get() = tokens[n]
+    val next get() = peek(0)
 
     fun peek(n: Int) = tokens[this.n + n]
     fun take() = next.also { n += 1 }
     fun untake() { n -= 1 }
-    fun skipNewline() = if(next.has("\n")) take() else null
-    fun done() = Context(tokens.drop(n))
+    fun skipNewline() = if(next.has("\n")) take().let { true } else false
+
+    fun expectingHas(vararg strings: String) {
+
+    }
 }
 
-private data class ContextResult(val ctx: Context, val result: Result) {
-    constructor(ctx: Context, node: Node, faults: List<Fault> = listOf()):
-        this(ctx, Result(node, faults))
-}
+private const val LABEL = "Parsing"
+private fun Warning(obj: Faultable, msg: String) = Fault(LABEL, 'W', obj, msg)
+private fun Error(obj: Faultable, msg: String) = Fault(LABEL, 'E', obj, msg)
+private fun Failure(obj: Faultable, msg: String) = Fault(LABEL, 'F', obj, msg)
 
-private const val FAULT_LABEL = "Parsing"
-
-private fun Warning(node: Node, message: String) =
-    Fault.Warning(FAULT_LABEL, node, message)
-
-private fun Error(node: Node, message: String) =
-    Fault.Error(FAULT_LABEL, node, message)
-
-private fun Failure(node: Node, message: String) =
-    Fault.Failure(FAULT_LABEL, node, message)
-
-private tailrec fun parseLeftRecBinaryExpr(
-    type: String,
-    parseChild: (Context) -> ContextResult,
-    opList: List<String>,
+private tailrec fun parseLeftBinaryExpr(
     ctx: Context,
-    left: ContextResult = parseChild(ctx)
-): ContextResult {
-    if(left.result.failed) return left
-    if(!left.ctx.next.has(opList)) return left
+    type: String,
+    parseChild: (Context) -> NodeResult,
+    opList: List<String>,
+    left: NodeResult = parseChild(ctx)
+): NodeResult {
+    if(left.failed || !ctx.next.has(opList)) return left
 
-    val op = left.ctx.take()
-    left.ctx.skipNewline()
-    val right = parseChild(left.ctx.done())
-    val faults = left.result.faults + right.result.faults
+    val op = ctx.take()
+    ctx.skipNewline()
 
-    val node = Node(type, listOf(left.result.node, op, right.result.node))
-    val ctxResult = ContextResult(right.ctx.done(), node, faults)
+    val right = parseChild(ctx)
+    val node = Node(type, listOf(left.value, op, right.value))
+    val result = NodeResult(node, left.faults + right.faults)
 
-    return parseLeftRecBinaryExpr(type, parseChild, opList, ctx, ctxResult)
+    return parseLeftBinaryExpr(ctx, type, parseChild, opList, result)
 }
 
-private fun parseExpr(ctx: Context): ContextResult {
+private fun parseExpr(ctx: Context): NodeResult {
     return parseBitOrExpr(ctx)
 }
 
-private fun parseBitOrExpr(ctx: Context): ContextResult {
-    val type = "BitOrExpr"
-    return parseLeftRecBinaryExpr(type, ::parseBitXorExpr, listOf("|"), ctx)
+private fun parseBitOrExpr(ctx: Context) = parseLeftBinaryExpr(
+    ctx, "BitOrExpr", ::parseBitXorExpr, listOf("|")
+)
+
+private fun parseBitXorExpr(ctx: Context) = parseLeftBinaryExpr(
+    ctx, "BitXorExpr", ::parseBitAndExpr, listOf("$")
+)
+
+private fun parseBitAndExpr(ctx: Context) = parseLeftBinaryExpr(
+    ctx, "BitAndExpr", ::parseBitShiftExpr, listOf("&")
+)
+
+private fun parseBitShiftExpr(ctx: Context) = parseLeftBinaryExpr(
+    ctx, "BitShiftExpr", ::parseAddExpr, listOf("<<", ">>")
+)
+
+private fun parseAddExpr(ctx: Context) = parseLeftBinaryExpr(
+    ctx, "AddExpr", ::parseMultiplyExpr, listOf("+", "-")
+)
+
+private fun parseMultiplyExpr(ctx: Context) = parseLeftBinaryExpr(
+    ctx, "MultiplyExpr", ::parsePrefixExpr, listOf("*", "/", "%")
+)
+
+private fun parseExponentExpr(ctx: Context): NodeResult {
+    val left = parsePrefixExpr(ctx)
+    if(left.failed || !ctx.next.has("^")) return left
+
+    val op = ctx.take()
+    ctx.skipNewline()
+
+    val right = parseExponentExpr(ctx)
+    val node = Node("ExponentExpr", listOf(left.value, op, right.value))
+
+    return NodeResult(node, left.faults + right.faults)
 }
 
-private fun parseBitXorExpr(ctx: Context): ContextResult {
-    val type = "BitXorExpr"
-    return parseLeftRecBinaryExpr(type, ::parseBitAndExpr, listOf("$"), ctx)
-}
-
-private fun parseBitAndExpr(ctx: Context): ContextResult {
-    val type = "BitAndExpr"
-    return parseLeftRecBinaryExpr(type, ::parseBitShiftExpr, listOf("&"), ctx)
-}
-
-private fun parseBitShiftExpr(ctx: Context): ContextResult {
-    val type = "BitShiftExpr"
-    val opList = listOf("<<", ">>")
-    return parseLeftRecBinaryExpr(type, ::parseAdditiveExpr, opList, ctx)
-}
-
-private fun parseAdditiveExpr(ctx: Context): ContextResult {
-    val type = "AdditiveExpr"
-    val opList = listOf("+", "-")
-    return parseLeftRecBinaryExpr(type, ::parseMultiplicativeExpr, opList, ctx)
-}
-
-private fun parseMultiplicativeExpr(ctx: Context): ContextResult {
-    val type = "MultiplicativeExpr"
-    val opList = listOf("*", "/", "%")
-    return parseLeftRecBinaryExpr(type, ::parsePrimaryExpr, opList, ctx)
-}
-
-private fun parsePrefixExpr(ctx: Context): ContextResult {
+private fun parsePrefixExpr(ctx: Context): NodeResult {
     val opList = listOf("+", "-", "~", "$", "&", "#", "not")
     if(!ctx.next.has(opList)) return parsePostfixExpr(ctx)
 
     val op = ctx.take()
-    val right = parsePostfixExpr(ctx.done())
-    val node = Node("PrefixExpr", listOf(op, right.result.node))
+    val right = parsePostfixExpr(ctx)
+    val node = Node("PrefixExpr", listOf(op, right.value))
 
-    return ContextResult(right.ctx.done(), node, right.result.faults)
+    return NodeResult(node, right.faults)
 }
 
-private fun parsePostfixExpr(ctx: Context): ContextResult {
-    return parsePrimaryExpr(ctx)
+private fun parsePostfixExpr(
+    ctx: Context,
+    left: NodeResult = parsePrimaryExpr(ctx)
+): NodeResult {
+    if(left.failed) return left
+    val type = "PostfixExpr"
+
+    if(ctx.next.has("!")) {
+        val node = Node(type, listOf(left.value, ctx.take()))
+        return parsePostfixExpr(ctx, NodeResult(node, left.faults))
+    }
+
+    val skipped = ctx.skipNewline()
+
+    if(ctx.next.has(".")) {
+        val op = ctx.take()
+        ctx.skipNewline()
+
+        // expecting
+
+        return left
+    }
+
+    if(skipped) ctx.untake()
+    return left
 }
 
-private fun parsePrimaryExpr(ctx: Context): ContextResult {
+private fun parsePrimaryExpr(ctx: Context): NodeResult {
     val type = "PrimaryExpr"
 
     if(ctx.next.of(Token.Type.NUM)) {
         val node = Node(type, listOf(ctx.take()))
-        return ContextResult(ctx.done(), node)
+        return NodeResult(node)
     }
 
     val node = Node(type, listOf(ctx.take()))
     val fault = Failure(node, "Unexpected token in primary expression")
-    return ContextResult(ctx.done(), node, listOf(fault))
+    return NodeResult(node, listOf(fault))
 }

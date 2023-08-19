@@ -122,28 +122,28 @@ private fun buildCommand(): Status {
         val tokens = tokenizeFile(file.path).let { result ->
             faults += result.faults
 
+            val tokenString = result.value.joinToString(", ", "[", "]")
+            println("Created ${result.value.size} tokens: \n$tokenString\n")
+
             if(result.errored) {
                 printFaults(file.path, faults)
                 return Status.COMPILER_ERROR
             }
 
-            result.tokens
+            result.value
         }
-
-        val tokenString = tokens.joinToString(", ", "[", "]")
-        println("Created ${tokens.size} tokens: \n$tokenString\n")
 
         val tree = parseTokens(tokens).let { result ->
             faults += result.faults
 
             if(result.errored) {
-                println("Created AST: \n${result.node}\n")
+                println("Created AST: \n${result.value}\n")
 
                 printFaults(file.path, faults)
                 return Status.COMPILER_ERROR
             }
 
-            result.node
+            result.value
         }
 
         println("Created AST: \n$tree")

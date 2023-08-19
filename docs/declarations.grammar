@@ -1,0 +1,20 @@
+varDecl : storageKey? ("val" | "var") ID [":" NL? type] NL? "=" NL? expr
+
+storageKey : "static"
+           | "auto"
+           | "dynamic"
+           ;
+
+type : dataType
+     | refType
+     ;
+
+refType : ("$" | "&" | "#") dataType ["?"] ;
+
+dataType : "Bool" | "Char"  | "String"
+         | "Int8" | "Int16" | "Int32"   | "Int64"   | "IntMax"
+         | "Nat8" | "Nat16" | "Nat32"   | "Nat64"   | "NatMax"
+                            | "Real32"  | "Real64"  | "RealMax"
+                            | "Cplex32" | "Cplex64" | "CplexMax"
+         | "Size"
+         ;

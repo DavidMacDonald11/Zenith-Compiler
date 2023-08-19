@@ -3,7 +3,7 @@
 
 expr : next ;
 
-conditionalExpr : next ["if" NL? next "else" NL? self]
+conditionExpr : next ["if" NL? next "else" NL? self] ;
 
 logicalOrExpr : [self "or" NL?] next ;
 
@@ -13,26 +13,26 @@ logicalAndExpr : [self "and" NL?] next ;
 
 compareExpr : next (("<" | ">" | "<=" | ">=" | "==" | "!=") NL? next)* ;
 
-bitwiseOrExpr : [self "|" NL?] next ;
+bitOrExpr : [self "|" NL?] next ;
 
-bitwiseXorExpr : [self "$" NL?] next ;
+bitXorExpr : [self "$" NL?] next ;
 
-bitwiseAndExpr : [self "&" NL?] next ;
+bitAndExpr : [self "&" NL?] next ;
 
-shiftExpr : [self ("<<" | ">>") NL?] next ;
+bitShiftExpr : [self ("<<" | ">>") NL?] next ;
 
-additiveExpr : [self ("+" | "-") NL?] next ;
+addExpr : [self ("+" | "-") NL?] next ;
 
-multiplicativeExpr : [self ("*" | "/" | "%") NL?] next ;
+multiplyExpr : [self ("*" | "/" | "%") NL?] next ;
 
-exponentialExpr : next ["^" NL? self] ;
+exponentExpr : next ["^" NL? self] ;
 
 prefixExpr : ("+" | "-" | "~" | "not" | "$" | "&" | "#") NL? self
            | next
            ;
 
 postfixExpr : self "!"
-            | self "." ID
+            | self NL? "." NL? ID
             | self "(" [funArgs] ")"
             | next
             ;
