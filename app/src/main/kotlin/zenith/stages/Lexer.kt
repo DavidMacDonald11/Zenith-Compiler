@@ -3,12 +3,8 @@ package zenith.lexer
 import zenith.*
 
 private typealias TokenResult = Result<List<Token>>
-
-private fun TokenResult(token: Token? = null)
-    = Result(listOfNotNull(token))
-
-private fun TokenResult(fault: Fault)
-    = Result(listOf(fault.obj as Token), fault)
+private fun TokenResult(token: Token? = null) = Result(listOfNotNull(token))
+private fun TokenResult(fault: Fault) = Result(listOf(fault.obj as Token), fault)
 
 fun tokenizeFile(filePath: String): TokenResult {
     val tokens = mutableListOf<Token>()
@@ -35,7 +31,6 @@ private const val LABEL = "Lexing"
 private fun Warning(obj: Token, msg: String) = Fault(LABEL, 'W', obj, msg)
 private fun Error(obj: Token, msg: String) = Fault(LABEL, 'E', obj, msg)
 private fun Failure(obj: Token, msg: String) = Fault(LABEL, 'F', obj, msg)
-private fun Result(fault: Fault) = Result(fault.obj as Token, listOf(fault))
 
 private fun newToken(file: SourceFile, type: Token.Type, string: String) =
     Token(type, string, file.charPos - string.length.toUInt())
@@ -160,7 +155,7 @@ private fun makeStr(file: SourceFile): TokenResult {
     val quoteLength = if(isMulti) 3 else 1
     val stopPattern = if(isMulti) "$\"" else "$\"\\\n"
 
-    val tokens = mutableListOf(newToken(file, Token.Type.STR_START, ""))
+    val tokens = mutableListOf(newToken(file, Token.Type.STR_START, "<S>"))
     val faults = mutableListOf<Fault>()
     val builder = StringBuilder(file.readChars(quoteLength))
 
@@ -187,7 +182,7 @@ private fun makeStr(file: SourceFile): TokenResult {
             '"' -> if(!isMulti || file.peek(3) == MULTI_QUOTE) {
                 builder.append(file.readChars(quoteLength))
                 tokens += newToken(file, Token.Type.STR, "$builder")
-                tokens += newToken(file, Token.Type.STR_END, "")
+                tokens += newToken(file, Token.Type.STR_END, "</S>")
 
                 return Result(tokens, faults)
             }

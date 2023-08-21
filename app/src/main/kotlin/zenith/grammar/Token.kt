@@ -12,6 +12,8 @@ data class Token(
 
     override val faultPosition get(): UIntRange {
         val start = position
+        if(of(Type.STR_START, Type.STR_END)) return UIntRange(start, start)
+
         val end = start + string.length.toUInt() - 1u
         return UIntRange(start, end)
     }

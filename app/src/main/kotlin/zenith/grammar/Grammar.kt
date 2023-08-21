@@ -37,8 +37,8 @@ object Grammar {
     val ID_START_SYMS = "_" + LETTERS + LETTERS.lowercase()
     val ID_SYMS = ID_START_SYMS + "0123456789"
 
-    val KEYS = setOf(
-        "true", "false", "none", "undefined",
+    val PRIMARY_KEYS = setOf("true", "false", "none", "undefined")
+    val KEYS = PRIMARY_KEYS + setOf(
         "not", "in", "is", "and", "xor", "or", "if", "else"
     )
 

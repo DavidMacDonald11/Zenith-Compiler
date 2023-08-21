@@ -15,7 +15,7 @@ class Fault(label: String, val type: Char, val obj: Faultable, msg: String) {
     }
 }
 
-class Result<T>(val value: T, val faults: List<Fault> = listOf()) {
+data class Result<T>(val value: T, val faults: List<Fault> = listOf()) {
     constructor(value: T, fault: Fault): this(value, listOf(fault))
 
     val failed get() = faults.any { it.type == 'F' }
