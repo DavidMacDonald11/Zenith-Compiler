@@ -2,7 +2,79 @@ package zenith.parser
 
 import zenith.*
 
-internal fun parseExpr(ctx: Context) = parseBitOrExpr(ctx)
+internal fun parseExpr(ctx: Context) = parseConditionExpr(ctx)
+
+internal fun parseConditionExpr(ctx: Context): NodeResult {
+    val left = parseLogicOrExpr(ctx)
+    if(left.failed || !ctx.next.has("if")) return left
+
+    val children = mutableListOf<Faultable>(left.value)
+    val faults = left.faults.toMutableList()
+    val type = "ConditionExpr"
+
+    children += ctx.take()
+    ctx.skipNewline()
+
+    val condition = parseLogicOrExpr(ctx)
+
+    children += condition.value
+    faults += condition.faults
+
+    if(condition.failed) return NodeResult(Node(type, children), faults)
+
+    ctx.skipNewline()
+    val elseResult = ctx.expectingHas("else")
+
+    children += elseResult.value
+    faults += elseResult.faults
+
+    if(elseResult.failed) return NodeResult(Node(type, children), faults)
+
+    ctx.skipNewline()
+    val right = parseConditionExpr(ctx)
+
+    children += right.value
+    faults += right.faults
+
+    return NodeResult(Node(type, children), faults)
+}
+
+internal fun parseLogicOrExpr(ctx: Context) = parseLeftBinaryExpr(
+    ctx, "LogicOrExpr", ::parseLogicXorExpr, listOf("or")
+)
+
+internal fun parseLogicXorExpr(ctx: Context) = parseLeftBinaryExpr(
+    ctx, "LogicXorExpr", ::parseLogicAndExpr, listOf("xor")
+)
+
+internal fun parseLogicAndExpr(ctx: Context) = parseLeftBinaryExpr(
+    ctx, "LogicAndExpr", ::parseCompareExpr, listOf("and")
+)
+
+internal fun parseCompareExpr(ctx: Context): NodeResult {
+    val children = mutableListOf<Faultable>()
+    val faults = mutableListOf<Fault>()
+
+    val left = parseBitOrExpr(ctx)
+    if(left.failed || !ctx.next.has(Grammar.COMPARE_OPS)) return left
+
+    children += left.value
+    faults += left.faults
+
+    while(ctx.next.has(Grammar.COMPARE_OPS)) {
+        children += ctx.take()
+        ctx.skipNewline()
+
+        val next = parseBitOrExpr(ctx)
+
+        children += next.value
+        faults += next.faults
+
+        if(next.failed) break
+    }
+
+    return NodeResult(Node("CompareExpr", children), faults)
+}
 
 internal fun parseBitOrExpr(ctx: Context) = parseLeftBinaryExpr(
     ctx, "BitOrExpr", ::parseBitXorExpr, listOf("|")

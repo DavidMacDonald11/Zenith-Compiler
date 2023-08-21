@@ -3,13 +3,13 @@
 
 expr : next ;
 
-conditionExpr : next ["if" NL? next "else" NL? self] ;
+conditionExpr : next ["if" NL? next NL? "else" NL? self] ;
 
-logicalOrExpr : [self "or" NL?] next ;
+logicOrExpr : [self "or" NL?] next ;
 
-logicalXorExpr : [self "xor" NL?] next ;
+logicXorExpr : [self "xor" NL?] next ;
 
-logicalAndExpr : [self "and" NL?] next ;
+logicAndExpr : [self "and" NL?] next ;
 
 compareExpr : next (("<" | ">" | "<=" | ">=" | "==" | "!=") NL? next)* ;
 

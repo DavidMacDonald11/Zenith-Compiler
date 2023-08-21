@@ -22,7 +22,7 @@ fun main(args: Array<String>) {
         null -> noCommand()
         in listOf("help", "--help", "-h") -> helpCommand()
         "init" -> initCommand(args.getOrNull(1))
-        "build" -> printTimeMillis(::buildCommand)
+        "build" -> printTimeMillis("Build", ::buildCommand)
         "clean" -> cleanCommand()
         else -> {
             println("Error: There is no such command '${args[0]}'")
@@ -34,14 +34,14 @@ fun main(args: Array<String>) {
     exitProcess(status.code)
 }
 
-private fun<T> printTimeMillis(block: () -> T): T {
+private fun<T> printTimeMillis(name: String, block: () -> T): T {
     var result: T
 
     val time = measureTimeMillis {
         result = block()
     }
 
-    println("$time ms")
+    println("$name Time: ${"%,d".format(time)} ms")
     return result
 }
 
@@ -112,8 +112,13 @@ private fun initCommand(name: String?): Status {
     return Status.GOOD
 }
 
+private fun Runtime.usedMemory() = gc().let { totalMemory() - freeMemory() }
+
 private fun buildCommand(): Status {
     if(!inProject()) return Status.NOT_IN_PROJECT_DIR
+
+    val runtime = Runtime.getRuntime()
+    val startMem = runtime.usedMemory() / 1024
 
     for(file in File("src").walk()) {
         if(!file.path.endsWith(".zen")) continue
@@ -135,10 +140,9 @@ private fun buildCommand(): Status {
 
         val tree = parseTokens(tokens).let { result ->
             faults += result.faults
+            println("Created AST: \n${result.value}\n")
 
             if(result.errored) {
-                println("Created AST: \n${result.value}\n")
-
                 printFaults(file.path, faults)
                 return Status.COMPILER_ERROR
             }
@@ -146,14 +150,11 @@ private fun buildCommand(): Status {
             result.value
         }
 
-        println("Created AST: \n$tree")
         printFaults(file.path, faults)
 
-        val runtime = Runtime.getRuntime()
-        runtime.gc()
-
-        val mem = runtime.totalMemory() - runtime.freeMemory()
-        println("\nCompilation used ${"%,d".format(mem)} bytes of memory")
+        val finalMem = runtime.usedMemory() / 1024
+        println("\nTotal Memory: ${"%,d".format(finalMem)} KB")
+        println("Build Memory: ${"%,d".format(finalMem - startMem)} KB")
     }
 
     return Status.GOOD
