@@ -56,3 +56,31 @@ internal class Context(private val tokens: List<Token>) {
     fun expectingHas(c: Collection<String>) = expectingHas(*c.toTypedArray())
     fun expectingOf(c: Collection<Token.Type>) = expectingOf(*c.toTypedArray())
 }
+
+internal class MutableNodeResult(private val type: String) {
+    private val children = mutableListOf<Faultable>()
+    private val faults = mutableListOf<Fault>()
+    val failed get() = faults.any { it.type == 'F' }
+
+    constructor(type: String, obj: Faultable): this(type) { add(obj) }
+    constructor(type: String, result: NodeResult): this(type) { add(result) }
+
+    fun add(fault: Fault) { faults += fault }
+    fun add(obj: Faultable) { children += obj }
+
+    @JvmName("addNodeResult")
+    fun add(result: NodeResult): Boolean {
+        children += result.value
+        faults += result.faults
+        return result.failed
+    }
+
+    @JvmName("addTokenResult")
+    fun add(result: Result<Token>): Boolean {
+        children += result.value
+        faults += result.faults
+        return result.failed
+    }
+
+    fun toNodeResult() = NodeResult(Node(type, children), faults)
+}

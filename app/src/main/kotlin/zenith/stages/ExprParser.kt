@@ -8,120 +8,91 @@ internal fun parseConditionExpr(ctx: Context): NodeResult {
     val left = parseLogicOrExpr(ctx)
     if(left.failed || !ctx.next.has("if")) return left
 
-    val children = mutableListOf<Faultable>(left.value)
-    val faults = left.faults.toMutableList()
-    val type = "ConditionExpr"
-
-    children += ctx.take()
+    val result = MutableNodeResult("ConditionExpr", left)
+    result.add(ctx.take())
     ctx.skipNewline()
 
-    val condition = parseLogicOrExpr(ctx)
-
-    children += condition.value
-    faults += condition.faults
-
-    if(condition.failed) return NodeResult(Node(type, children), faults)
-
+    if(result.add(parseLogicOrExpr(ctx))) return result.toNodeResult()
     ctx.skipNewline()
-    val elseResult = ctx.expectingHas("else")
 
-    children += elseResult.value
-    faults += elseResult.faults
-
-    if(elseResult.failed) return NodeResult(Node(type, children), faults)
-
+    if(result.add(ctx.expectingHas("else"))) return result.toNodeResult()
     ctx.skipNewline()
-    val right = parseConditionExpr(ctx)
 
-    children += right.value
-    faults += right.faults
-
-    return NodeResult(Node(type, children), faults)
+    result.add(parseConditionExpr(ctx))
+    return result.toNodeResult()
 }
 
 internal fun parseLogicOrExpr(ctx: Context) = parseLeftBinaryExpr(
-    ctx, "LogicOrExpr", ::parseLogicXorExpr, listOf("or")
+    BinaryArgs(ctx, "LogicOrExpr", ::parseLogicXorExpr, "or")
 )
 
 internal fun parseLogicXorExpr(ctx: Context) = parseLeftBinaryExpr(
-    ctx, "LogicXorExpr", ::parseLogicAndExpr, listOf("xor")
+    BinaryArgs(ctx, "LogicXorExpr", ::parseLogicAndExpr, "xor")
 )
 
 internal fun parseLogicAndExpr(ctx: Context) = parseLeftBinaryExpr(
-    ctx, "LogicAndExpr", ::parseCompareExpr, listOf("and")
+    BinaryArgs(ctx, "LogicAndExpr", ::parseCompareExpr, "and")
 )
 
 internal fun parseCompareExpr(ctx: Context): NodeResult {
-    val children = mutableListOf<Faultable>()
-    val faults = mutableListOf<Fault>()
-
     val left = parseBitOrExpr(ctx)
     if(left.failed || !ctx.next.has(Grammar.COMPARE_OPS)) return left
 
-    children += left.value
-    faults += left.faults
+    val result = MutableNodeResult("CompareExpr", left)
 
     while(ctx.next.has(Grammar.COMPARE_OPS)) {
-        children += ctx.take()
+        result.add(ctx.take())
         ctx.skipNewline()
-
-        val next = parseBitOrExpr(ctx)
-
-        children += next.value
-        faults += next.faults
-
-        if(next.failed) break
+        if(result.add(parseBitOrExpr(ctx))) break
     }
 
-    return NodeResult(Node("CompareExpr", children), faults)
+    return result.toNodeResult()
 }
 
 internal fun parseBitOrExpr(ctx: Context) = parseLeftBinaryExpr(
-    ctx, "BitOrExpr", ::parseBitXorExpr, listOf("|")
+    BinaryArgs(ctx, "BitOrExpr", ::parseBitXorExpr, "|")
 )
 
 internal fun parseBitXorExpr(ctx: Context) = parseLeftBinaryExpr(
-    ctx, "BitXorExpr", ::parseBitAndExpr, listOf("$")
+    BinaryArgs(ctx, "BitXorExpr", ::parseBitAndExpr, "$")
 )
 
 internal fun parseBitAndExpr(ctx: Context) = parseLeftBinaryExpr(
-    ctx, "BitAndExpr", ::parseBitShiftExpr, listOf("&")
+    BinaryArgs(ctx, "BitAndExpr", ::parseBitShiftExpr, "&")
 )
 
 internal fun parseBitShiftExpr(ctx: Context) = parseLeftBinaryExpr(
-    ctx, "BitShiftExpr", ::parseAddExpr, listOf("<<", ">>")
+    BinaryArgs(ctx, "BitShiftExpr", ::parseAddExpr, "<<", ">>")
 )
 
 internal fun parseAddExpr(ctx: Context) = parseLeftBinaryExpr(
-    ctx, "AddExpr", ::parseMultiplyExpr, listOf("+", "-")
+    BinaryArgs(ctx, "AddExpr", ::parseMultiplyExpr, "+", "-")
 )
 
 internal fun parseMultiplyExpr(ctx: Context) = parseLeftBinaryExpr(
-    ctx, "MultiplyExpr", ::parseExponentExpr, listOf("*", "/", "%")
+    BinaryArgs(ctx, "MultiplyExpr", ::parseExponentExpr, "*", "/", "%")
 )
 
 internal fun parseExponentExpr(ctx: Context): NodeResult {
     val left = parsePrefixExpr(ctx)
     if(left.failed || !ctx.next.has("^")) return left
 
-    val op = ctx.take()
+    val result = MutableNodeResult("ExponentialExpr", left)
+
+    result.add(ctx.take())
     ctx.skipNewline()
 
-    val right = parseExponentExpr(ctx)
-    val node = Node("ExponentExpr", listOf(left.value, op, right.value))
-
-    return NodeResult(node, left.faults + right.faults)
+    result.add(parseExponentExpr(ctx))
+    return result.toNodeResult()
 }
 
 internal fun parsePrefixExpr(ctx: Context): NodeResult {
     val opList = listOf("+", "-", "~", "$", "&", "#", "not")
     if(!ctx.next.has(opList)) return parsePostfixExpr(ctx)
 
-    val op = ctx.take()
-    val right = parsePostfixExpr(ctx)
-    val node = Node("PrefixExpr", listOf(op, right.value))
-
-    return NodeResult(node, right.faults)
+    val result = MutableNodeResult("PrefixExpr", ctx.take())
+    result.add(parsePostfixExpr(ctx))
+    return result.toNodeResult()
 }
 
 internal fun parsePostfixExpr(
@@ -129,22 +100,21 @@ internal fun parsePostfixExpr(
     left: NodeResult = parsePrimaryExpr(ctx)
 ): NodeResult {
     if(left.failed) return left
-    val type = "PostfixExpr"
+    val result = MutableNodeResult("PostfixExpr", left)
 
     if(ctx.next.has("!")) {
-        val node = Node(type, listOf(left.value, ctx.take()))
-        return parsePostfixExpr(ctx, NodeResult(node, left.faults))
+        result.add(ctx.take())
+        return result.toNodeResult()
     }
 
     val skipped = ctx.skipNewline()
 
     if(ctx.next.has(".")) {
-        val op = ctx.take()
+        result.add(ctx.take())
         ctx.skipNewline()
-        val (id, faults) = ctx.expectingOf(Token.Type.ID)
-        val node = Node(type, listOf(left.value, op, id))
 
-        return parsePostfixExpr(ctx, NodeResult(node, left.faults + faults))
+        result.add(ctx.expectingOf(Token.Type.ID))
+        return parsePostfixExpr(ctx, result.toNodeResult())
     }
 
     if(skipped) ctx.untake()
@@ -153,17 +123,14 @@ internal fun parsePostfixExpr(
 
 internal fun parsePrimaryExpr(ctx: Context): NodeResult {
     val type = "PrimaryExpr"
+    val primaryTypes = listOf(Token.Type.NUM, Token.Type.ID, Token.Type.CHAR)
 
-    if(ctx.next.of(Token.Type.NUM, Token.Type.ID, Token.Type.CHAR)) {
+    if(ctx.next.of(primaryTypes) || ctx.next.has(Grammar.PRIMARY_KEYS)) {
         return NodeResult(Node(type, listOf(ctx.take())))
     }
 
-    if(ctx.next.has(Grammar.PRIMARY_KEYS)) {
-        return NodeResult(Node(type, listOf(ctx.take())))
-    }
-
-    if(ctx.next.has(Grammar.STORAGE_KEYS)) return parseAllocExpr(ctx)
     if(ctx.next.has("(")) return parseParenExpr(ctx)
+    if(ctx.next.has(Grammar.STORAGE_KEYS)) return parseAllocExpr(ctx)
     if(ctx.next.of(Token.Type.STR_START)) return parseStringExpr(ctx)
 
     val node = Node(type, listOf(ctx.take()))
@@ -171,74 +138,69 @@ internal fun parsePrimaryExpr(ctx: Context): NodeResult {
     return NodeResult(node, listOf(fault))
 }
 
-internal fun parseAllocExpr(ctx: Context): NodeResult {
-    val type = "AllocExpr"
+internal fun parseParenExpr(ctx: Context): NodeResult {
+    val result = MutableNodeResult("ParenExpr")
 
-    val storage = ctx.expectingHas(Grammar.STORAGE_KEYS)
-    if(storage.failed) return NodeResult(Node(type, listOf(storage.value)), storage.faults)
+    if(result.add(ctx.expectingHas("("))) return result.toNodeResult()
+    ctx.skipNewline()
 
-    val expr = parseParenExpr(ctx)
-    return NodeResult(Node(type, listOf(storage.value, expr.value)), storage.faults + expr.faults)
+    if(result.add(parseExpr(ctx))) return result.toNodeResult()
+    ctx.skipNewline()
+
+    result.add(ctx.expectingHas(")"))
+    return result.toNodeResult()
 }
 
-internal fun parseParenExpr(ctx: Context): NodeResult {
-    val type = "ParenExpr"
+internal fun parseAllocExpr(ctx: Context): NodeResult {
+    val result = MutableNodeResult("AllocExpr")
 
-    val left = ctx.expectingHas("(")
-    if(left.failed) return NodeResult(Node(type, listOf(left.value)), left.faults)
+    val storage = ctx.expectingHas(Grammar.STORAGE_KEYS)
+    if(result.add(storage)) return result.toNodeResult()
 
-    ctx.skipNewline()
-    val expr = parseExpr(ctx)
-    ctx.skipNewline()
-
-    val right = ctx.expectingHas(")")
-    val faults = left.faults + expr.faults + right.faults
-
-    val node = Node(type, listOf(left.value, expr.value, right.value))
-    return NodeResult(node, faults)
+    result.add(parseParenExpr(ctx))
+    return result.toNodeResult()
 }
 
 internal fun parseStringExpr(ctx: Context): NodeResult {
-    val children = mutableListOf<Faultable>()
-    val faults = mutableListOf<Fault>()
+    val result = MutableNodeResult("StringExpr")
 
     val start = ctx.expectingOf(Token.Type.STR_START)
-    children += start.value
-    faults += start.faults
+    if(result.add(start)) return result.toNodeResult()
 
     while(!ctx.next.of(Token.Type.STR_END)) {
         if(ctx.next.of(Token.Type.STR)) {
-            children += ctx.take()
+            result.add(ctx.take())
             continue
         }
 
-        val expr = parseExpr(ctx)
-
-        children += expr.value
-        faults += expr.faults
-
-        if(expr.failed) break
+        if(result.add(parseExpr(ctx))) return result.toNodeResult()
     }
 
-    if(ctx.next.of(Token.Type.STR_END)) children += ctx.take()
-    return NodeResult(Node("StringExpr", children), faults)
+    result.add(ctx.expectingOf(Token.Type.STR_END))
+    return result.toNodeResult()
 }
 
 private tailrec fun parseLeftBinaryExpr(
-    ctx: Context,
-    type: String,
-    parseChild: (Context) -> NodeResult,
-    opList: List<String>,
-    left: NodeResult = parseChild(ctx)
+    args: BinaryArgs,
+    left: NodeResult = args.parseChild(args.ctx)
 ): NodeResult {
-    if(left.failed || !ctx.next.has(opList)) return left
+    if(left.failed || !args.ctx.next.has(args.opList)) return left
 
-    val op = ctx.take()
-    ctx.skipNewline()
+    val result = MutableNodeResult(args.type, args.ctx.take())
+    args.ctx.skipNewline()
 
-    val right = parseChild(ctx)
-    val node = Node(type, listOf(left.value, op, right.value))
-    val result = NodeResult(node, left.faults + right.faults)
+    result.add(args.parseChild(args.ctx))
+    return parseLeftBinaryExpr(args, result.toNodeResult())
+}
 
-    return parseLeftBinaryExpr(ctx, type, parseChild, opList, result)
+private typealias parseFun = (Context) -> NodeResult
+
+private class BinaryArgs(
+    val ctx: Context,
+    val type: String,
+    val parseChild: parseFun,
+    val opList: List<String>
+) {
+    constructor(ctx: Context, type: String, parse: parseFun, vararg op: String):
+        this(ctx, type, parse, op.toList())
 }
