@@ -33,9 +33,16 @@ prefixExpr : ("+" | "-" | "~" | "not" | "$" | "&" | "#") NL? self
 
 postfixExpr : self "!"
             | self NL? "." NL? ID
-            | self "(" [funArgs] ")"
+            | self "(" NL? [funArgs] NL? ")"
             | next
             ;
+
+part funArgs : [pFunArgs "," NL?] dFunArgs
+             | pFunArgs
+             ;
+
+part pFunArgs : [pFunArgs "," NL?] expr ;
+part dFunArgs : [dFunArgs "," NL?] ID "=" NL? expr ;
 
 primaryExpr : NUM
             | CHAR
@@ -47,5 +54,4 @@ primaryExpr : NUM
             ;
 
 allocExpr : storageKey parenExpr ;
-
 parenExpr : "(" NL? expr NL? ")"

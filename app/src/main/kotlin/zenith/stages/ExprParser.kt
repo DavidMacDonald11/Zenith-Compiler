@@ -107,6 +107,27 @@ internal fun parsePostfixExpr(
         return result.toNodeResult()
     }
 
+    if(ctx.next.has("(")) {
+        var allowPArgs = true
+
+        result.add(ctx.take())
+        ctx.skipNewline()
+
+        while(!ctx.next.has(")")) {
+            val arg = parseFunArg(ctx, allowPArgs)
+            if(result.add(arg.result)) return result.toNodeResult()
+            allowPArgs = arg.allowPArgs
+
+            if(!ctx.next.has(",")) break
+            ctx.take()
+            ctx.skipNewline()
+        }
+
+        ctx.skipNewline()
+        result.add(ctx.expectingHas(")"))
+        return result.toNodeResult()
+    }
+
     val skipped = ctx.skipNewline()
 
     if(ctx.next.has(".")) {
@@ -119,6 +140,35 @@ internal fun parsePostfixExpr(
 
     if(skipped) ctx.untake()
     return left
+}
+
+private class FunArgResult(val result: NodeResult, val allowPArgs: Boolean)
+
+private fun parseFunArg(ctx: Context, allowPArgs: Boolean): FunArgResult {
+    val result = MutableNodeResult("FunArg")
+
+    if(ctx.next.of(Token.Type.ID)) {
+        val id = ctx.take()
+
+        if(ctx.next.has("=")) {
+            result.add(id)
+            result.add(ctx.take())
+            ctx.skipNewline()
+
+            result.add(parseExpr(ctx))
+            return FunArgResult(result.toNodeResult(), false)
+        }
+
+        ctx.untake()
+    }
+
+    val expr = parseExpr(ctx)
+    result.add(expr)
+
+    if(!allowPArgs) result.add(Error(expr.value,
+        "Positional args cannot come after default args"))
+
+    return FunArgResult(result.toNodeResult(), true)
 }
 
 internal fun parsePrimaryExpr(ctx: Context): NodeResult {

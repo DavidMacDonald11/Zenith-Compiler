@@ -4,23 +4,7 @@ import zenith.*
 
 internal typealias NodeResult = Result<Node>
 
-fun parseTokens(tokens: List<Token>): NodeResult {
-    val ctx = Context(tokens)
-    val stats = mutableListOf<Faultable>()
-    val faults = mutableListOf<Fault>()
-
-    while(!ctx.next.has(Grammar.EOF)) {
-        val result = parseExpr(ctx)
-        ctx.skipNewline()
-
-        stats += result.value
-        faults += result.faults
-
-        if(result.failed) break
-    }
-
-    return NodeResult(Node("FileStat", stats), faults)
-}
+fun parseTokens(tokens: List<Token>) = parseFileStat(Context(tokens))
 
 internal const val LABEL = "Parsing"
 internal fun Warning(obj: Faultable, msg: String) = Fault(LABEL, 'W', obj, msg)
