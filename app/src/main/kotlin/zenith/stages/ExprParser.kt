@@ -162,6 +162,7 @@ internal fun parsePrimaryExpr(ctx: Context): NodeResult {
         return NodeResult(Node(type, listOf(ctx.take())))
     }
 
+    if(ctx.next.has(Grammar.STORAGE_KEYS)) return parseAllocExpr(ctx)
     if(ctx.next.has("(")) return parseParenExpr(ctx)
     if(ctx.next.of(Token.Type.STR_START)) return parseStringExpr(ctx)
 
@@ -170,18 +171,28 @@ internal fun parsePrimaryExpr(ctx: Context): NodeResult {
     return NodeResult(node, listOf(fault))
 }
 
+internal fun parseAllocExpr(ctx: Context): NodeResult {
+    val type = "AllocExpr"
+
+    val storage = ctx.expectingHas(Grammar.STORAGE_KEYS)
+    if(storage.failed) return NodeResult(Node(type, listOf(storage.value)), storage.faults)
+
+    val expr = parseParenExpr(ctx)
+    return NodeResult(Node(type, listOf(storage.value, expr.value)), storage.faults + expr.faults)
+}
+
 internal fun parseParenExpr(ctx: Context): NodeResult {
     val type = "ParenExpr"
 
     val left = ctx.expectingHas("(")
-    if(left.failed) return NodeResult(Node(type, listOf(left.value)))
+    if(left.failed) return NodeResult(Node(type, listOf(left.value)), left.faults)
 
     ctx.skipNewline()
     val expr = parseExpr(ctx)
     ctx.skipNewline()
 
     val right = ctx.expectingHas(")")
-    val faults = expr.faults + right.faults
+    val faults = left.faults + expr.faults + right.faults
 
     val node = Node(type, listOf(left.value, expr.value, right.value))
     return NodeResult(node, faults)

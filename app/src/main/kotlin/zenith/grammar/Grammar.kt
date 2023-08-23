@@ -27,7 +27,7 @@ object Grammar {
     val PUNCS = COMPARE_OPS + setOf(
         "~", "#", "!", ".",
         "^", "*", "/", "%", "+", "-", "<<", ">>", "&", "$", "|",
-        ";", "(", ")", "{", "}", "[", "]", ",", ":",
+        ";", "(", ")", "{", "}", "[", "]", ",", ":", "?",
         "="
     )
     val PUNC_SYMS = PUNCS.flatMap{ it.asIterable() }.toSet()
@@ -37,8 +37,17 @@ object Grammar {
     val ID_START_SYMS = "_" + LETTERS + LETTERS.lowercase()
     val ID_SYMS = ID_START_SYMS + "0123456789"
 
+    val TYPE_KEYS = setOf(
+        "Bool", "Char", "String",
+        "Int8", "Int16", "Int32",   "Int64",   "IntMax",
+        "Nat8", "Nat16", "Nat32",   "Nat64",   "NatMax",
+                         "Real32",  "Real64",  "RealMax",
+                         "Cplex32", "Cplex64", "CplexMax",
+        "Size"
+    )
+    val STORAGE_KEYS = setOf("static", "auto", "dynamic")
     val PRIMARY_KEYS = setOf("true", "false", "none", "undefined")
-    val KEYS = PRIMARY_KEYS + setOf(
+    val KEYS = TYPE_KEYS + STORAGE_KEYS + PRIMARY_KEYS + setOf(
         "not", "in", "is", "and", "xor", "or", "if", "else"
     )
 

@@ -42,7 +42,10 @@ primaryExpr : NUM
             | STR
             | ID
             | ("true" | "false" | "none" | "undefined")
+            | allocExpr
             | parenExpr
             ;
+
+allocExpr : storageKey parenExpr ;
 
 parenExpr : "(" NL? expr NL? ")"
