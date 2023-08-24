@@ -1,7 +1,8 @@
-package zenith
+package zenith.files
 
 import java.io.File
 import java.io.BufferedReader
+import zenith.Grammar
 
 private val BUF_SIZE = maxOf(3, Grammar.LONGEST_PUNC_SIZE)
 
@@ -36,15 +37,12 @@ class SourceFile(val path: String) {
             if(char == null) break else readBuffer.append(char)
         }
 
+        val string = "$readBuffer"
         charPos += readBuffer.length.toUInt()
-        return readBuffer.empty()
-    }
-}
+        readBuffer.clear()
 
-private fun StringBuilder.empty(): String {
-    val string = "$this"
-    clear()
-    return string
+        return string
+    }
 }
 
 private fun BufferedReader.readChar(): Char? {

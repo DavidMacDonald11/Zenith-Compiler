@@ -1,6 +1,7 @@
 package zenith.lexer
 
 import zenith.*
+import zenith.files.SourceFile
 
 private typealias TokenResult = Result<List<Token>>
 private fun TokenResult(token: Token? = null) = Result(listOfNotNull(token))
