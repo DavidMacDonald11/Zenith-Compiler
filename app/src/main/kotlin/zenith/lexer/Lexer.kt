@@ -1,13 +1,15 @@
 package zenith.lexer
 
 import zenith.*
-import zenith.files.SourceFile
+import zenith.io.SourceFile
 
 private typealias TokenResult = Result<List<Token>>
 private fun TokenResult(token: Token? = null) = Result(listOfNotNull(token))
 private fun TokenResult(fault: Fault) = Result(listOf(fault.obj as Token), fault)
 
-fun tokenizeFile(filePath: String): TokenResult {
+data class LexerResult(val tokens: List<Token>, val faults: Faults)
+
+fun tokenizeFile(filePath: String): LexerResult {
     val tokens = mutableListOf<Token>()
     val faults = mutableListOf<Fault>()
     val file = SourceFile(filePath)
@@ -19,13 +21,13 @@ fun tokenizeFile(filePath: String): TokenResult {
         tokens += result.value
         faults += result.faults
 
-        if(result.failed) return result
+        if(result.failed) return LexerResult(tokens, faults)
     }
 
     tokens += newToken(file, Token.Type.PUNC, Grammar.EOF)
     file.close()
 
-    return Result(tokens, faults)
+    return LexerResult(tokens, faults)
 }
 
 private const val LABEL = "Lexing"

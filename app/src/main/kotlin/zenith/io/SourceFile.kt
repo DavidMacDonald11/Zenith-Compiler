@@ -1,4 +1,4 @@
-package zenith.files
+package zenith.io
 
 import java.io.File
 import java.io.BufferedReader

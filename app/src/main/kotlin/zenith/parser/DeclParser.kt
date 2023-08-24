@@ -6,19 +6,6 @@ internal fun parseDecl(ctx: Context): NodeResult? {
     return parseVarDecl(ctx) ?: parseFunDecl(ctx)
 }
 
-/*
-funDecl : "fun" ID "(" NL? [funParams] NL? ")" ["->" NL? type] NL? multiStat
-        | "fun" ID "(" NL? [funParams] NL? ")" ["->" NL? type] "=" NL? expr
-        ;
-
-funParams : [pFunParams "," NL?] dFunParams
-          | pFunParams
-          ;
-
-pFunParams : [pFunParams "," NL?] ID ":" NL? type ;
-dFunParams : [dFunParams "," NL?] ID [":" NL? type] "=" NL? expr ;
-*/
-
 internal fun parseFunDecl(ctx: Context): NodeResult? {
     if(!ctx.next.has("fun")) return null
     val result = MutableNodeResult("FunDecl")

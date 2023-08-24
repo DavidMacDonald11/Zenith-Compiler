@@ -4,7 +4,12 @@ import zenith.*
 
 internal typealias NodeResult = Result<Node>
 
-fun parseTokens(tokens: List<Token>) = parseFileStat(Context(tokens))
+data class ParserResult(val node: Node, val faults: Faults)
+
+fun parseTokens(tokens: List<Token>): ParserResult {
+    val result = parseFileStat(Context(tokens))
+    return ParserResult(result.value, result.faults)
+}
 
 internal const val LABEL = "Parsing"
 internal fun Warning(obj: Faultable, msg: String) = Fault(LABEL, 'W', obj, msg)
