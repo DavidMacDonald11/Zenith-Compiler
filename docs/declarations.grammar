@@ -1,4 +1,17 @@
-decl : varDecl ;
+decl : varDecl
+     | funDecl
+     ;
+
+funDecl : "fun" ID "(" NL? [funParams] NL? ")" "->" NL? type NL? multiStat
+        | "fun" ID "(" NL? [funParams] NL? ")" ["->" NL? type] "=" NL? expr
+        ;
+
+funParams : [pFunParams "," NL?] dFunParams
+          | pFunParams
+          ;
+
+pFunParams : [pFunParams "," NL?] ID ":" NL? type ;
+dFunParams : [dFunParams "," NL?] ID [":" NL? type] "=" NL? expr ;
 
 varDecl : storageKey? ("val" | "var") ID [":" NL? type] "=" NL? expr
 

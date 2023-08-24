@@ -1,0 +1,13 @@
+fileStat : endedStat* stat? EOF ;
+
+endedStat : stat ";" NL?
+          | stat NL
+          | ";" NL?
+          ;
+
+stat : expr
+     | decl
+     | multiStat
+     ;
+
+multiStat : "{" NL? endedStat* stat? NL? "}" ;

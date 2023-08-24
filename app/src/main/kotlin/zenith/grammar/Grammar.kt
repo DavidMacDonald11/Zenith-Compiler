@@ -28,7 +28,7 @@ object Grammar {
     val PUNCS = REF_OPS + COMPARE_OPS + setOf(
         "~", "!", ".",
         "^", "*", "/", "%", "+", "-", "<<", ">>", "&", "$", "|",
-        ";", "(", ")", "{", "}", "[", "]", ",", ":", "?",
+        ";", "(", ")", "{", "}", "[", "]", ",", ":", "?", "->",
         "="
     )
     val PUNC_SYMS = PUNCS.flatMap{ it.asIterable() }.toSet()
@@ -42,7 +42,7 @@ object Grammar {
     val PRIMARY_KEYS = setOf("true", "false", "none", "undefined")
     val KEYS = STORAGE_KEYS + PRIMARY_KEYS + setOf(
         "not", "in", "is", "and", "xor", "or", "if", "else",
-        "val", "var"
+        "val", "var", "fun"
     )
 
     val CHAR_PATTERN = """
@@ -54,7 +54,6 @@ object Grammar {
     """.replace("\\s".toRegex(), "").toRegex()
 
     val EOF = ""
-    val LINE_END = setOf(";", "\n", EOF)
 
     /*
         Three reference types: immutable($), mutable(&), and exclusive(#)

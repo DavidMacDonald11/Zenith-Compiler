@@ -49,6 +49,12 @@ internal class MutableNodeResult(private val type: String) {
     constructor(type: String, obj: Faultable): this(type) { add(obj) }
     constructor(type: String, result: NodeResult): this(type) { add(result) }
 
+    constructor(result: NodeResult): this(result.value.type) {
+        children += result.value.children
+        faults += result.faults
+    }
+
+    fun addAll(faults: Collection<Fault>) { this.faults += faults }
     fun add(fault: Fault) { faults += fault }
     fun add(obj: Faultable) { children += obj }
 
@@ -66,5 +72,6 @@ internal class MutableNodeResult(private val type: String) {
         return result.failed
     }
 
+    fun error(message: String) = add(Error(Node(type, children), message))
     fun toNodeResult() = NodeResult(Node(type, children), faults)
 }
