@@ -4,9 +4,6 @@ import java.io.File
 
 interface Faultable { val faultPosition: UIntRange }
 
-typealias Faults = List<Fault>
-typealias MutableFaults = MutableList<Fault>
-
 class Fault(label: String, val type: Char, val obj: Faultable, msg: String) {
     val message = "$label ${mapType()}: $msg"
 
@@ -18,17 +15,15 @@ class Fault(label: String, val type: Char, val obj: Faultable, msg: String) {
     }
 }
 
-data class Result<T>(val value: T, val faults: List<Fault> = listOf()) {
-    constructor(value: T, fault: Fault): this(value, listOf(fault))
-
+interface FaultResult {
+    val faults: List<Fault>
+    val errored get() = faults.any { it.type in listOf('E', 'F') }
     val failed get() = faults.any { it.type == 'F' }
-    val errored get() = faults.any { it.type in listOf('F', 'E') }
-    val hasFaults get() = faults.isNotEmpty()
 }
 
 fun printFaults(
     filePath: String,
-    faults: Faults,
+    faults: List<Fault>,
     printWarnings: Boolean = false
 ): Boolean {
     if(faults.isEmpty()) return false

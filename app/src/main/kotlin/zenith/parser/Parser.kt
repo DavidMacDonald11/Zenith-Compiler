@@ -2,9 +2,17 @@ package zenith.parser
 
 import zenith.*
 
+data class Result<T>(val value: T, val faults: List<Fault> = listOf()) {
+    constructor(value: T, fault: Fault): this(value, listOf(fault))
+
+    val failed get() = faults.any { it.type == 'F' }
+    val errored get() = faults.any { it.type in listOf('F', 'E') }
+    val hasFaults get() = faults.isNotEmpty()
+}
+
 internal typealias NodeResult = Result<Node>
 
-data class ParserResult(val node: Node, val faults: Faults)
+data class ParserResult(val node: Node, val faults: List<Fault>)
 
 fun parseTokens(tokens: List<Token>): ParserResult {
     val result = parseFileStat(Context(tokens))

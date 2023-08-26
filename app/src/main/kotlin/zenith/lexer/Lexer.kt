@@ -3,49 +3,77 @@ package zenith.lexer
 import zenith.*
 import zenith.io.SourceFile
 
-private typealias TokenResult = Result<List<Token>>
-private fun TokenResult(token: Token? = null) = Result(listOfNotNull(token))
-private fun TokenResult(fault: Fault) = Result(listOf(fault.obj as Token), fault)
+interface Result: FaultResult {
+    val tokens: List<Token>
+    val isNone get() = tokens.isEmpty()
 
-data class LexerResult(val tokens: List<Token>, val faults: Faults)
+    fun lastHas(string: String) = tokens.lastOrNull()?.has(string) ?: false
 
-fun tokenizeFile(filePath: String): LexerResult {
-    val tokens = mutableListOf<Token>()
-    val faults = mutableListOf<Fault>()
+    private class FinalResult(
+        override val tokens: List<Token>,
+        override val faults: List<Fault>
+    ): Result {
+        constructor(token: Token? = null, fault: Fault? = null):
+            this(listOfNotNull(token), listOfNotNull(fault))
+    }
+
+    companion object {
+        internal val LABEL = "Lexing"
+
+        fun none(): Result = FinalResult()
+        fun token(token: Token): Result = FinalResult(token)
+        fun warn(token: Token, message: String) = fault('W', token, message)
+        fun error(token: Token, message: String) = fault('E', token, message)
+        fun fail(token: Token, message: String) = fault('F', token, message)
+
+        private fun fault(type: Char, token: Token, message: String): Result =
+            FinalResult(token, Fault(LABEL, type, token, message))
+    }
+}
+
+internal class MutableResult(
+    override val tokens: MutableList<Token> = mutableListOf<Token>(),
+    override val faults: MutableList<Fault> = mutableListOf<Fault>()
+): Result {
+    operator fun plusAssign(result: Result) {
+        tokens += result.tokens
+        faults += result.faults
+    }
+
+    operator fun plusAssign(token: Token) { tokens += token }
+    fun addWarning(token: Token, message: String) { fault('W', token, message) }
+    fun addError(token: Token, message: String) { fault('E', token, message) }
+    fun addFailure(token: Token, message: String) { fault('F', token, message) }
+
+    private fun fault(type: Char, token: Token, message: String) {
+        tokens += token
+        faults += Fault(Result.LABEL, type, token, message)
+    }
+}
+
+fun tokenizeFile(filePath: String): Result {
+    val result = MutableResult()
     val file = SourceFile(filePath)
 
     while(!file.atEnd) {
-        val saveNextNewline = !tokens.isEmpty() && !lastHas(tokens, "\n")
-        val result = makeToken(file, saveNextNewline)
-
-        tokens += result.value
-        faults += result.faults
-
-        if(result.failed) return LexerResult(tokens, faults)
+        val saveNextNewline = !result.isNone && !result.lastHas("\n")
+        result += makeToken(file, saveNextNewline)
+        if(result.failed) return result
     }
 
-    tokens += newToken(file, Token.Type.PUNC, Grammar.EOF)
+    result += newToken(file, Token.Type.PUNC, Grammar.EOF)
     file.close()
 
-    return LexerResult(tokens, faults)
+    return result
 }
 
-private const val LABEL = "Lexing"
-private fun Warning(obj: Token, msg: String) = Fault(LABEL, 'W', obj, msg)
-private fun Error(obj: Token, msg: String) = Fault(LABEL, 'E', obj, msg)
-private fun Failure(obj: Token, msg: String) = Fault(LABEL, 'F', obj, msg)
-
-private fun newToken(file: SourceFile, type: Token.Type, string: String) =
+internal fun newToken(file: SourceFile, type: Token.Type, string: String) =
     Token(type, string, file.charPos - string.length.toUInt())
 
-private fun newFaultToken(file: SourceFile, string: String) =
+internal fun newFaultToken(file: SourceFile, string: String) =
     newToken(file, Token.Type.NONE, string)
 
-private fun lastHas(tokens: List<Token>, string: String): Boolean {
-    return tokens.lastOrNull()?.has(string) ?: false
-}
-
-private fun makeToken(file: SourceFile, saveNextNewline: Boolean): TokenResult {
+internal fun makeToken(file: SourceFile, saveNextNewline: Boolean): Result {
     val result = readSpacesAndComments(file)
     if(result.failed || file.atEnd) return result
 
@@ -58,14 +86,14 @@ private fun makeToken(file: SourceFile, saveNextNewline: Boolean): TokenResult {
         '"' -> makeStr(file)
         else -> {
             val token = newFaultToken(file, file.readChar())
-            return TokenResult(Failure(token, "Unrecognized symbol"))
+            return Result.fail(token, "Unrecognized symbol")
         }
     }
 }
 
-private fun readSpacesAndComments(file: SourceFile): TokenResult {
+internal fun readSpacesAndComments(file: SourceFile): Result {
     while(file.nextChar.isWhitespace()) {
-        if(file.nextChar == '\n') return TokenResult()
+        if(file.nextChar == '\n') return Result.none()
         file.readChar()
     }
 
@@ -85,55 +113,55 @@ private fun readSpacesAndComments(file: SourceFile): TokenResult {
             }
 
             val token = newFaultToken(file, "$builder")
-            return TokenResult(Failure(token, "Unterminated multiline comment"))
+            return Result.fail(token, "Unterminated multiline comment")
         }
     }
 
-    return TokenResult()
+    return Result.none()
 }
 
-private fun makeNewline(file: SourceFile, saveNext: Boolean): TokenResult {
+internal fun makeNewline(file: SourceFile, saveNext: Boolean): Result {
     val token = newToken(file, Token.Type.PUNC, file.readChar())
-    return TokenResult(if(saveNext) token else null)
+    return if(saveNext) Result.token(token) else Result.none()
 }
 
-private fun makeNum(file: SourceFile): TokenResult {
+internal fun makeNum(file: SourceFile): Result {
     if(file.peek(2).matches(Grammar.NON_NUM_PATTERN)) return makePunc(file)
 
     val string = file.readTheseChars(Grammar.NUM_SYMS)
     val token = newToken(file, Token.Type.NUM, string)
     val num = string.replace("_", "")
 
-    if(num.matches(Grammar.NUM_PATTERN)) return TokenResult(token)
-    return TokenResult(Error(token, "Invalid number"))
+    if(num.matches(Grammar.NUM_PATTERN)) return Result.token(token)
+    return Result.error(token, "Invalid number")
 }
 
-private fun makePunc(file: SourceFile): TokenResult {
+internal fun makePunc(file: SourceFile): Result {
     for(puncSize in Grammar.LONGEST_PUNC_SIZE downTo 1) {
         if(file.peek(puncSize) in Grammar.PUNCS) {
             val string = file.readChars(puncSize)
-            return TokenResult(newToken(file, Token.Type.PUNC, string))
+            return Result.token(newToken(file, Token.Type.PUNC, string))
         }
     }
 
     val token = newFaultToken(file, file.readChar())
-    return TokenResult(Error(token, "Incomplete punctuator"))
+    return Result.error(token, "Incomplete punctuator")
 }
 
-private fun makeIdOrKey(file: SourceFile): TokenResult {
+internal fun makeIdOrKey(file: SourceFile): Result {
     val string = file.readTheseChars(Grammar.ID_SYMS)
     val type = if(string !in Grammar.KEYS) Token.Type.ID else Token.Type.KEY
-    return TokenResult(newToken(file, type, string))
+    return Result.token(newToken(file, type, string))
 }
 
-private fun makeChar(file: SourceFile): TokenResult {
+internal fun makeChar(file: SourceFile): Result {
     val builder = StringBuilder(file.readChar())
 
     when(file.nextChar) {
         '\'' -> {
             builder.append(file.readChar())
             val token = newFaultToken(file, "$builder")
-            return TokenResult(Error(token, "Empty character"))
+            return Result.error(token, "Empty character")
         }
         '\\' -> {
             builder.append(file.readChars(2))
@@ -146,21 +174,21 @@ private fun makeChar(file: SourceFile): TokenResult {
     val charEnded = (builder.last() == '\'')
     val token = newToken(file, Token.Type.CHAR, "$builder")
 
-    if(!charEnded) return TokenResult(Failure(token, "Unterminated character"))
-    if(builder.matches(Grammar.CHAR_PATTERN)) return TokenResult(token)
-    return TokenResult(Error(token, "Invaid Character"))
+    if(!charEnded) return Result.fail(token, "Unterminated character")
+    if(builder.matches(Grammar.CHAR_PATTERN)) return Result.token(token)
+    return Result.error(token, "Invaid Character")
 }
 
 private const val MULTI_QUOTE = "\"\"\""
 
-private fun makeStr(file: SourceFile): TokenResult {
+internal fun makeStr(file: SourceFile): Result {
     val isMulti = (file.peek(3) == MULTI_QUOTE)
     val quoteLength = if(isMulti) 3 else 1
     val stopPattern = if(isMulti) "$\"" else "$\"\\\n"
 
-    val tokens = mutableListOf(newToken(file, Token.Type.STR_START, "<S>"))
-    val faults = mutableListOf<Fault>()
     val builder = StringBuilder(file.readChars(quoteLength))
+    val result = MutableResult()
+    result += newToken(file, Token.Type.STR_START, "<S>")
 
     while(!file.atEnd) {
         builder.append(file.readCharsUntil(stopPattern))
@@ -168,26 +196,25 @@ private fun makeStr(file: SourceFile): TokenResult {
         when(file.nextChar) {
             '$' -> {
                 val token = newToken(file, Token.Type.STR, "$builder")
-                val result = makeStrTemplate(file)
+                val template = makeStrTemplate(file)
 
-                if(result.value.isEmpty() && result.faults.isEmpty()) {
+                if(result.isNone) {
                     builder.append(file.readChar())
                     continue
                 }
 
                 builder.clear()
-                tokens += token
-                tokens += result.value
-                faults += result.faults
+                result += token
+                result += template
 
-                if(result.failed) return Result(tokens, faults)
+                if(result.failed) return result
             }
             '"' -> if(!isMulti || file.peek(3) == MULTI_QUOTE) {
                 builder.append(file.readChars(quoteLength))
-                tokens += newToken(file, Token.Type.STR, "$builder")
-                tokens += newToken(file, Token.Type.STR_END, "</S>")
+                result += newToken(file, Token.Type.STR, "$builder")
+                result += newToken(file, Token.Type.STR_END, "</S>")
 
-                return Result(tokens, faults)
+                return result
             }
             '\\' -> {
                 val escapeLength = if(file.peek(2) == "\\u") 6 else 2
@@ -195,53 +222,49 @@ private fun makeStr(file: SourceFile): TokenResult {
                 builder.append(escape)
 
                 if(escape.matches(Grammar.ESCAPE_PATTERN)) continue
-                tokens += newFaultToken(file, escape)
-                faults += Error(tokens.last(), "Invalid escape sequence")
+
+                val token = newFaultToken(file, escape)
+                result.addError(token, "Invalid escape sequence")
             }
             '\n' -> break
         }
     }
 
+    val token = newToken(file, Token.Type.STR, "$builder")
     val kind = if(isMulti) " multiline" else ""
-    tokens += newToken(file, Token.Type.STR, "$builder")
-    faults += Failure(tokens.last(), "Unterminated$kind string literal")
+    result.addFailure(token, "Unterminated$kind string literal")
 
-    return Result(tokens, faults)
+    return result
 }
 
-private fun makeStrTemplate(file: SourceFile): TokenResult {
+internal fun makeStrTemplate(file: SourceFile): Result {
     return when(file.peek(2).last()) {
         in Grammar.ID_START_SYMS -> {
             file.readChar()
             makeIdOrKey(file)
         }
         '{' -> makeStrExprTemplate(file)
-        else -> TokenResult()
+        else -> Result.none()
     }
 }
 
-private fun makeStrExprTemplate(file: SourceFile): TokenResult {
-    val tokens = mutableListOf<Token>()
-    val faults = mutableListOf<Fault>()
+internal fun makeStrExprTemplate(file: SourceFile): Result {
+    val result = MutableResult()
     val faultToken = newFaultToken(file, file.readChars(2))
 
     while(!file.atEnd) {
-        val result = makeToken(file, false)
+        val newTokens = makeToken(file, false)
 
-        if(lastHas(result.value, "}")) {
-            if(tokens.isEmpty())
-                faults += Warning(faultToken, "Empty string template")
-
-            return Result(tokens, faults)
+        if(!newTokens.lastHas("}")) {
+            result += newTokens
+            if(result.failed) return result
+            continue
         }
 
-        tokens += result.value
-        faults += result.faults
-
-        if(result.failed) return Result(tokens, faults)
+        if(result.isNone) result.addWarning(faultToken, "Empty string template")
+        return result
     }
 
-    tokens += faultToken
-    faults += Failure(faultToken, "Unterminated string template")
-    return Result(tokens, faults)
+    result.addFailure(faultToken, "Unterminated string template")
+    return result
 }
