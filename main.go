@@ -8,7 +8,7 @@ import (
 )
 
 type treeShapeListener struct {
-    *parser.BaseZenithListener
+    *parser.BaseZenithParserListener
 }
 
 func (s *treeShapeListener) VisitTerminal(node antlr.TerminalNode) {
