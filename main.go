@@ -28,7 +28,7 @@ func (s *treeShapeListener) ExitEveryRule(ctx antlr.ParserRuleContext) {
 }
 
 func main() {
-    in := antlr.NewInputStream("1 + 2 / 3")
+    in := antlr.NewInputStream("1 + 2 / 0b_101")
     lexer := parser.NewZenithLexer(in)
     tokens := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
     parser := parser.NewZenithParser(tokens)
