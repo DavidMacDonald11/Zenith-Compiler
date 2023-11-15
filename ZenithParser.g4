@@ -3,7 +3,7 @@ options { tokenVocab = ZenithLexer; }
 
 fileStat : expr EOF ;
 
-expr : expr op=(TIMES | DIVIDE) NL? expr
-     | expr op=(PLUS | MINUS) NL? expr
-     | NUM
+expr : Left=expr Op=(TIMES | DIVIDE) NL? Right=expr #mulExpr
+     | Left=expr Op=(PLUS | MINUS) NL? Right=expr #addExpr
+     | Num=NUM #numExpr
      ;

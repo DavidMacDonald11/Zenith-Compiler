@@ -11,12 +11,24 @@ type ZenithParserListener interface {
 	// EnterFileStat is called when entering the fileStat production.
 	EnterFileStat(c *FileStatContext)
 
-	// EnterExpr is called when entering the expr production.
-	EnterExpr(c *ExprContext)
+	// EnterAddExpr is called when entering the addExpr production.
+	EnterAddExpr(c *AddExprContext)
+
+	// EnterMulExpr is called when entering the mulExpr production.
+	EnterMulExpr(c *MulExprContext)
+
+	// EnterNumExpr is called when entering the numExpr production.
+	EnterNumExpr(c *NumExprContext)
 
 	// ExitFileStat is called when exiting the fileStat production.
 	ExitFileStat(c *FileStatContext)
 
-	// ExitExpr is called when exiting the expr production.
-	ExitExpr(c *ExprContext)
+	// ExitAddExpr is called when exiting the addExpr production.
+	ExitAddExpr(c *AddExprContext)
+
+	// ExitMulExpr is called when exiting the mulExpr production.
+	ExitMulExpr(c *MulExprContext)
+
+	// ExitNumExpr is called when exiting the numExpr production.
+	ExitNumExpr(c *NumExprContext)
 }

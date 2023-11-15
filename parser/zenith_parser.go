@@ -195,6 +195,16 @@ func (s *FileStatContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
+func (s *FileStatContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case ZenithParserVisitor:
+		return t.VisitFileStat(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
 func (p *ZenithParser) FileStat() (localctx IFileStatContext) {
 	localctx = NewFileStatContext(p, p.GetParserRuleContext(), p.GetState())
 	p.EnterRule(localctx, 0, ZenithParserRULE_fileStat)
@@ -231,23 +241,6 @@ type IExprContext interface {
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
-
-	// GetOp returns the op token.
-	GetOp() antlr.Token
-
-	// SetOp sets the op token.
-	SetOp(antlr.Token)
-
-	// Getter signatures
-	NUM() antlr.TerminalNode
-	AllExpr() []IExprContext
-	Expr(i int) IExprContext
-	TIMES() antlr.TerminalNode
-	DIVIDE() antlr.TerminalNode
-	NL() antlr.TerminalNode
-	PLUS() antlr.TerminalNode
-	MINUS() antlr.TerminalNode
-
 	// IsExprContext differentiates from other interfaces.
 	IsExprContext()
 }
@@ -255,7 +248,6 @@ type IExprContext interface {
 type ExprContext struct {
 	antlr.BaseParserRuleContext
 	parser antlr.Parser
-	op     antlr.Token
 }
 
 func NewEmptyExprContext() *ExprContext {
@@ -285,15 +277,52 @@ func NewExprContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokin
 
 func (s *ExprContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *ExprContext) GetOp() antlr.Token { return s.op }
-
-func (s *ExprContext) SetOp(v antlr.Token) { s.op = v }
-
-func (s *ExprContext) NUM() antlr.TerminalNode {
-	return s.GetToken(ZenithParserNUM, 0)
+func (s *ExprContext) CopyAll(ctx *ExprContext) {
+	s.CopyFrom(&ctx.BaseParserRuleContext)
 }
 
-func (s *ExprContext) AllExpr() []IExprContext {
+func (s *ExprContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *ExprContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
+type AddExprContext struct {
+	ExprContext
+	Left  IExprContext
+	Op    antlr.Token
+	Right IExprContext
+}
+
+func NewAddExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *AddExprContext {
+	var p = new(AddExprContext)
+
+	InitEmptyExprContext(&p.ExprContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExprContext))
+
+	return p
+}
+
+func (s *AddExprContext) GetOp() antlr.Token { return s.Op }
+
+func (s *AddExprContext) SetOp(v antlr.Token) { s.Op = v }
+
+func (s *AddExprContext) GetLeft() IExprContext { return s.Left }
+
+func (s *AddExprContext) GetRight() IExprContext { return s.Right }
+
+func (s *AddExprContext) SetLeft(v IExprContext) { s.Left = v }
+
+func (s *AddExprContext) SetRight(v IExprContext) { s.Right = v }
+
+func (s *AddExprContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *AddExprContext) AllExpr() []IExprContext {
 	children := s.GetChildren()
 	len := 0
 	for _, ctx := range children {
@@ -314,7 +343,7 @@ func (s *ExprContext) AllExpr() []IExprContext {
 	return tst
 }
 
-func (s *ExprContext) Expr(i int) IExprContext {
+func (s *AddExprContext) Expr(i int) IExprContext {
 	var t antlr.RuleContext
 	j := 0
 	for _, ctx := range s.GetChildren() {
@@ -334,43 +363,194 @@ func (s *ExprContext) Expr(i int) IExprContext {
 	return t.(IExprContext)
 }
 
-func (s *ExprContext) TIMES() antlr.TerminalNode {
-	return s.GetToken(ZenithParserTIMES, 0)
-}
-
-func (s *ExprContext) DIVIDE() antlr.TerminalNode {
-	return s.GetToken(ZenithParserDIVIDE, 0)
-}
-
-func (s *ExprContext) NL() antlr.TerminalNode {
-	return s.GetToken(ZenithParserNL, 0)
-}
-
-func (s *ExprContext) PLUS() antlr.TerminalNode {
+func (s *AddExprContext) PLUS() antlr.TerminalNode {
 	return s.GetToken(ZenithParserPLUS, 0)
 }
 
-func (s *ExprContext) MINUS() antlr.TerminalNode {
+func (s *AddExprContext) MINUS() antlr.TerminalNode {
 	return s.GetToken(ZenithParserMINUS, 0)
 }
 
-func (s *ExprContext) GetRuleContext() antlr.RuleContext {
-	return s
+func (s *AddExprContext) NL() antlr.TerminalNode {
+	return s.GetToken(ZenithParserNL, 0)
 }
 
-func (s *ExprContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-func (s *ExprContext) EnterRule(listener antlr.ParseTreeListener) {
+func (s *AddExprContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(ZenithParserListener); ok {
-		listenerT.EnterExpr(s)
+		listenerT.EnterAddExpr(s)
 	}
 }
 
-func (s *ExprContext) ExitRule(listener antlr.ParseTreeListener) {
+func (s *AddExprContext) ExitRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(ZenithParserListener); ok {
-		listenerT.ExitExpr(s)
+		listenerT.ExitAddExpr(s)
+	}
+}
+
+func (s *AddExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case ZenithParserVisitor:
+		return t.VisitAddExpr(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
+type MulExprContext struct {
+	ExprContext
+	Left  IExprContext
+	Op    antlr.Token
+	Right IExprContext
+}
+
+func NewMulExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *MulExprContext {
+	var p = new(MulExprContext)
+
+	InitEmptyExprContext(&p.ExprContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExprContext))
+
+	return p
+}
+
+func (s *MulExprContext) GetOp() antlr.Token { return s.Op }
+
+func (s *MulExprContext) SetOp(v antlr.Token) { s.Op = v }
+
+func (s *MulExprContext) GetLeft() IExprContext { return s.Left }
+
+func (s *MulExprContext) GetRight() IExprContext { return s.Right }
+
+func (s *MulExprContext) SetLeft(v IExprContext) { s.Left = v }
+
+func (s *MulExprContext) SetRight(v IExprContext) { s.Right = v }
+
+func (s *MulExprContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *MulExprContext) AllExpr() []IExprContext {
+	children := s.GetChildren()
+	len := 0
+	for _, ctx := range children {
+		if _, ok := ctx.(IExprContext); ok {
+			len++
+		}
+	}
+
+	tst := make([]IExprContext, len)
+	i := 0
+	for _, ctx := range children {
+		if t, ok := ctx.(IExprContext); ok {
+			tst[i] = t.(IExprContext)
+			i++
+		}
+	}
+
+	return tst
+}
+
+func (s *MulExprContext) Expr(i int) IExprContext {
+	var t antlr.RuleContext
+	j := 0
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExprContext); ok {
+			if j == i {
+				t = ctx.(antlr.RuleContext)
+				break
+			}
+			j++
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExprContext)
+}
+
+func (s *MulExprContext) TIMES() antlr.TerminalNode {
+	return s.GetToken(ZenithParserTIMES, 0)
+}
+
+func (s *MulExprContext) DIVIDE() antlr.TerminalNode {
+	return s.GetToken(ZenithParserDIVIDE, 0)
+}
+
+func (s *MulExprContext) NL() antlr.TerminalNode {
+	return s.GetToken(ZenithParserNL, 0)
+}
+
+func (s *MulExprContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(ZenithParserListener); ok {
+		listenerT.EnterMulExpr(s)
+	}
+}
+
+func (s *MulExprContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(ZenithParserListener); ok {
+		listenerT.ExitMulExpr(s)
+	}
+}
+
+func (s *MulExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case ZenithParserVisitor:
+		return t.VisitMulExpr(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
+type NumExprContext struct {
+	ExprContext
+	Num antlr.Token
+}
+
+func NewNumExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *NumExprContext {
+	var p = new(NumExprContext)
+
+	InitEmptyExprContext(&p.ExprContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExprContext))
+
+	return p
+}
+
+func (s *NumExprContext) GetNum() antlr.Token { return s.Num }
+
+func (s *NumExprContext) SetNum(v antlr.Token) { s.Num = v }
+
+func (s *NumExprContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *NumExprContext) NUM() antlr.TerminalNode {
+	return s.GetToken(ZenithParserNUM, 0)
+}
+
+func (s *NumExprContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(ZenithParserListener); ok {
+		listenerT.EnterNumExpr(s)
+	}
+}
+
+func (s *NumExprContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(ZenithParserListener); ok {
+		listenerT.ExitNumExpr(s)
+	}
+}
+
+func (s *NumExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case ZenithParserVisitor:
+		return t.VisitNumExpr(s)
+
+	default:
+		return t.VisitChildren(s)
 	}
 }
 
@@ -392,9 +572,16 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 	var _alt int
 
 	p.EnterOuterAlt(localctx, 1)
+	localctx = NewNumExprContext(p, localctx)
+	p.SetParserRuleContext(localctx)
+	_prevctx = localctx
+
 	{
 		p.SetState(8)
-		p.Match(ZenithParserNUM)
+
+		var _m = p.Match(ZenithParserNUM)
+
+		localctx.(*NumExprContext).Num = _m
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -425,7 +612,9 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 			switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 2, p.GetParserRuleContext()) {
 			case 1:
-				localctx = NewExprContext(p, _parentctx, _parentState)
+				localctx = NewMulExprContext(p, NewExprContext(p, _parentctx, _parentState))
+				localctx.(*MulExprContext).Left = _prevctx
+
 				p.PushNewRecursionContext(localctx, _startState, ZenithParserRULE_expr)
 				p.SetState(10)
 
@@ -438,14 +627,14 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 					var _lt = p.GetTokenStream().LT(1)
 
-					localctx.(*ExprContext).op = _lt
+					localctx.(*MulExprContext).Op = _lt
 
 					_la = p.GetTokenStream().LA(1)
 
 					if !(_la == ZenithParserTIMES || _la == ZenithParserDIVIDE) {
 						var _ri = p.GetErrorHandler().RecoverInline(p)
 
-						localctx.(*ExprContext).op = _ri
+						localctx.(*MulExprContext).Op = _ri
 					} else {
 						p.GetErrorHandler().ReportMatch(p)
 						p.Consume()
@@ -471,11 +660,16 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 				}
 				{
 					p.SetState(15)
-					p.expr(4)
+
+					var _x = p.expr(4)
+
+					localctx.(*MulExprContext).Right = _x
 				}
 
 			case 2:
-				localctx = NewExprContext(p, _parentctx, _parentState)
+				localctx = NewAddExprContext(p, NewExprContext(p, _parentctx, _parentState))
+				localctx.(*AddExprContext).Left = _prevctx
+
 				p.PushNewRecursionContext(localctx, _startState, ZenithParserRULE_expr)
 				p.SetState(16)
 
@@ -488,14 +682,14 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 					var _lt = p.GetTokenStream().LT(1)
 
-					localctx.(*ExprContext).op = _lt
+					localctx.(*AddExprContext).Op = _lt
 
 					_la = p.GetTokenStream().LA(1)
 
 					if !(_la == ZenithParserPLUS || _la == ZenithParserMINUS) {
 						var _ri = p.GetErrorHandler().RecoverInline(p)
 
-						localctx.(*ExprContext).op = _ri
+						localctx.(*AddExprContext).Op = _ri
 					} else {
 						p.GetErrorHandler().ReportMatch(p)
 						p.Consume()
@@ -521,7 +715,10 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 				}
 				{
 					p.SetState(21)
-					p.expr(3)
+
+					var _x = p.expr(3)
+
+					localctx.(*AddExprContext).Right = _x
 				}
 
 			case antlr.ATNInvalidAltNumber:
