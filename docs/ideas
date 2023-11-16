@@ -1,0 +1,61 @@
+Two pointer types: exclusive pointers and borrow pointers
+Exclusive pointers are responsible for deallocating.
+Borrow pointers will last at least as long as their usage.
+
+var a int = 4
+var aPtr &int = &a - a borrow pointer to an int
+var b int = dyn(5)
+var bPtr $int = $b - an exclusive ponter to an int; b is unusable now
+
+@aPtr gives 4
+@bPtr gives 5
+
+a := 4
+aPtr := &a
+b := dyn(5)
+bPtr := $b
+
+type Node struct {
+    value int
+    next $Node
+}
+
+AddNode(v int) {
+    seek...
+    next = $dyn(Node{v, nil})
+}
+
+node = Node{10, nil}
+node.AddNode(11)
+
+nodes will be chain deallocated
+reassagning next will deallocate previous assign
+transfering next will set it to nil
+
+type Node struct {
+    value int
+    next $Node
+    prev &Node
+}
+
+new idea: psuedo smart pointers
+$exclusive - cleans up when scope ends. Cannot be copied; only moved - *
+#shared - cleans up when scope ends. Sets all other ptrs to nil - **
+&borrow - may be set to nil by something else. Temp copy of data - **
+
+type Node struct {
+    value int
+    next #Node
+    prev &Node
+}
+
+new idea: ptr to exclusive ptr
+$exclusive - cleans up automatically. Sets itself to nil; - *
+&borrow - temp copy of data - *
+&$shared - ptr to exclusive. If cleaned up, val is nil; - **
+
+type Node struct {
+    value int
+    next $Node
+    prev &$Node
+}

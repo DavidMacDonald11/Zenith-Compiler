@@ -33,25 +33,25 @@ var ZenithParserParserStaticData struct {
 func zenithparserParserInit() {
 	staticData := &ZenithParserParserStaticData
 	staticData.LiteralNames = []string{
-		"", "'+'", "'-'", "'*'", "'/'",
+		"", "'+'", "'-'", "'*'", "'/'", "'%'",
 	}
 	staticData.SymbolicNames = []string{
-		"", "PLUS", "MINUS", "TIMES", "DIVIDE", "NUM", "NL", "SPACE",
+		"", "PLUS", "MINUS", "TIMES", "DIVIDE", "REM", "NUM", "NL", "SPACE",
 	}
 	staticData.RuleNames = []string{
 		"fileStat", "expr",
 	}
 	staticData.PredictionContextCache = antlr.NewPredictionContextCache()
 	staticData.serializedATN = []int32{
-		4, 1, 7, 28, 2, 0, 7, 0, 2, 1, 7, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1,
+		4, 1, 8, 28, 2, 0, 7, 0, 2, 1, 7, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1,
 		1, 1, 1, 1, 1, 1, 3, 1, 14, 8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 20, 8,
 		1, 1, 1, 5, 1, 23, 8, 1, 10, 1, 12, 1, 26, 9, 1, 1, 1, 0, 1, 2, 2, 0, 2,
-		0, 2, 1, 0, 3, 4, 1, 0, 1, 2, 29, 0, 4, 1, 0, 0, 0, 2, 7, 1, 0, 0, 0, 4,
+		0, 2, 1, 0, 3, 5, 1, 0, 1, 2, 29, 0, 4, 1, 0, 0, 0, 2, 7, 1, 0, 0, 0, 4,
 		5, 3, 2, 1, 0, 5, 6, 5, 0, 0, 1, 6, 1, 1, 0, 0, 0, 7, 8, 6, 1, -1, 0, 8,
-		9, 5, 5, 0, 0, 9, 24, 1, 0, 0, 0, 10, 11, 10, 3, 0, 0, 11, 13, 7, 0, 0,
-		0, 12, 14, 5, 6, 0, 0, 13, 12, 1, 0, 0, 0, 13, 14, 1, 0, 0, 0, 14, 15,
+		9, 5, 6, 0, 0, 9, 24, 1, 0, 0, 0, 10, 11, 10, 3, 0, 0, 11, 13, 7, 0, 0,
+		0, 12, 14, 5, 7, 0, 0, 13, 12, 1, 0, 0, 0, 13, 14, 1, 0, 0, 0, 14, 15,
 		1, 0, 0, 0, 15, 23, 3, 2, 1, 4, 16, 17, 10, 2, 0, 0, 17, 19, 7, 1, 0, 0,
-		18, 20, 5, 6, 0, 0, 19, 18, 1, 0, 0, 0, 19, 20, 1, 0, 0, 0, 20, 21, 1,
+		18, 20, 5, 7, 0, 0, 19, 18, 1, 0, 0, 0, 19, 20, 1, 0, 0, 0, 20, 21, 1,
 		0, 0, 0, 21, 23, 3, 2, 1, 3, 22, 10, 1, 0, 0, 0, 22, 16, 1, 0, 0, 0, 23,
 		26, 1, 0, 0, 0, 24, 22, 1, 0, 0, 0, 24, 25, 1, 0, 0, 0, 25, 3, 1, 0, 0,
 		0, 26, 24, 1, 0, 0, 0, 4, 13, 19, 22, 24,
@@ -97,9 +97,10 @@ const (
 	ZenithParserMINUS  = 2
 	ZenithParserTIMES  = 3
 	ZenithParserDIVIDE = 4
-	ZenithParserNUM    = 5
-	ZenithParserNL     = 6
-	ZenithParserSPACE  = 7
+	ZenithParserREM    = 5
+	ZenithParserNUM    = 6
+	ZenithParserNL     = 7
+	ZenithParserSPACE  = 8
 )
 
 // ZenithParser rules.
@@ -479,6 +480,10 @@ func (s *MulExprContext) DIVIDE() antlr.TerminalNode {
 	return s.GetToken(ZenithParserDIVIDE, 0)
 }
 
+func (s *MulExprContext) REM() antlr.TerminalNode {
+	return s.GetToken(ZenithParserREM, 0)
+}
+
 func (s *MulExprContext) NL() antlr.TerminalNode {
 	return s.GetToken(ZenithParserNL, 0)
 }
@@ -631,7 +636,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 					_la = p.GetTokenStream().LA(1)
 
-					if !(_la == ZenithParserTIMES || _la == ZenithParserDIVIDE) {
+					if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&56) != 0) {
 						var _ri = p.GetErrorHandler().RecoverInline(p)
 
 						localctx.(*MulExprContext).Op = _ri

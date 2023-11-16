@@ -20,15 +20,35 @@ func (a *Analyzer) VisitFileStat(ctx *parser.FileStatContext) any {
 }
 
 func (a *Analyzer) VisitMulExpr(ctx *parser.MulExprContext) any {
-    return nil
+    left := a.Visit(ctx.Left)
+    right := a.Visit(ctx.Right)
+
+    if left.(string) != right.(string) {
+        panic("Cannot mul/div/rem different types")
+    }
+
+    return left
 }
 
 func (a *Analyzer) VisitAddExpr(ctx *parser.AddExprContext) any {
-    return nil
+    left := a.Visit(ctx.Left)
+    right := a.Visit(ctx.Right)
+
+    if left.(string) != right.(string) {
+        panic("Cannot add/sub different types")
+    }
+
+    return left
 }
 
 func (a *Analyzer) VisitNumExpr(ctx *parser.NumExprContext) any {
-    if strings.ContainsRune(ctx.Num.GetText(), '.') {
+    num := ctx.Num.GetText()
+
+    if strings.ContainsRune(num, 'i') {
+        return "complex128"
+    }
+
+    if strings.ContainsRune(num, '.') {
         return "float64"
     }
 
