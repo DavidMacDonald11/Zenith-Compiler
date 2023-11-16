@@ -44,10 +44,6 @@ func (a *Analyzer) VisitAddExpr(ctx *parser.AddExprContext) any {
 func (a *Analyzer) VisitNumExpr(ctx *parser.NumExprContext) any {
     num := ctx.Num.GetText()
 
-    if strings.ContainsRune(num, 'i') {
-        return "complex128"
-    }
-
     if strings.ContainsRune(num, '.') {
         return "float64"
     }

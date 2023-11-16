@@ -7,10 +7,10 @@ DIVIDE : '/' ;
 REM : '%' ;
 
 NUM
-    : DEC_NUM [i]?
-    | BIN_NUM [i]?
-    | OCT_NUM [i]?
-    | HEX_NUM [i]?
+    : DEC_NUM
+    | BIN_NUM
+    | OCT_NUM
+    | HEX_NUM
     ;
 
 fragment DEC_NUM
