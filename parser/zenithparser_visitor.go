@@ -11,6 +11,9 @@ type ZenithParserVisitor interface {
 	// Visit a parse tree produced by ZenithParser#fileStat.
 	VisitFileStat(ctx *FileStatContext) interface{}
 
+	// Visit a parse tree produced by ZenithParser#prefixExpr.
+	VisitPrefixExpr(ctx *PrefixExprContext) interface{}
+
 	// Visit a parse tree produced by ZenithParser#castExpr.
 	VisitCastExpr(ctx *CastExprContext) interface{}
 
@@ -19,6 +22,12 @@ type ZenithParserVisitor interface {
 
 	// Visit a parse tree produced by ZenithParser#mulExpr.
 	VisitMulExpr(ctx *MulExprContext) interface{}
+
+	// Visit a parse tree produced by ZenithParser#ifExpr.
+	VisitIfExpr(ctx *IfExprContext) interface{}
+
+	// Visit a parse tree produced by ZenithParser#keyExpr.
+	VisitKeyExpr(ctx *KeyExprContext) interface{}
 
 	// Visit a parse tree produced by ZenithParser#parenExpr.
 	VisitParenExpr(ctx *ParenExprContext) interface{}

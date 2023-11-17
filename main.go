@@ -10,7 +10,10 @@ import (
 )
 
 func main() {
-    in := antlr.NewInputStream("16 - 2 % uint(1.0 + 1)")
+    str := "5 if true else uint(6)"
+    fmt.Printf(`Compiling "%s"` + "\n", str)
+    in := antlr.NewInputStream(str)
+
     lexer := parser.NewZenithLexer(in)
     tokens := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
     tree := parser.NewZenithParser(tokens).FileStat()

@@ -24,6 +24,25 @@ func (g *Generator) VisitFileStat(ctx *parser.FileStatContext) any {
     return g.Visit(ctx.Expr())
 }
 
+func (g *Generator) VisitParenExpr(ctx *parser.ParenExprContext) any {
+    inner := g.Visit(ctx.Inner)
+    return fmt.Sprintf("(%v)", inner)
+}
+
+func (g *Generator) VisitCastExpr(ctx *parser.CastExprContext) any {
+    exprType := getCType(g.Analyzer.ExprTypes[ctx])
+    inner := g.Visit(ctx.Inner)
+
+    return fmt.Sprintf("(%v)(%v)", exprType, inner)
+}
+
+func (g *Generator) VisitPrefixExpr(ctx *parser.PrefixExprContext) any {
+    op := ctx.Op.GetText()
+    right := g.Visit(ctx.Right)
+
+    return fmt.Sprintf("%v%v", op, right)
+}
+
 func (g *Generator) VisitMulExpr(ctx *parser.MulExprContext) any {
     left := g.Visit(ctx.Left)
     right := g.Visit(ctx.Right)
@@ -40,16 +59,12 @@ func (g *Generator) VisitAddExpr(ctx *parser.AddExprContext) any {
     return fmt.Sprintf("%v %v %v", left, op, right)
 }
 
-func (g *Generator) VisitCastExpr(ctx *parser.CastExprContext) any {
-    exprType := getCType(g.Analyzer.ExprTypes[ctx])
-    inner := g.Visit(ctx.Inner)
+func (g *Generator) VisitIfExpr(ctx *parser.IfExprContext) any {
+    left := g.Visit(ctx.Left)
+    condition := g.Visit(ctx.Condition)
+    right := g.Visit(ctx.Right)
 
-    return fmt.Sprintf("(%v)(%v)", exprType, inner)
-}
-
-func (g *Generator) VisitParenExpr(ctx *parser.ParenExprContext) any {
-    inner := g.Visit(ctx.Inner)
-    return fmt.Sprintf("(%v)", inner)
+    return fmt.Sprintf("(%v)? %v : %v", condition, left, right)
 }
 
 func (g *Generator) VisitNumExpr(ctx *parser.NumExprContext) any {
@@ -89,6 +104,11 @@ func (g *Generator) VisitNumExpr(ctx *parser.NumExprContext) any {
     return str
 }
 
+func (g *Generator) VisitKeyExpr(ctx *parser.KeyExprContext) any {
+    key := ctx.Key.GetText()
+    return key
+}
+
 func getBase(num string) int64 {
     if strings.Contains(num, "0b") { return 2 }
     if strings.Contains(num, "0o") { return 8 }
@@ -121,6 +141,7 @@ func getCType(t string) string {
     case "float32": return "float"
     case "anyfloat": fallthrough
     case "float64": return "double"
+    case "bool": return "bool"
     }
 
     return "void"

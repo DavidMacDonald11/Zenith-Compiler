@@ -6,10 +6,16 @@ TIMES : '*' ;
 DIVIDE : '/' ;
 REM : '%' ;
 
+IF : 'if' ;
+ELSE : 'else' ;
+TRUE : 'true' ;
+FALSE : 'false' ;
+
 TYPE
     : 'uint8' | 'uint16' |  'uint32' |  'uint64' | 'uint'
     |  'int8' |  'int16' |   'int32' |   'int64' |  'int'
                          | 'float32' | 'float64'
+    | 'bool'
     ;
 
 NUM
