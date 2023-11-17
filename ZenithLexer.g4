@@ -6,6 +6,12 @@ TIMES : '*' ;
 DIVIDE : '/' ;
 REM : '%' ;
 
+TYPE
+    : 'uint8' | 'uint16' |  'uint32' |  'uint64' | 'uint'
+    |  'int8' |  'int16' |   'int32' |   'int64' |  'int'
+                         | 'float32' | 'float64'
+    ;
+
 NUM
     : DEC_NUM
     | BIN_NUM
@@ -46,5 +52,7 @@ fragment HEX_NUM : '0x' (
 fragment HEX_SEG : (HEX_DIGIT | '_')* HEX_DIGIT (HEX_DIGIT | '_')* ;
 fragment HEX_DIGIT : [0-9a-fA-F] ;
 
+LPAREN : '(' ;
+RPAREN : ')' ;
 NL : ([\r]? [\n])+ ;
 SPACE : [ \t] -> skip ;

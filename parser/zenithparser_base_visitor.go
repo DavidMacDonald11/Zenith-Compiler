@@ -12,11 +12,19 @@ func (v *BaseZenithParserVisitor) VisitFileStat(ctx *FileStatContext) interface{
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseZenithParserVisitor) VisitCastExpr(ctx *CastExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseZenithParserVisitor) VisitAddExpr(ctx *AddExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
 func (v *BaseZenithParserVisitor) VisitMulExpr(ctx *MulExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitParenExpr(ctx *ParenExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

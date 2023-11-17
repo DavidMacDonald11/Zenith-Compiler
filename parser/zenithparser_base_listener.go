@@ -27,6 +27,12 @@ func (s *BaseZenithParserListener) EnterFileStat(ctx *FileStatContext) {}
 // ExitFileStat is called when production fileStat is exited.
 func (s *BaseZenithParserListener) ExitFileStat(ctx *FileStatContext) {}
 
+// EnterCastExpr is called when production castExpr is entered.
+func (s *BaseZenithParserListener) EnterCastExpr(ctx *CastExprContext) {}
+
+// ExitCastExpr is called when production castExpr is exited.
+func (s *BaseZenithParserListener) ExitCastExpr(ctx *CastExprContext) {}
+
 // EnterAddExpr is called when production addExpr is entered.
 func (s *BaseZenithParserListener) EnterAddExpr(ctx *AddExprContext) {}
 
@@ -38,6 +44,12 @@ func (s *BaseZenithParserListener) EnterMulExpr(ctx *MulExprContext) {}
 
 // ExitMulExpr is called when production mulExpr is exited.
 func (s *BaseZenithParserListener) ExitMulExpr(ctx *MulExprContext) {}
+
+// EnterParenExpr is called when production parenExpr is entered.
+func (s *BaseZenithParserListener) EnterParenExpr(ctx *ParenExprContext) {}
+
+// ExitParenExpr is called when production parenExpr is exited.
+func (s *BaseZenithParserListener) ExitParenExpr(ctx *ParenExprContext) {}
 
 // EnterNumExpr is called when production numExpr is entered.
 func (s *BaseZenithParserListener) EnterNumExpr(ctx *NumExprContext) {}
