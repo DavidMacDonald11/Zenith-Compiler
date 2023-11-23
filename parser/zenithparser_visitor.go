@@ -17,11 +17,11 @@ type ZenithParserVisitor interface {
 	// Visit a parse tree produced by ZenithParser#lineEnd.
 	VisitLineEnd(ctx *LineEndContext) interface{}
 
-	// Visit a parse tree produced by ZenithParser#exprStat.
-	VisitExprStat(ctx *ExprStatContext) interface{}
-
 	// Visit a parse tree produced by ZenithParser#defineStat.
 	VisitDefineStat(ctx *DefineStatContext) interface{}
+
+	// Visit a parse tree produced by ZenithParser#exprStat.
+	VisitExprStat(ctx *ExprStatContext) interface{}
 
 	// Visit a parse tree produced by ZenithParser#prefixExpr.
 	VisitPrefixExpr(ctx *PrefixExprContext) interface{}
@@ -41,11 +41,11 @@ type ZenithParserVisitor interface {
 	// Visit a parse tree produced by ZenithParser#keyExpr.
 	VisitKeyExpr(ctx *KeyExprContext) interface{}
 
-	// Visit a parse tree produced by ZenithParser#parenExpr.
-	VisitParenExpr(ctx *ParenExprContext) interface{}
-
 	// Visit a parse tree produced by ZenithParser#numExpr.
 	VisitNumExpr(ctx *NumExprContext) interface{}
+
+	// Visit a parse tree produced by ZenithParser#parenExpr.
+	VisitParenExpr(ctx *ParenExprContext) interface{}
 
 	// Visit a parse tree produced by ZenithParser#idExpr.
 	VisitIdExpr(ctx *IdExprContext) interface{}

@@ -45,49 +45,6 @@ func (g *Generator) VisitDefineStat(ctx *parser.DefineStatContext) any {
     return fmt.Sprintf("%v %v = %v", exprType, id, g.Visit(ctx.Expr()))
 }
 
-func (g *Generator) VisitParenExpr(ctx *parser.ParenExprContext) any {
-    inner := g.Visit(ctx.Expr())
-    return fmt.Sprintf("(%v)", inner)
-}
-
-func (g *Generator) VisitCastExpr(ctx *parser.CastExprContext) any {
-    exprType := getCType(g.Analyzer.ExprTypes[ctx])
-    inner := g.Visit(ctx.Expr())
-
-    return fmt.Sprintf("(%v)(%v)", exprType, inner)
-}
-
-func (g *Generator) VisitPrefixExpr(ctx *parser.PrefixExprContext) any {
-    op := ctx.Op.GetText()
-    right := g.Visit(ctx.Right)
-
-    return fmt.Sprintf("%v%v", op, right)
-}
-
-func (g *Generator) VisitMulExpr(ctx *parser.MulExprContext) any {
-    left := g.Visit(ctx.Left)
-    right := g.Visit(ctx.Right)
-    op := ctx.Op.GetText()
-
-    return fmt.Sprintf("%v %v %v", left, op, right)
-}
-
-func (g *Generator) VisitAddExpr(ctx *parser.AddExprContext) any {
-    left := g.Visit(ctx.Left)
-    right := g.Visit(ctx.Right)
-    op := ctx.Op.GetText()
-
-    return fmt.Sprintf("%v %v %v", left, op, right)
-}
-
-func (g *Generator) VisitIfExpr(ctx *parser.IfExprContext) any {
-    left := g.Visit(ctx.Left)
-    condition := g.Visit(ctx.Condition)
-    right := g.Visit(ctx.Right)
-
-    return fmt.Sprintf("(%v)? %v : %v", condition, left, right)
-}
-
 func (g *Generator) VisitNumExpr(ctx *parser.NumExprContext) any {
     str := strings.ReplaceAll(ctx.NUM().GetText(), "_", "")
     b := getBase(str)
@@ -132,6 +89,49 @@ func (g *Generator) VisitIdExpr(ctx *parser.IdExprContext) any {
 func (g *Generator) VisitKeyExpr(ctx *parser.KeyExprContext) any {
     key := ctx.Key.GetText()
     return key
+}
+
+func (g *Generator) VisitParenExpr(ctx *parser.ParenExprContext) any {
+    inner := g.Visit(ctx.Expr())
+    return fmt.Sprintf("(%v)", inner)
+}
+
+func (g *Generator) VisitCastExpr(ctx *parser.CastExprContext) any {
+    exprType := getCType(g.Analyzer.ExprTypes[ctx])
+    inner := g.Visit(ctx.Expr())
+
+    return fmt.Sprintf("(%v)(%v)", exprType, inner)
+}
+
+func (g *Generator) VisitPrefixExpr(ctx *parser.PrefixExprContext) any {
+    op := ctx.Op.GetText()
+    right := g.Visit(ctx.Right)
+
+    return fmt.Sprintf("%v%v", op, right)
+}
+
+func (g *Generator) VisitMulExpr(ctx *parser.MulExprContext) any {
+    left := g.Visit(ctx.Left)
+    right := g.Visit(ctx.Right)
+    op := ctx.Op.GetText()
+
+    return fmt.Sprintf("%v %v %v", left, op, right)
+}
+
+func (g *Generator) VisitAddExpr(ctx *parser.AddExprContext) any {
+    left := g.Visit(ctx.Left)
+    right := g.Visit(ctx.Right)
+    op := ctx.Op.GetText()
+
+    return fmt.Sprintf("%v %v %v", left, op, right)
+}
+
+func (g *Generator) VisitIfExpr(ctx *parser.IfExprContext) any {
+    left := g.Visit(ctx.Left)
+    condition := g.Visit(ctx.Condition)
+    right := g.Visit(ctx.Right)
+
+    return fmt.Sprintf("(%v)? %v : %v", condition, left, right)
 }
 
 func getBase(num string) int64 {

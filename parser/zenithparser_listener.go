@@ -17,11 +17,11 @@ type ZenithParserListener interface {
 	// EnterLineEnd is called when entering the lineEnd production.
 	EnterLineEnd(c *LineEndContext)
 
-	// EnterExprStat is called when entering the exprStat production.
-	EnterExprStat(c *ExprStatContext)
-
 	// EnterDefineStat is called when entering the defineStat production.
 	EnterDefineStat(c *DefineStatContext)
+
+	// EnterExprStat is called when entering the exprStat production.
+	EnterExprStat(c *ExprStatContext)
 
 	// EnterPrefixExpr is called when entering the prefixExpr production.
 	EnterPrefixExpr(c *PrefixExprContext)
@@ -41,11 +41,11 @@ type ZenithParserListener interface {
 	// EnterKeyExpr is called when entering the keyExpr production.
 	EnterKeyExpr(c *KeyExprContext)
 
-	// EnterParenExpr is called when entering the parenExpr production.
-	EnterParenExpr(c *ParenExprContext)
-
 	// EnterNumExpr is called when entering the numExpr production.
 	EnterNumExpr(c *NumExprContext)
+
+	// EnterParenExpr is called when entering the parenExpr production.
+	EnterParenExpr(c *ParenExprContext)
 
 	// EnterIdExpr is called when entering the idExpr production.
 	EnterIdExpr(c *IdExprContext)
@@ -59,11 +59,11 @@ type ZenithParserListener interface {
 	// ExitLineEnd is called when exiting the lineEnd production.
 	ExitLineEnd(c *LineEndContext)
 
-	// ExitExprStat is called when exiting the exprStat production.
-	ExitExprStat(c *ExprStatContext)
-
 	// ExitDefineStat is called when exiting the defineStat production.
 	ExitDefineStat(c *DefineStatContext)
+
+	// ExitExprStat is called when exiting the exprStat production.
+	ExitExprStat(c *ExprStatContext)
 
 	// ExitPrefixExpr is called when exiting the prefixExpr production.
 	ExitPrefixExpr(c *PrefixExprContext)
@@ -83,11 +83,11 @@ type ZenithParserListener interface {
 	// ExitKeyExpr is called when exiting the keyExpr production.
 	ExitKeyExpr(c *KeyExprContext)
 
-	// ExitParenExpr is called when exiting the parenExpr production.
-	ExitParenExpr(c *ParenExprContext)
-
 	// ExitNumExpr is called when exiting the numExpr production.
 	ExitNumExpr(c *NumExprContext)
+
+	// ExitParenExpr is called when exiting the parenExpr production.
+	ExitParenExpr(c *ParenExprContext)
 
 	// ExitIdExpr is called when exiting the idExpr production.
 	ExitIdExpr(c *IdExprContext)

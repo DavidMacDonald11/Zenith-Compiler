@@ -39,17 +39,17 @@ func (s *BaseZenithParserListener) EnterLineEnd(ctx *LineEndContext) {}
 // ExitLineEnd is called when production lineEnd is exited.
 func (s *BaseZenithParserListener) ExitLineEnd(ctx *LineEndContext) {}
 
-// EnterExprStat is called when production exprStat is entered.
-func (s *BaseZenithParserListener) EnterExprStat(ctx *ExprStatContext) {}
-
-// ExitExprStat is called when production exprStat is exited.
-func (s *BaseZenithParserListener) ExitExprStat(ctx *ExprStatContext) {}
-
 // EnterDefineStat is called when production defineStat is entered.
 func (s *BaseZenithParserListener) EnterDefineStat(ctx *DefineStatContext) {}
 
 // ExitDefineStat is called when production defineStat is exited.
 func (s *BaseZenithParserListener) ExitDefineStat(ctx *DefineStatContext) {}
+
+// EnterExprStat is called when production exprStat is entered.
+func (s *BaseZenithParserListener) EnterExprStat(ctx *ExprStatContext) {}
+
+// ExitExprStat is called when production exprStat is exited.
+func (s *BaseZenithParserListener) ExitExprStat(ctx *ExprStatContext) {}
 
 // EnterPrefixExpr is called when production prefixExpr is entered.
 func (s *BaseZenithParserListener) EnterPrefixExpr(ctx *PrefixExprContext) {}
@@ -87,17 +87,17 @@ func (s *BaseZenithParserListener) EnterKeyExpr(ctx *KeyExprContext) {}
 // ExitKeyExpr is called when production keyExpr is exited.
 func (s *BaseZenithParserListener) ExitKeyExpr(ctx *KeyExprContext) {}
 
-// EnterParenExpr is called when production parenExpr is entered.
-func (s *BaseZenithParserListener) EnterParenExpr(ctx *ParenExprContext) {}
-
-// ExitParenExpr is called when production parenExpr is exited.
-func (s *BaseZenithParserListener) ExitParenExpr(ctx *ParenExprContext) {}
-
 // EnterNumExpr is called when production numExpr is entered.
 func (s *BaseZenithParserListener) EnterNumExpr(ctx *NumExprContext) {}
 
 // ExitNumExpr is called when production numExpr is exited.
 func (s *BaseZenithParserListener) ExitNumExpr(ctx *NumExprContext) {}
+
+// EnterParenExpr is called when production parenExpr is entered.
+func (s *BaseZenithParserListener) EnterParenExpr(ctx *ParenExprContext) {}
+
+// ExitParenExpr is called when production parenExpr is exited.
+func (s *BaseZenithParserListener) ExitParenExpr(ctx *ParenExprContext) {}
 
 // EnterIdExpr is called when production idExpr is entered.
 func (s *BaseZenithParserListener) EnterIdExpr(ctx *IdExprContext) {}

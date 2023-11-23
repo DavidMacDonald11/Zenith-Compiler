@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"zenith/code"
 	"zenith/parser"
 	"zenith/semantic"
@@ -10,19 +11,25 @@ import (
 )
 
 func main() {
-    str := `x := 5 if true else uint(6)
-            y := float64(x + 2)`
-    fmt.Printf(`Compiling "%s"` + "\n", str)
-    in := antlr.NewInputStream(str)
+    for _, path := range os.Args[1:] {
+        file, err := antlr.NewFileStream(path)
 
-    lexer := parser.NewZenithLexer(in)
-    tokens := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
-    tree := parser.NewZenithParser(tokens).FileStat()
+        if err != nil {
+            fmt.Printf("No such file: %s\n", path)
+            continue
+        }
 
-    analyzer := semantic.MakeAnalyzer()
-    analyzer.Visit(tree)
+        fmt.Printf("Compiling %s:\n\n", path)
 
-    generator := code.Generator{Analyzer: &analyzer}
-    res := generator.Visit(tree)
-    fmt.Println(res.(string))
+        lexer := parser.NewZenithLexer(file)
+        tokens := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
+        tree := parser.NewZenithParser(tokens).FileStat()
+
+        analyzer := semantic.MakeAnalyzer()
+        analyzer.Visit(tree)
+
+        generator := code.Generator{Analyzer: &analyzer}
+        res := generator.Visit(tree)
+        fmt.Printf("%s\n\n", res.(string))
+    }
 }

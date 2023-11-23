@@ -58,6 +58,31 @@ func (a *Analyzer) VisitDefineStat(ctx *parser.DefineStatContext) any {
     return result{exprType: a.ExprTypes[expr]}
 }
 
+func (a *Analyzer) VisitNumExpr(ctx *parser.NumExprContext) any {
+    num := ctx.NUM().GetText()
+
+    if strings.ContainsRune(num, '.') {
+        return result{exprType: "anyfloat"}
+    }
+
+    return result{exprType: "anyint"}
+}
+
+func (a *Analyzer) VisitIdExpr(ctx *parser.IdExprContext) any {
+    id := ctx.ID().GetText()
+    exprType, ok := a.Ids[id]
+
+    if !ok {
+        panic("No such identifier")
+    }
+
+    return result{exprType: exprType}
+}
+
+func (a *Analyzer) VisitKeyExpr(ctx *parser.KeyExprContext) any {
+    return result{exprType: "bool"}
+}
+
 func (a *Analyzer) VisitParenExpr(ctx *parser.ParenExprContext) any {
     return a.Visit(ctx.Expr())
 }
@@ -117,29 +142,4 @@ func (a *Analyzer) VisitIfExpr(ctx *parser.IfExprContext) any {
     }
 
     return result{exprType: *t}
-}
-
-func (a *Analyzer) VisitNumExpr(ctx *parser.NumExprContext) any {
-    num := ctx.NUM().GetText()
-
-    if strings.ContainsRune(num, '.') {
-        return result{exprType: "anyfloat"}
-    }
-
-    return result{exprType: "anyint"}
-}
-
-func (a *Analyzer) VisitIdExpr(ctx *parser.IdExprContext) any {
-    id := ctx.ID().GetText()
-    exprType, ok := a.Ids[id]
-
-    if !ok {
-        panic("No such identifier")
-    }
-
-    return result{exprType: exprType}
-}
-
-func (a *Analyzer) VisitKeyExpr(ctx *parser.KeyExprContext) any {
-    return result{exprType: "bool"}
 }

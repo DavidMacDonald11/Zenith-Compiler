@@ -20,11 +20,11 @@ func (v *BaseZenithParserVisitor) VisitLineEnd(ctx *LineEndContext) interface{} 
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseZenithParserVisitor) VisitExprStat(ctx *ExprStatContext) interface{} {
+func (v *BaseZenithParserVisitor) VisitDefineStat(ctx *DefineStatContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseZenithParserVisitor) VisitDefineStat(ctx *DefineStatContext) interface{} {
+func (v *BaseZenithParserVisitor) VisitExprStat(ctx *ExprStatContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -52,11 +52,11 @@ func (v *BaseZenithParserVisitor) VisitKeyExpr(ctx *KeyExprContext) interface{} 
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseZenithParserVisitor) VisitParenExpr(ctx *ParenExprContext) interface{} {
+func (v *BaseZenithParserVisitor) VisitNumExpr(ctx *NumExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseZenithParserVisitor) VisitNumExpr(ctx *NumExprContext) interface{} {
+func (v *BaseZenithParserVisitor) VisitParenExpr(ctx *ParenExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

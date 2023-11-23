@@ -1,0 +1,2 @@
+x := 14 if bool(0) else 15
+y := x + 7
