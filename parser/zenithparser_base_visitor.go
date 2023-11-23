@@ -12,6 +12,22 @@ func (v *BaseZenithParserVisitor) VisitFileStat(ctx *FileStatContext) interface{
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseZenithParserVisitor) VisitEndedStat(ctx *EndedStatContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitLineEnd(ctx *LineEndContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitExprStat(ctx *ExprStatContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitDefineStat(ctx *DefineStatContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseZenithParserVisitor) VisitPrefixExpr(ctx *PrefixExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -41,5 +57,9 @@ func (v *BaseZenithParserVisitor) VisitParenExpr(ctx *ParenExprContext) interfac
 }
 
 func (v *BaseZenithParserVisitor) VisitNumExpr(ctx *NumExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitIdExpr(ctx *IdExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }

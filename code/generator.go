@@ -21,17 +21,38 @@ func (g *Generator) Visit(tree antlr.ParseTree) any {
 }
 
 func (g *Generator) VisitFileStat(ctx *parser.FileStatContext) any {
+    result := strings.Builder{}
+
+    for _, stat := range ctx.AllEndedStat() {
+        result.WriteString(fmt.Sprintf("%s\n", g.Visit(stat).(string)))
+    }
+
+    return result.String()
+}
+
+func (g *Generator) VisitEndedStat(ctx *parser.EndedStatContext) any {
+    return g.Visit(ctx.Stat()).(string) + ";"
+}
+
+func (g *Generator) VisitExprStat(ctx *parser.ExprStatContext) any {
     return g.Visit(ctx.Expr())
 }
 
+func (g *Generator) VisitDefineStat(ctx *parser.DefineStatContext) any {
+    id := getCId(ctx.ID().GetText())
+    exprType := getCType(g.Analyzer.ExprTypes[ctx.Expr()])
+
+    return fmt.Sprintf("%v %v = %v", exprType, id, g.Visit(ctx.Expr()))
+}
+
 func (g *Generator) VisitParenExpr(ctx *parser.ParenExprContext) any {
-    inner := g.Visit(ctx.Inner)
+    inner := g.Visit(ctx.Expr())
     return fmt.Sprintf("(%v)", inner)
 }
 
 func (g *Generator) VisitCastExpr(ctx *parser.CastExprContext) any {
     exprType := getCType(g.Analyzer.ExprTypes[ctx])
-    inner := g.Visit(ctx.Inner)
+    inner := g.Visit(ctx.Expr())
 
     return fmt.Sprintf("(%v)(%v)", exprType, inner)
 }
@@ -68,7 +89,7 @@ func (g *Generator) VisitIfExpr(ctx *parser.IfExprContext) any {
 }
 
 func (g *Generator) VisitNumExpr(ctx *parser.NumExprContext) any {
-    str := strings.ReplaceAll(ctx.Num.GetText(), "_", "")
+    str := strings.ReplaceAll(ctx.NUM().GetText(), "_", "")
     b := getBase(str)
 
     base := new(big.Float).SetInt64(b)
@@ -104,6 +125,10 @@ func (g *Generator) VisitNumExpr(ctx *parser.NumExprContext) any {
     return str
 }
 
+func (g *Generator) VisitIdExpr(ctx *parser.IdExprContext) any {
+    return getCId(ctx.ID().GetText())
+}
+
 func (g *Generator) VisitKeyExpr(ctx *parser.KeyExprContext) any {
     key := ctx.Key.GetText()
     return key
@@ -125,7 +150,11 @@ func getDigit(c byte) *big.Float {
     return new(big.Float).SetInt64(int64(c - 'a' + 10))
 }
 
-func getCType(t string) string {
+func getCId(id string) string {
+    return "__ZenithId" + id
+}
+
+func getCType(t semantic.EType) string {
     switch t {
     case "uint8": return "uint_least8_t"
     case "uint16": return "uint_least16_t"

@@ -1,5 +1,7 @@
 lexer grammar ZenithLexer;
 
+DEFINE_EQ : ':=' ;
+
 PLUS : '+' ;
 MINUS : '-' ;
 TIMES : '*' ;
@@ -58,7 +60,10 @@ fragment HEX_NUM : '0x' (
 fragment HEX_SEG : (HEX_DIGIT | '_')* HEX_DIGIT (HEX_DIGIT | '_')* ;
 fragment HEX_DIGIT : [0-9a-fA-F] ;
 
+ID : [_a-zA-Z][_a-zA-Z0-9]* ;
+
 LPAREN : '(' ;
 RPAREN : ')' ;
+SEMICOLON : ';' ;
 NL : ([\r]? [\n])+ ;
 SPACE : [ \t] -> skip ;

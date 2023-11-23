@@ -11,6 +11,18 @@ type ZenithParserListener interface {
 	// EnterFileStat is called when entering the fileStat production.
 	EnterFileStat(c *FileStatContext)
 
+	// EnterEndedStat is called when entering the endedStat production.
+	EnterEndedStat(c *EndedStatContext)
+
+	// EnterLineEnd is called when entering the lineEnd production.
+	EnterLineEnd(c *LineEndContext)
+
+	// EnterExprStat is called when entering the exprStat production.
+	EnterExprStat(c *ExprStatContext)
+
+	// EnterDefineStat is called when entering the defineStat production.
+	EnterDefineStat(c *DefineStatContext)
+
 	// EnterPrefixExpr is called when entering the prefixExpr production.
 	EnterPrefixExpr(c *PrefixExprContext)
 
@@ -35,8 +47,23 @@ type ZenithParserListener interface {
 	// EnterNumExpr is called when entering the numExpr production.
 	EnterNumExpr(c *NumExprContext)
 
+	// EnterIdExpr is called when entering the idExpr production.
+	EnterIdExpr(c *IdExprContext)
+
 	// ExitFileStat is called when exiting the fileStat production.
 	ExitFileStat(c *FileStatContext)
+
+	// ExitEndedStat is called when exiting the endedStat production.
+	ExitEndedStat(c *EndedStatContext)
+
+	// ExitLineEnd is called when exiting the lineEnd production.
+	ExitLineEnd(c *LineEndContext)
+
+	// ExitExprStat is called when exiting the exprStat production.
+	ExitExprStat(c *ExprStatContext)
+
+	// ExitDefineStat is called when exiting the defineStat production.
+	ExitDefineStat(c *DefineStatContext)
 
 	// ExitPrefixExpr is called when exiting the prefixExpr production.
 	ExitPrefixExpr(c *PrefixExprContext)
@@ -61,4 +88,7 @@ type ZenithParserListener interface {
 
 	// ExitNumExpr is called when exiting the numExpr production.
 	ExitNumExpr(c *NumExprContext)
+
+	// ExitIdExpr is called when exiting the idExpr production.
+	ExitIdExpr(c *IdExprContext)
 }

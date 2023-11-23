@@ -10,7 +10,8 @@ import (
 )
 
 func main() {
-    str := "5 if true else uint(6)"
+    str := `x := 5 if true else uint(6)
+            y := float64(x + 2)`
     fmt.Printf(`Compiling "%s"` + "\n", str)
     in := antlr.NewInputStream(str)
 
@@ -19,10 +20,9 @@ func main() {
     tree := parser.NewZenithParser(tokens).FileStat()
 
     analyzer := semantic.MakeAnalyzer()
-    res := analyzer.Visit(tree)
-    fmt.Println(res.(string))
+    analyzer.Visit(tree)
 
     generator := code.Generator{Analyzer: &analyzer}
-    res = generator.Visit(tree)
+    res := generator.Visit(tree)
     fmt.Println(res.(string))
 }
