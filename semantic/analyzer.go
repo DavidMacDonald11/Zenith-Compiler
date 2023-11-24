@@ -9,8 +9,9 @@ import (
 
 type Analyzer struct {
     parser.BaseZenithParserVisitor
+    table Table
+
     ExprTypes map[parser.IExprContext]EType
-    Ids map[string]EType
 }
 
 type result struct {
@@ -19,8 +20,8 @@ type result struct {
 
 func MakeAnalyzer() Analyzer {
     return Analyzer {
+        table: MakeTable(),
         ExprTypes: map[parser.IExprContext]EType{},
-        Ids: map[string]EType{},
     }
 }
 
@@ -40,22 +41,36 @@ func (a *Analyzer) VisitEndedStat(ctx *parser.EndedStatContext) any {
     return a.Visit(ctx.Stat())
 }
 
-func (a *Analyzer) VisitExprStat(ctx *parser.ExprStatContext) any {
-    return a.Visit(ctx.Expr())
+func (a *Analyzer) VisitMultiStat(ctx *parser.MultiStatContext) any {
+    a.table.StartScope()
+
+    for _, stat := range ctx.AllEndedStat() {
+        a.Visit(stat)
+    }
+
+    if stat := ctx.Stat(); stat != nil {
+        a.Visit(stat)
+    }
+
+    a.table.EndScope()
+    return nil
 }
 
 func (a *Analyzer) VisitDefineStat(ctx *parser.DefineStatContext) any {
     id := ctx.ID().GetText()
+    expr := ctx.Expr()
+    exprType := a.Visit(expr).(result).exprType
 
-    if _, ok := a.Ids[id]; ok {
+    if !a.table.AddSymbol(id, exprType) {
         panic("Identifier is already defined")
     }
 
-    expr := ctx.Expr()
-    a.ExprTypes[expr] = a.Visit(expr).(result).exprType
-    a.Ids[id] = a.ExprTypes[expr]
+    a.ExprTypes[expr] = exprType
+    return result{exprType: exprType}
+}
 
-    return result{exprType: a.ExprTypes[expr]}
+func (a *Analyzer) VisitExprStat(ctx *parser.ExprStatContext) any {
+    return a.Visit(ctx.Expr())
 }
 
 func (a *Analyzer) VisitNumExpr(ctx *parser.NumExprContext) any {
@@ -70,7 +85,7 @@ func (a *Analyzer) VisitNumExpr(ctx *parser.NumExprContext) any {
 
 func (a *Analyzer) VisitIdExpr(ctx *parser.IdExprContext) any {
     id := ctx.ID().GetText()
-    exprType, ok := a.Ids[id]
+    exprType, ok := a.table.FindSymbol(id)
 
     if !ok {
         panic("No such identifier")

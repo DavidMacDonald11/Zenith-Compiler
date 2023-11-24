@@ -13,7 +13,9 @@ lineEnd : SEMICOLON
         ;
 
 stat : ID DEFINE_EQ expr #defineStat
+     | LBRACE NL? endedStat* stat? lineEnd? RBRACE #multiStat
      | expr #exprStat
+     | SEMICOLON #blankStat
      ;
 
 expr : NUM #numExpr

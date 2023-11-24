@@ -64,6 +64,8 @@ ID : [_a-zA-Z][_a-zA-Z0-9]* ;
 
 LPAREN : '(' ;
 RPAREN : ')' ;
+LBRACE : '{' ;
+RBRACE : '}' ;
 SEMICOLON : ';' ;
 NL : ([\r]? [\n])+ ;
 SPACE : [ \t] -> skip ;

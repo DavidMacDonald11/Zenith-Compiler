@@ -20,8 +20,14 @@ type ZenithParserVisitor interface {
 	// Visit a parse tree produced by ZenithParser#defineStat.
 	VisitDefineStat(ctx *DefineStatContext) interface{}
 
+	// Visit a parse tree produced by ZenithParser#multiStat.
+	VisitMultiStat(ctx *MultiStatContext) interface{}
+
 	// Visit a parse tree produced by ZenithParser#exprStat.
 	VisitExprStat(ctx *ExprStatContext) interface{}
+
+	// Visit a parse tree produced by ZenithParser#blankStat.
+	VisitBlankStat(ctx *BlankStatContext) interface{}
 
 	// Visit a parse tree produced by ZenithParser#prefixExpr.
 	VisitPrefixExpr(ctx *PrefixExprContext) interface{}

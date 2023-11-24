@@ -24,7 +24,15 @@ func (v *BaseZenithParserVisitor) VisitDefineStat(ctx *DefineStatContext) interf
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseZenithParserVisitor) VisitMultiStat(ctx *MultiStatContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseZenithParserVisitor) VisitExprStat(ctx *ExprStatContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitBlankStat(ctx *BlankStatContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

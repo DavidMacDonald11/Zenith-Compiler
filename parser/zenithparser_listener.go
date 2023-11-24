@@ -20,8 +20,14 @@ type ZenithParserListener interface {
 	// EnterDefineStat is called when entering the defineStat production.
 	EnterDefineStat(c *DefineStatContext)
 
+	// EnterMultiStat is called when entering the multiStat production.
+	EnterMultiStat(c *MultiStatContext)
+
 	// EnterExprStat is called when entering the exprStat production.
 	EnterExprStat(c *ExprStatContext)
+
+	// EnterBlankStat is called when entering the blankStat production.
+	EnterBlankStat(c *BlankStatContext)
 
 	// EnterPrefixExpr is called when entering the prefixExpr production.
 	EnterPrefixExpr(c *PrefixExprContext)
@@ -62,8 +68,14 @@ type ZenithParserListener interface {
 	// ExitDefineStat is called when exiting the defineStat production.
 	ExitDefineStat(c *DefineStatContext)
 
+	// ExitMultiStat is called when exiting the multiStat production.
+	ExitMultiStat(c *MultiStatContext)
+
 	// ExitExprStat is called when exiting the exprStat production.
 	ExitExprStat(c *ExprStatContext)
+
+	// ExitBlankStat is called when exiting the blankStat production.
+	ExitBlankStat(c *BlankStatContext)
 
 	// ExitPrefixExpr is called when exiting the prefixExpr production.
 	ExitPrefixExpr(c *PrefixExprContext)
