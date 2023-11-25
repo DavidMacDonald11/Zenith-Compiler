@@ -84,7 +84,7 @@ func (a *Analyzer) VisitMultiStat(ctx *parser.MultiStatContext) any {
 }
 
 func (a *Analyzer) VisitType(ctx *parser.TypeContext) any {
-    return result{exprType: EType(ctx.TYPE().GetText())}
+    return result{exprType: EType(strings.ToLower((ctx.TYPE().GetText())))}
 }
 
 func (a *Analyzer) VisitExprStat(ctx *parser.ExprStatContext) any {
@@ -122,7 +122,7 @@ func (a *Analyzer) VisitParenExpr(ctx *parser.ParenExprContext) any {
 
 func (a *Analyzer) VisitCastExpr(ctx *parser.CastExprContext) any {
     a.Visit(ctx.Expr())
-    a.ExprTypes[ctx] = EType(ctx.TYPE().GetText())
+    a.ExprTypes[ctx] = EType(strings.ToLower((ctx.TYPE().GetText())))
 
     return result{exprType: a.ExprTypes[ctx]}
 }

@@ -1,4 +1,4 @@
 {
-    x uint64 := 14 if bool(0) else 15
+    x UInt64 := 14 if Bool(0) else 15
     y := x + 7
 }

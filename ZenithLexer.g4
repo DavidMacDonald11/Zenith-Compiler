@@ -15,10 +15,10 @@ TRUE : 'true' ;
 FALSE : 'false' ;
 
 TYPE
-    : 'uint8' | 'uint16' |  'uint32' |  'uint64' | 'uint'
-    |  'int8' |  'int16' |   'int32' |   'int64' |  'int'
-                         | 'float32' | 'float64'
-    | 'bool'
+    : 'UInt8' | 'UInt16' |  'UInt32' |  'UInt64' | 'UInt'
+    |  'Int8' |  'Int16' |   'Int32' |   'Int64' |  'Int'
+                         | 'Float32' | 'Float64'
+    | 'Bool'
     ;
 
 NUM
