@@ -1,4 +1,11 @@
 {
     x UInt64 := 14 if Bool(0) else 15
     y := x + 7
+    // HERE;;
+    ;
+
+    ;;
+    /* HeHe
+
+     */z:= true // means 1
 }

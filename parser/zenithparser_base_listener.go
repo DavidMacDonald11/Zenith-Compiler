@@ -57,12 +57,6 @@ func (s *BaseZenithParserListener) EnterExprStat(ctx *ExprStatContext) {}
 // ExitExprStat is called when production exprStat is exited.
 func (s *BaseZenithParserListener) ExitExprStat(ctx *ExprStatContext) {}
 
-// EnterBlankStat is called when production blankStat is entered.
-func (s *BaseZenithParserListener) EnterBlankStat(ctx *BlankStatContext) {}
-
-// ExitBlankStat is called when production blankStat is exited.
-func (s *BaseZenithParserListener) ExitBlankStat(ctx *BlankStatContext) {}
-
 // EnterType is called when production type is entered.
 func (s *BaseZenithParserListener) EnterType(ctx *TypeContext) {}
 

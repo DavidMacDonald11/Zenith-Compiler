@@ -32,10 +32,6 @@ func (v *BaseZenithParserVisitor) VisitExprStat(ctx *ExprStatContext) interface{
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseZenithParserVisitor) VisitBlankStat(ctx *BlankStatContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseZenithParserVisitor) VisitType(ctx *TypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }

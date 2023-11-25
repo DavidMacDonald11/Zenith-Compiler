@@ -69,4 +69,4 @@ LBRACE : '{' ;
 RBRACE : '}' ;
 SEMICOLON : ';' ;
 NL : ([\r]? [\n])+ ;
-SPACE : [ \t] -> skip ;
+IGNORED : ([ \t] | '/*' .*? '*/' | '//' ~[\n]*) -> skip ;

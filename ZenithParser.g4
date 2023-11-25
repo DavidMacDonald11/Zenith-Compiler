@@ -7,15 +7,14 @@ fileStat : endedStat+
 
 endedStat : NL? stat lineEnd ;
 
-lineEnd : SEMICOLON
-        | NL
+lineEnd : SEMICOLON (NL | SEMICOLON)*
+        | NL (NL | SEMICOLON)*
         | EOF
         ;
 
 stat : ID type? INIT_ASSIGN NL? expr #defineStat
      | LBRACE NL? endedStat* stat? lineEnd? RBRACE #multiStat
      | expr #exprStat
-     | SEMICOLON #blankStat
      ;
 
 type : TYPE ;

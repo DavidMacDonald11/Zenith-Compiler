@@ -26,9 +26,6 @@ type ZenithParserVisitor interface {
 	// Visit a parse tree produced by ZenithParser#exprStat.
 	VisitExprStat(ctx *ExprStatContext) interface{}
 
-	// Visit a parse tree produced by ZenithParser#blankStat.
-	VisitBlankStat(ctx *BlankStatContext) interface{}
-
 	// Visit a parse tree produced by ZenithParser#type.
 	VisitType(ctx *TypeContext) interface{}
 
