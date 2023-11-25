@@ -12,11 +12,13 @@ lineEnd : SEMICOLON
         | EOF
         ;
 
-stat : ID DEFINE_EQ expr #defineStat
+stat : ID type? INIT_ASSIGN NL? expr #defineStat
      | LBRACE NL? endedStat* stat? lineEnd? RBRACE #multiStat
      | expr #exprStat
      | SEMICOLON #blankStat
      ;
+
+type : TYPE ;
 
 expr : NUM #numExpr
      | ID #idExpr

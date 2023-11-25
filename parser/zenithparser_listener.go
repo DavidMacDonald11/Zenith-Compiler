@@ -29,6 +29,9 @@ type ZenithParserListener interface {
 	// EnterBlankStat is called when entering the blankStat production.
 	EnterBlankStat(c *BlankStatContext)
 
+	// EnterType is called when entering the type production.
+	EnterType(c *TypeContext)
+
 	// EnterPrefixExpr is called when entering the prefixExpr production.
 	EnterPrefixExpr(c *PrefixExprContext)
 
@@ -76,6 +79,9 @@ type ZenithParserListener interface {
 
 	// ExitBlankStat is called when exiting the blankStat production.
 	ExitBlankStat(c *BlankStatContext)
+
+	// ExitType is called when exiting the type production.
+	ExitType(c *TypeContext)
 
 	// ExitPrefixExpr is called when exiting the prefixExpr production.
 	ExitPrefixExpr(c *PrefixExprContext)

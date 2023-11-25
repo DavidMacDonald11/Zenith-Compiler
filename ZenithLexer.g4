@@ -1,6 +1,7 @@
 lexer grammar ZenithLexer;
 
-DEFINE_EQ : ':=' ;
+ASSIGN : '=' ;
+INIT_ASSIGN : ':=' ;
 
 PLUS : '+' ;
 MINUS : '-' ;

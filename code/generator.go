@@ -37,6 +37,12 @@ func (g *Generator) VisitEndedStat(ctx *parser.EndedStatContext) any {
     return indent + g.Visit(ctx.Stat()).(string) + ";"
 }
 
+func (g *Generator) VisitDefineStat(ctx *parser.DefineStatContext) any {
+    id := getCId(ctx.ID().GetText())
+    exprType := getCType(g.Analyzer.ExprTypes[ctx.Expr()])
+
+    return fmt.Sprintf("%v %v = %v", exprType, id, g.Visit(ctx.Expr()))
+}
 
 func (g *Generator) VisitMultiStat(ctx *parser.MultiStatContext) any {
     result := strings.Builder{}
@@ -56,13 +62,6 @@ func (g *Generator) VisitMultiStat(ctx *parser.MultiStatContext) any {
     result.WriteString(indent + "}")
 
     return result.String()
-}
-
-func (g *Generator) VisitDefineStat(ctx *parser.DefineStatContext) any {
-    id := getCId(ctx.ID().GetText())
-    exprType := getCType(g.Analyzer.ExprTypes[ctx.Expr()])
-
-    return fmt.Sprintf("%v %v = %v", exprType, id, g.Visit(ctx.Expr()))
 }
 
 func (g *Generator) VisitExprStat(ctx *parser.ExprStatContext) any {
@@ -180,17 +179,17 @@ func getCId(id string) string {
 
 func getCType(t semantic.EType) string {
     switch t {
-    case "uint8": return "uint_least8_t"
-    case "uint16": return "uint_least16_t"
-    case "uint32": return "uint_least32_t"
-    case "uint64": return "uint_least64_t"
-    case "int8": return "int_least8_t"
-    case "int16": return "int_least16_t"
-    case "int32": return "int_least32_t"
-    case "int64": return "int_least64_t"
-    case "uint": return "unsigned int"
+    case "uint8": return "uint8_t"
+    case "uint16": return "uint16_t"
+    case "uint32": return "uint32_t"
+    case "uint64": return "uint64_t"
+    case "int8": return "int8_t"
+    case "int16": return "int16_t"
+    case "int32": return "int32_t"
+    case "int64": return "int64_t"
+    case "uint": return "uint_fast32_t"
     case "anyint": fallthrough
-    case "int": return "int"
+    case "int": return "int_fast32_t"
     case "float32": return "float"
     case "anyfloat": fallthrough
     case "float64": return "double"

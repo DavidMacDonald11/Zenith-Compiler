@@ -1,6 +1,7 @@
 package semantic
 
 import (
+	"fmt"
 	"strings"
 	"zenith/parser"
 
@@ -41,6 +42,32 @@ func (a *Analyzer) VisitEndedStat(ctx *parser.EndedStatContext) any {
     return a.Visit(ctx.Stat())
 }
 
+func (a *Analyzer) VisitDefineStat(ctx *parser.DefineStatContext) any {
+    id := ctx.ID().GetText()
+
+    expr := ctx.Expr()
+    exprType := a.Visit(expr).(result).exprType
+
+    if t := ctx.Type_(); t != nil {
+        declType := a.Visit(t).(result).exprType
+        common := deduceCommonType(declType, exprType)
+
+        if common == nil || *common != declType {
+            panic(fmt.Sprintf("Cannot assign %v to %v", exprType, declType))
+        }
+
+        exprType = declType
+    }
+
+
+    if !a.table.AddSymbol(id, exprType) {
+        panic("Identifier is already defined")
+    }
+
+    a.ExprTypes[expr] = exprType
+    return result{exprType: exprType}
+}
+
 func (a *Analyzer) VisitMultiStat(ctx *parser.MultiStatContext) any {
     a.table.StartScope()
 
@@ -56,17 +83,8 @@ func (a *Analyzer) VisitMultiStat(ctx *parser.MultiStatContext) any {
     return nil
 }
 
-func (a *Analyzer) VisitDefineStat(ctx *parser.DefineStatContext) any {
-    id := ctx.ID().GetText()
-    expr := ctx.Expr()
-    exprType := a.Visit(expr).(result).exprType
-
-    if !a.table.AddSymbol(id, exprType) {
-        panic("Identifier is already defined")
-    }
-
-    a.ExprTypes[expr] = exprType
-    return result{exprType: exprType}
+func (a *Analyzer) VisitType(ctx *parser.TypeContext) any {
+    return result{exprType: EType(ctx.TYPE().GetText())}
 }
 
 func (a *Analyzer) VisitExprStat(ctx *parser.ExprStatContext) any {

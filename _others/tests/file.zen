@@ -1,10 +1,4 @@
 {
-    x := 14 if bool(0) else 15
+    x uint64 := 14 if bool(0) else 15
     y := x + 7
-
-    {
-        i := 5
-    }
-
-    i := 6
 }
