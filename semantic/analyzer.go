@@ -12,17 +12,18 @@ type Analyzer struct {
     parser.BaseZenithParserVisitor
     table Table
 
-    ExprTypes map[parser.IExprContext]EType
+    ExprTypes map[parser.IExprContext]Type
 }
 
 type result struct {
-    exprType EType
+    exprType Type
+    isVar bool
 }
 
 func MakeAnalyzer() Analyzer {
     return Analyzer {
         table: MakeTable(),
-        ExprTypes: map[parser.IExprContext]EType{},
+        ExprTypes: map[parser.IExprContext]Type{},
     }
 }
 
@@ -50,15 +51,20 @@ func (a *Analyzer) VisitDefineStat(ctx *parser.DefineStatContext) any {
 
     if t := ctx.Type_(); t != nil {
         declType := a.Visit(t).(result).exprType
-        common := deduceCommonType(declType, exprType)
 
-        if common == nil || *common != declType {
-            panic(fmt.Sprintf("Cannot assign %v to %v", exprType, declType))
+        if !exprType.MayBeAssignedTo(declType) {
+            e, d := exprType.FullType(), declType.FullType()
+            panic(fmt.Sprintf("Cannot assign %v to %v", e, d))
         }
 
         exprType = declType
-    }
+    } else {
+        exprType = exprType.InferType()
 
+        if exprType == nil {
+            panic("Cannot infer type; requires a type annotation")
+        }
+    }
 
     if !a.table.AddSymbol(id, exprType) {
         panic("Identifier is already defined")
@@ -83,8 +89,17 @@ func (a *Analyzer) VisitMultiStat(ctx *parser.MultiStatContext) any {
     return nil
 }
 
-func (a *Analyzer) VisitType(ctx *parser.TypeContext) any {
-    return result{exprType: EType(strings.ToLower((ctx.TYPE().GetText())))}
+func (a *Analyzer) VisitBaseType(ctx *parser.BaseTypeContext) any {
+    t := BaseType{Name: ctx.TYPE().GetText()}
+    return result{exprType: t}
+}
+
+func (a *Analyzer) VisitPtrType(ctx *parser.PtrTypeContext) any {
+    base := a.Visit(ctx.Type_()).(result).exprType
+    ptr := ctx.Ptr.GetText()
+
+    t := PtrType{Base: base, Kind: PtrKind(ptr)}
+    return result{exprType: t}
 }
 
 func (a *Analyzer) VisitExprStat(ctx *parser.ExprStatContext) any {
@@ -93,27 +108,38 @@ func (a *Analyzer) VisitExprStat(ctx *parser.ExprStatContext) any {
 
 func (a *Analyzer) VisitNumExpr(ctx *parser.NumExprContext) any {
     num := ctx.NUM().GetText()
+    var t Type
 
     if strings.ContainsRune(num, '.') {
-        return result{exprType: "anyfloat"}
+        t = BaseType{Name: "AnyFloat"}
+    } else {
+        t = BaseType{Name: "AnyNum"}
     }
 
-    return result{exprType: "anyint"}
+    return result{exprType: t}
 }
 
 func (a *Analyzer) VisitIdExpr(ctx *parser.IdExprContext) any {
     id := ctx.ID().GetText()
-    exprType, ok := a.table.FindSymbol(id)
+    exprType := a.table.FindSymbol(id)
 
-    if !ok {
+    if exprType == nil {
         panic("No such identifier")
     }
 
-    return result{exprType: exprType}
+    return result{exprType: exprType, isVar: true}
 }
 
 func (a *Analyzer) VisitKeyExpr(ctx *parser.KeyExprContext) any {
-    return result{exprType: "bool"}
+    var t Type
+
+    if ctx.Key.GetText() == "null" {
+        t = PtrType{Base: nil}
+    } else {
+        t = BaseType{Name: "Bool"}
+    }
+
+    return result{exprType: t}
 }
 
 func (a *Analyzer) VisitParenExpr(ctx *parser.ParenExprContext) any {
@@ -122,41 +148,75 @@ func (a *Analyzer) VisitParenExpr(ctx *parser.ParenExprContext) any {
 
 func (a *Analyzer) VisitCastExpr(ctx *parser.CastExprContext) any {
     a.Visit(ctx.Expr())
-    a.ExprTypes[ctx] = EType(strings.ToLower((ctx.TYPE().GetText())))
+    t := BaseType{Name: ctx.TYPE().GetText()}
 
-    return result{exprType: a.ExprTypes[ctx]}
+    a.ExprTypes[ctx] = t
+    return result{exprType: t}
+}
+
+func (a *Analyzer) VisitPtrExpr(ctx *parser.PtrExprContext) any {
+    res := a.Visit(ctx.Right).(result)
+
+    if !res.isVar {
+        panic("Cannot make pointer to non-variable")
+    }
+
+    kind := ctx.Op.GetText()
+
+    if kind[0] == '$' {
+        panic("Cannot take ownership of variable")
+    }
+
+    t := PtrType{Base: res.exprType, Kind: PtrKind(kind)}
+    return result{exprType: t}
 }
 
 func (a *Analyzer) VisitPrefixExpr(ctx *parser.PrefixExprContext) any {
-    return a.Visit(ctx.Right)
+    op := ctx.GetOp().GetText()
+    exprType := a.Visit(ctx.Right).(result).exprType
+
+    if op == "!" && !exprType.IsBool() {
+        panic("Cannot negate non-boolean value")
+    }
+
+    if (op == "+" || op == "-") && !exprType.IsNumeric() {
+        panic("Cannot plus or minus non-numeric value")
+    }
+
+    return result{exprType: exprType}
 }
 
 func (a *Analyzer) VisitMulExpr(ctx *parser.MulExprContext) any {
     left := a.Visit(ctx.Left).(result)
     right := a.Visit(ctx.Right).(result)
-    t := deduceCommonType(left.exprType, right.exprType)
+    t := DeduceType(left.exprType, right.exprType)
 
     if t == nil {
         panic("Cannot mul/div/rem different types")
     }
 
-    if strings.Contains(string(*t), "float") && ctx.Op.GetText() == "%" {
-        panic("Cannot take rem with float")
+    if !t.IsNumeric() {
+        panic("Cannot mul/div/rem non-numeric types")
     }
 
-    return result{exprType: *t}
+    a.ExprTypes[ctx] = t
+    return result{exprType: t}
 }
 
 func (a *Analyzer) VisitAddExpr(ctx *parser.AddExprContext) any {
     left := a.Visit(ctx.Left).(result)
     right := a.Visit(ctx.Right).(result)
-    t := deduceCommonType(left.exprType, right.exprType)
+    t := DeduceType(left.exprType, right.exprType)
 
     if t == nil {
         panic("Cannot add/sub different types")
     }
 
-    return result{exprType: *t}
+    if !t.IsNumeric() {
+        panic("Cannot add/sub non-numeric types")
+    }
+
+    return result{exprType: t}
 }
 
 func (a *Analyzer) VisitIfExpr(ctx *parser.IfExprContext) any {
@@ -164,15 +224,15 @@ func (a *Analyzer) VisitIfExpr(ctx *parser.IfExprContext) any {
     condition := a.Visit(ctx.Condition).(result)
     right := a.Visit(ctx.Right).(result)
 
-    if condition.exprType != "bool" {
+    if !condition.exprType.IsBool() {
         panic("Condition must be a boolean expression")
     }
 
-    t := deduceCommonType(left.exprType, right.exprType)
+    t := DeduceType(left.exprType, right.exprType)
 
     if t == nil {
         panic("Both sides of if expression must be the same type")
     }
 
-    return result{exprType: *t}
+    return result{exprType: t}
 }

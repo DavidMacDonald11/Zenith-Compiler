@@ -32,7 +32,15 @@ func (v *BaseZenithParserVisitor) VisitExprStat(ctx *ExprStatContext) interface{
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseZenithParserVisitor) VisitType(ctx *TypeContext) interface{} {
+func (v *BaseZenithParserVisitor) VisitBaseType(ctx *BaseTypeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitPtrType(ctx *PtrTypeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitPtrExpr(ctx *PtrExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

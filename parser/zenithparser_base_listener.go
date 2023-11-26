@@ -57,11 +57,23 @@ func (s *BaseZenithParserListener) EnterExprStat(ctx *ExprStatContext) {}
 // ExitExprStat is called when production exprStat is exited.
 func (s *BaseZenithParserListener) ExitExprStat(ctx *ExprStatContext) {}
 
-// EnterType is called when production type is entered.
-func (s *BaseZenithParserListener) EnterType(ctx *TypeContext) {}
+// EnterBaseType is called when production baseType is entered.
+func (s *BaseZenithParserListener) EnterBaseType(ctx *BaseTypeContext) {}
 
-// ExitType is called when production type is exited.
-func (s *BaseZenithParserListener) ExitType(ctx *TypeContext) {}
+// ExitBaseType is called when production baseType is exited.
+func (s *BaseZenithParserListener) ExitBaseType(ctx *BaseTypeContext) {}
+
+// EnterPtrType is called when production ptrType is entered.
+func (s *BaseZenithParserListener) EnterPtrType(ctx *PtrTypeContext) {}
+
+// ExitPtrType is called when production ptrType is exited.
+func (s *BaseZenithParserListener) ExitPtrType(ctx *PtrTypeContext) {}
+
+// EnterPtrExpr is called when production ptrExpr is entered.
+func (s *BaseZenithParserListener) EnterPtrExpr(ctx *PtrExprContext) {}
+
+// ExitPtrExpr is called when production ptrExpr is exited.
+func (s *BaseZenithParserListener) ExitPtrExpr(ctx *PtrExprContext) {}
 
 // EnterPrefixExpr is called when production prefixExpr is entered.
 func (s *BaseZenithParserListener) EnterPrefixExpr(ctx *PrefixExprContext) {}

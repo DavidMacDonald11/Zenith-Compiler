@@ -26,8 +26,14 @@ type ZenithParserVisitor interface {
 	// Visit a parse tree produced by ZenithParser#exprStat.
 	VisitExprStat(ctx *ExprStatContext) interface{}
 
-	// Visit a parse tree produced by ZenithParser#type.
-	VisitType(ctx *TypeContext) interface{}
+	// Visit a parse tree produced by ZenithParser#baseType.
+	VisitBaseType(ctx *BaseTypeContext) interface{}
+
+	// Visit a parse tree produced by ZenithParser#ptrType.
+	VisitPtrType(ctx *PtrTypeContext) interface{}
+
+	// Visit a parse tree produced by ZenithParser#ptrExpr.
+	VisitPtrExpr(ctx *PtrExprContext) interface{}
 
 	// Visit a parse tree produced by ZenithParser#prefixExpr.
 	VisitPrefixExpr(ctx *PrefixExprContext) interface{}

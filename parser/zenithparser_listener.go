@@ -26,8 +26,14 @@ type ZenithParserListener interface {
 	// EnterExprStat is called when entering the exprStat production.
 	EnterExprStat(c *ExprStatContext)
 
-	// EnterType is called when entering the type production.
-	EnterType(c *TypeContext)
+	// EnterBaseType is called when entering the baseType production.
+	EnterBaseType(c *BaseTypeContext)
+
+	// EnterPtrType is called when entering the ptrType production.
+	EnterPtrType(c *PtrTypeContext)
+
+	// EnterPtrExpr is called when entering the ptrExpr production.
+	EnterPtrExpr(c *PtrExprContext)
 
 	// EnterPrefixExpr is called when entering the prefixExpr production.
 	EnterPrefixExpr(c *PrefixExprContext)
@@ -74,8 +80,14 @@ type ZenithParserListener interface {
 	// ExitExprStat is called when exiting the exprStat production.
 	ExitExprStat(c *ExprStatContext)
 
-	// ExitType is called when exiting the type production.
-	ExitType(c *TypeContext)
+	// ExitBaseType is called when exiting the baseType production.
+	ExitBaseType(c *BaseTypeContext)
+
+	// ExitPtrType is called when exiting the ptrType production.
+	ExitPtrType(c *PtrTypeContext)
+
+	// ExitPtrExpr is called when exiting the ptrExpr production.
+	ExitPtrExpr(c *PtrExprContext)
 
 	// ExitPrefixExpr is called when exiting the prefixExpr production.
 	ExitPrefixExpr(c *PrefixExprContext)

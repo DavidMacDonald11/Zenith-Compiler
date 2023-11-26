@@ -1,7 +1,12 @@
 lexer grammar ZenithLexer;
 
-ASSIGN : '=' ;
-INIT_ASSIGN : ':=' ;
+OWN_PTR : '$' ;
+NULL_OWN_PTR : '$?' ;
+PTR : '&' ;
+NULL_PTR : '&?' ;
+AT : '@' ;
+BIT_NOT : '~' ;
+NOT : '!' ;
 
 PLUS : '+' ;
 MINUS : '-' ;
@@ -13,6 +18,10 @@ IF : 'if' ;
 ELSE : 'else' ;
 TRUE : 'true' ;
 FALSE : 'false' ;
+NULL : 'null' ;
+
+ASSIGN : '=' ;
+INIT_ASSIGN : ':=' ;
 
 TYPE
     : 'UInt8' | 'UInt16' |  'UInt32' |  'UInt64' | 'UInt'

@@ -5,44 +5,109 @@ import (
 	"strings"
 )
 
-type EType string
+type PtrKind string
 
-func numerics() []EType {
-    return []EType {
-        "uint8", "uint16", "uint32", "uint64", "uint",
-        "int8", "int16", "int32", "int64", "int",
-        "float32", "float64",
-        "anyint", "anyfloat",
+const (
+    PtrKindOwn = "$"
+    PtrKindNullOwn = "$?"
+    PtrKindBorrow = "&"
+    PtrKindNullBorrow = "&?"
+)
+
+type Type interface {
+    FullType() string
+    InferType() Type
+    MayBeAssignedTo(Type) bool
+    IsBool() bool
+    IsNumeric() bool
+}
+
+type BaseType struct {
+    Name string
+}
+
+func (b BaseType) FullType() string {
+    return b.Name
+}
+
+func (b BaseType) IsNumeric() bool {
+    return !slices.Contains([]string {
+        "Bool",
+    }, b.Name)
+}
+
+func (b BaseType) InferType() Type {
+    switch(b.Name) {
+    case "AnyNum": return BaseType{Name: "Int"}
+    case "AnyFloat": return BaseType{Name: "Float64"}
+    default: return b
     }
 }
 
-func nonNumerics() []EType {
-    return []EType {
-        "bool",
+func (b BaseType) MayBeAssignedTo(t Type) bool {
+    if _, isPtr := t.(PtrType); isPtr {
+        return false
+    }
+
+    name := t.(BaseType).Name
+    isFloat := strings.Contains(name, "Float")
+    isNum := strings.Contains(name, "Int") || isFloat
+
+    switch(b.Name) {
+    case name: return true
+    case "AnyNum": return isNum
+    case "AnyFloat": return isFloat
+    default: return false
     }
 }
 
-func deduceCommonType(left, right EType) *EType {
-    numericTypes := numerics()
-    leftIsNumeric := slices.Contains(numericTypes, left)
-    rightIsNumeric := slices.Contains(numericTypes, right)
+func (b BaseType) IsBool() bool { return b.Name == "Bool" }
 
-    switch {
-    case left == right: return &left
-    case left == "anyint" && rightIsNumeric: return &right
-    case right == "anyint" && leftIsNumeric: return &left
-    case left == "anyfloat":
-        if strings.Contains(string(right), "int") || !rightIsNumeric {
-            return nil
-        }
+type PtrType struct {
+    Base Type
+    Kind PtrKind
+}
 
-        return &right
-    case right == "anyfloat":
-        if strings.Contains(string(left), "int") || !leftIsNumeric {
-            return nil
-        }
+func (p PtrType) FullType() string {
+    if p.Base == nil { return "NullType" }
+    base := p.Base.FullType()
 
-        return &left
-    default: return nil
+    if base == "NullType" { return "NullType" }
+    return string(p.Kind) + base
+}
+
+func (p PtrType) InferType() Type {
+    if p.Base == nil { return nil }
+    base := p.Base.InferType()
+
+    if base == nil { return nil }
+    return PtrType{Base: base, Kind: p.Kind}
+}
+
+func (p PtrType) MayBeAssignedTo(t Type) bool {
+    ptr, isPtr := t.(PtrType)
+    if !isPtr { return false }
+
+    if p.Base == nil {
+        return ptr.Kind == PtrKindNullOwn || ptr.Kind == PtrKindNullBorrow
     }
+
+    sameKind := p.Kind == ptr.Kind
+    nullFromOwn := p.Kind == PtrKindOwn && ptr.Kind == PtrKindNullOwn
+    nullFromBorrow := p.Kind == PtrKindBorrow && ptr.Kind == PtrKindNullBorrow
+
+    if sameKind || nullFromOwn || nullFromBorrow {
+        return p.Base.MayBeAssignedTo(ptr.Base)
+    }
+
+    return false
+}
+
+func (p PtrType) IsBool() bool { return false }
+func (p PtrType) IsNumeric() bool { return false }
+
+func DeduceType(left, right Type) Type {
+    if left.MayBeAssignedTo(right) { return right }
+    if right.MayBeAssignedTo(left) { return left }
+    return nil
 }

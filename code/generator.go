@@ -111,6 +111,8 @@ func (g *Generator) VisitIdExpr(ctx *parser.IdExprContext) any {
 
 func (g *Generator) VisitKeyExpr(ctx *parser.KeyExprContext) any {
     key := ctx.Key.GetText()
+
+    if key == "null" { return "0" }
     return key
 }
 
@@ -124,6 +126,11 @@ func (g *Generator) VisitCastExpr(ctx *parser.CastExprContext) any {
     inner := g.Visit(ctx.Expr())
 
     return fmt.Sprintf("(%v)(%v)", exprType, inner)
+}
+
+func (g *Generator) VisitPtrExpr(ctx *parser.PtrExprContext) any {
+    right := g.Visit(ctx.Right)
+    return fmt.Sprintf("&%v", right)
 }
 
 func (g *Generator) VisitPrefixExpr(ctx *parser.PrefixExprContext) any {
@@ -177,23 +184,29 @@ func getCId(id string) string {
     return "__ZenithId" + id
 }
 
-func getCType(t semantic.EType) string {
-    switch t {
-    case "uint8": return "uint8_t"
-    case "uint16": return "uint16_t"
-    case "uint32": return "uint32_t"
-    case "uint64": return "uint64_t"
-    case "int8": return "int8_t"
-    case "int16": return "int16_t"
-    case "int32": return "int32_t"
-    case "int64": return "int64_t"
-    case "uint": return "uint_fast32_t"
-    case "anyint": fallthrough
-    case "int": return "int_fast32_t"
-    case "float32": return "float"
-    case "anyfloat": fallthrough
-    case "float64": return "double"
-    case "bool": return "bool"
+func getCType(t semantic.Type) string {
+    if ptr, isPtr := t.(semantic.PtrType); isPtr {
+        return getCType(ptr.Base) + "*"
+    }
+
+    name := t.(semantic.BaseType).Name
+
+    switch name {
+    case "UInt8": return "uint8_t"
+    case "UInt16": return "uint16_t"
+    case "UInt32": return "uint32_t"
+    case "UInt64": return "uint64_t"
+    case "Int8": return "int8_t"
+    case "Int16": return "int16_t"
+    case "Int32": return "int32_t"
+    case "Int64": return "int64_t"
+    case "UInt": return "uint_fast32_t"
+    case "AnyNum": fallthrough
+    case "Int": return "int_fast32_t"
+    case "Float32": return "float"
+    case "AnyFloat": fallthrough
+    case "Float64": return "double"
+    case "Bool": return "bool"
     }
 
     return "void"
