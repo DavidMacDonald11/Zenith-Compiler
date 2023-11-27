@@ -18,6 +18,7 @@ type Analyzer struct {
 type result struct {
     exprType Type
     isVar bool
+    right Type
 }
 
 func MakeAnalyzer() Analyzer {
@@ -200,6 +201,23 @@ func (a *Analyzer) VisitPrefixExpr(ctx *parser.PrefixExprContext) any {
     return result{exprType: exprType}
 }
 
+func (a *Analyzer) VisitPowExpr(ctx *parser.PowExprContext) any {
+    left := a.Visit(ctx.Left).(result)
+    right := a.Visit(ctx.Right).(result)
+    t := DeduceType(left.exprType, right.exprType)
+
+    if t == nil {
+        panic("Cannot pow different types")
+    }
+
+    if !t.IsNumeric() {
+        panic("Cannot pow non-numeric types")
+    }
+
+    a.ExprTypes[ctx] = t
+    return result{exprType: t}
+}
+
 func (a *Analyzer) VisitMulExpr(ctx *parser.MulExprContext) any {
     left := a.Visit(ctx.Left).(result)
     right := a.Visit(ctx.Right).(result)
@@ -231,6 +249,90 @@ func (a *Analyzer) VisitAddExpr(ctx *parser.AddExprContext) any {
     }
 
     return result{exprType: t}
+}
+
+func (a *Analyzer) VisitShiftExpr(ctx *parser.ShiftExprContext) any {
+    left := a.Visit(ctx.Left).(result)
+    right := a.Visit(ctx.Right).(result)
+    t := DeduceType(left.exprType, right.exprType)
+
+    if t == nil {
+        panic("Cannot shift different types")
+    }
+
+    if !t.IsInt() {
+        panic("Cannot shift non-integer types")
+    }
+
+    return result{exprType: t}
+}
+
+func (a *Analyzer) VisitBitAndExpr(ctx *parser.BitAndExprContext) any {
+    left := a.Visit(ctx.Left).(result)
+    right := a.Visit(ctx.Right).(result)
+    t := DeduceType(left.exprType, right.exprType)
+
+    if t == nil {
+        panic("Cannot bitwise-and different types")
+    }
+
+    if !t.IsInt() {
+        panic("Cannot bitwise-and non-integer types")
+    }
+
+    return result{exprType: t}
+}
+
+func (a *Analyzer) VisitBitXorExpr(ctx *parser.BitXorExprContext) any {
+    left := a.Visit(ctx.Left).(result)
+    right := a.Visit(ctx.Right).(result)
+    t := DeduceType(left.exprType, right.exprType)
+
+    if t == nil {
+        panic("Cannot bitwise-xor different types")
+    }
+
+    if !t.IsInt() {
+        panic("Cannot bitwise-xor non-integer types")
+    }
+
+    return result{exprType: t}
+}
+
+func (a *Analyzer) VisitBitOrExpr(ctx *parser.BitOrExprContext) any {
+    left := a.Visit(ctx.Left).(result)
+    right := a.Visit(ctx.Right).(result)
+    t := DeduceType(left.exprType, right.exprType)
+
+    if t == nil {
+        panic("Cannot bitwise-or different types")
+    }
+
+    if !t.IsInt() {
+        panic("Cannot bitwise-or non-integer types")
+    }
+
+    return result{exprType: t}
+}
+
+func (a *Analyzer) VisitCompExpr(ctx *parser.CompExprContext) any {
+    var leftType Type
+
+    if comp, isComp := ctx.Left.(*parser.CompExprContext); isComp {
+        leftType = a.Visit(comp).(result).right
+    } else {
+        leftType = a.Visit(ctx.Left).(result).exprType
+    }
+
+    right := a.Visit(ctx.Right).(result)
+    t := DeduceType(leftType, right.exprType)
+
+    if t == nil {
+        panic("Cannot compare different types")
+    }
+
+    b := BaseType{Name: "Bool"}
+    return result{exprType: b, right: right.exprType}
 }
 
 func (a *Analyzer) VisitIfExpr(ctx *parser.IfExprContext) any {

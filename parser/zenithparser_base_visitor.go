@@ -40,27 +40,7 @@ func (v *BaseZenithParserVisitor) VisitPtrType(ctx *PtrTypeContext) interface{} 
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseZenithParserVisitor) VisitPtrExpr(ctx *PtrExprContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseZenithParserVisitor) VisitPrefixExpr(ctx *PrefixExprContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseZenithParserVisitor) VisitCastExpr(ctx *CastExprContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseZenithParserVisitor) VisitAddExpr(ctx *AddExprContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseZenithParserVisitor) VisitMulExpr(ctx *MulExprContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseZenithParserVisitor) VisitIfExpr(ctx *IfExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -73,6 +53,50 @@ func (v *BaseZenithParserVisitor) VisitNumExpr(ctx *NumExprContext) interface{} 
 }
 
 func (v *BaseZenithParserVisitor) VisitParenExpr(ctx *ParenExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitBitXorExpr(ctx *BitXorExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitShiftExpr(ctx *ShiftExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitPtrExpr(ctx *PtrExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitPrefixExpr(ctx *PrefixExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitBitOrExpr(ctx *BitOrExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitAddExpr(ctx *AddExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitCompExpr(ctx *CompExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitMulExpr(ctx *MulExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitIfExpr(ctx *IfExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitBitAndExpr(ctx *BitAndExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitPowExpr(ctx *PowExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

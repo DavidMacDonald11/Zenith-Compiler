@@ -148,6 +148,14 @@ func (g *Generator) VisitPrefixExpr(ctx *parser.PrefixExprContext) any {
     return fmt.Sprintf("%v%v", op, right)
 }
 
+func (g *Generator) VisitPowExpr(ctx *parser.PowExprContext) any {
+    left := g.Visit(ctx.Left)
+    right := g.Visit(ctx.Right)
+
+    // TODO implement correctly
+    return fmt.Sprintf("/*%v^%v*/", left, right)
+}
+
 func (g *Generator) VisitMulExpr(ctx *parser.MulExprContext) any {
     left := g.Visit(ctx.Left)
     right := g.Visit(ctx.Right)
@@ -161,6 +169,43 @@ func (g *Generator) VisitAddExpr(ctx *parser.AddExprContext) any {
     right := g.Visit(ctx.Right)
     op := ctx.Op.GetText()
 
+    return fmt.Sprintf("%v %v %v", left, op, right)
+}
+
+func (g *Generator) VisitShiftExpr(ctx *parser.ShiftExprContext) any {
+    left := g.Visit(ctx.Left)
+    right := g.Visit(ctx.Right)
+    op := ctx.Op.GetText()
+
+    return fmt.Sprintf("%v %v %v", left, op, right)
+}
+
+func (g *Generator) VisitBitAndExpr(ctx *parser.BitAndExprContext) any {
+    left := g.Visit(ctx.Left)
+    right := g.Visit(ctx.Right)
+
+    return fmt.Sprintf("%v & %v", left, right)
+}
+func (g *Generator) VisitBitXorExpr(ctx *parser.BitXorExprContext) any {
+    left := g.Visit(ctx.Left)
+    right := g.Visit(ctx.Right)
+
+    return fmt.Sprintf("%v ^ %v", left, right)
+}
+
+func (g *Generator) VisitBitOrExpr(ctx *parser.BitOrExprContext) any {
+    left := g.Visit(ctx.Left)
+    right := g.Visit(ctx.Right)
+
+    return fmt.Sprintf("%v | %v", left, right)
+}
+
+func (g *Generator) VisitCompExpr(ctx *parser.CompExprContext) any {
+    left := g.Visit(ctx.Left)
+    right := g.Visit(ctx.Right)
+    op := ctx.Op.GetText()
+
+    // TODO implement correctly
     return fmt.Sprintf("%v %v %v", left, op, right)
 }
 

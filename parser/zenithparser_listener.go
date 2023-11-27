@@ -32,23 +32,8 @@ type ZenithParserListener interface {
 	// EnterPtrType is called when entering the ptrType production.
 	EnterPtrType(c *PtrTypeContext)
 
-	// EnterPtrExpr is called when entering the ptrExpr production.
-	EnterPtrExpr(c *PtrExprContext)
-
-	// EnterPrefixExpr is called when entering the prefixExpr production.
-	EnterPrefixExpr(c *PrefixExprContext)
-
 	// EnterCastExpr is called when entering the castExpr production.
 	EnterCastExpr(c *CastExprContext)
-
-	// EnterAddExpr is called when entering the addExpr production.
-	EnterAddExpr(c *AddExprContext)
-
-	// EnterMulExpr is called when entering the mulExpr production.
-	EnterMulExpr(c *MulExprContext)
-
-	// EnterIfExpr is called when entering the ifExpr production.
-	EnterIfExpr(c *IfExprContext)
 
 	// EnterKeyExpr is called when entering the keyExpr production.
 	EnterKeyExpr(c *KeyExprContext)
@@ -58,6 +43,39 @@ type ZenithParserListener interface {
 
 	// EnterParenExpr is called when entering the parenExpr production.
 	EnterParenExpr(c *ParenExprContext)
+
+	// EnterBitXorExpr is called when entering the bitXorExpr production.
+	EnterBitXorExpr(c *BitXorExprContext)
+
+	// EnterShiftExpr is called when entering the shiftExpr production.
+	EnterShiftExpr(c *ShiftExprContext)
+
+	// EnterPtrExpr is called when entering the ptrExpr production.
+	EnterPtrExpr(c *PtrExprContext)
+
+	// EnterPrefixExpr is called when entering the prefixExpr production.
+	EnterPrefixExpr(c *PrefixExprContext)
+
+	// EnterBitOrExpr is called when entering the bitOrExpr production.
+	EnterBitOrExpr(c *BitOrExprContext)
+
+	// EnterAddExpr is called when entering the addExpr production.
+	EnterAddExpr(c *AddExprContext)
+
+	// EnterCompExpr is called when entering the compExpr production.
+	EnterCompExpr(c *CompExprContext)
+
+	// EnterMulExpr is called when entering the mulExpr production.
+	EnterMulExpr(c *MulExprContext)
+
+	// EnterIfExpr is called when entering the ifExpr production.
+	EnterIfExpr(c *IfExprContext)
+
+	// EnterBitAndExpr is called when entering the bitAndExpr production.
+	EnterBitAndExpr(c *BitAndExprContext)
+
+	// EnterPowExpr is called when entering the powExpr production.
+	EnterPowExpr(c *PowExprContext)
 
 	// EnterIdExpr is called when entering the idExpr production.
 	EnterIdExpr(c *IdExprContext)
@@ -86,23 +104,8 @@ type ZenithParserListener interface {
 	// ExitPtrType is called when exiting the ptrType production.
 	ExitPtrType(c *PtrTypeContext)
 
-	// ExitPtrExpr is called when exiting the ptrExpr production.
-	ExitPtrExpr(c *PtrExprContext)
-
-	// ExitPrefixExpr is called when exiting the prefixExpr production.
-	ExitPrefixExpr(c *PrefixExprContext)
-
 	// ExitCastExpr is called when exiting the castExpr production.
 	ExitCastExpr(c *CastExprContext)
-
-	// ExitAddExpr is called when exiting the addExpr production.
-	ExitAddExpr(c *AddExprContext)
-
-	// ExitMulExpr is called when exiting the mulExpr production.
-	ExitMulExpr(c *MulExprContext)
-
-	// ExitIfExpr is called when exiting the ifExpr production.
-	ExitIfExpr(c *IfExprContext)
 
 	// ExitKeyExpr is called when exiting the keyExpr production.
 	ExitKeyExpr(c *KeyExprContext)
@@ -112,6 +115,39 @@ type ZenithParserListener interface {
 
 	// ExitParenExpr is called when exiting the parenExpr production.
 	ExitParenExpr(c *ParenExprContext)
+
+	// ExitBitXorExpr is called when exiting the bitXorExpr production.
+	ExitBitXorExpr(c *BitXorExprContext)
+
+	// ExitShiftExpr is called when exiting the shiftExpr production.
+	ExitShiftExpr(c *ShiftExprContext)
+
+	// ExitPtrExpr is called when exiting the ptrExpr production.
+	ExitPtrExpr(c *PtrExprContext)
+
+	// ExitPrefixExpr is called when exiting the prefixExpr production.
+	ExitPrefixExpr(c *PrefixExprContext)
+
+	// ExitBitOrExpr is called when exiting the bitOrExpr production.
+	ExitBitOrExpr(c *BitOrExprContext)
+
+	// ExitAddExpr is called when exiting the addExpr production.
+	ExitAddExpr(c *AddExprContext)
+
+	// ExitCompExpr is called when exiting the compExpr production.
+	ExitCompExpr(c *CompExprContext)
+
+	// ExitMulExpr is called when exiting the mulExpr production.
+	ExitMulExpr(c *MulExprContext)
+
+	// ExitIfExpr is called when exiting the ifExpr production.
+	ExitIfExpr(c *IfExprContext)
+
+	// ExitBitAndExpr is called when exiting the bitAndExpr production.
+	ExitBitAndExpr(c *BitAndExprContext)
+
+	// ExitPowExpr is called when exiting the powExpr production.
+	ExitPowExpr(c *PowExprContext)
 
 	// ExitIdExpr is called when exiting the idExpr production.
 	ExitIdExpr(c *IdExprContext)

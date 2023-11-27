@@ -10,6 +10,7 @@ type Type interface {
     InferType() Type
     MayBeAssignedTo(Type) bool
     IsBool() bool
+    IsInt() bool
     IsNumeric() bool
 }
 
@@ -19,12 +20,6 @@ type BaseType struct {
 
 func (b BaseType) FullType() string {
     return b.Name
-}
-
-func (b BaseType) IsNumeric() bool {
-    return !slices.Contains([]string {
-        "Bool",
-    }, b.Name)
 }
 
 func (b BaseType) InferType() Type {
@@ -53,6 +48,17 @@ func (b BaseType) MayBeAssignedTo(t Type) bool {
 }
 
 func (b BaseType) IsBool() bool { return b.Name == "Bool" }
+
+func (b BaseType) IsInt() bool {
+    if b.Name == "AnyNum" { return true }
+    return strings.Contains(b.Name, "Int")
+}
+
+func (b BaseType) IsNumeric() bool {
+    return !slices.Contains([]string {
+        "Bool",
+    }, b.Name)
+}
 
 type PtrType struct {
     Base Type
@@ -87,6 +93,7 @@ func (p PtrType) MayBeAssignedTo(t Type) bool {
 }
 
 func (p PtrType) IsBool() bool { return false }
+func (p PtrType) IsInt() bool { return false }
 func (p PtrType) IsNumeric() bool { return false }
 
 func DeduceType(left, right Type) Type {

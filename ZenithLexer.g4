@@ -1,16 +1,23 @@
 lexer grammar ZenithLexer;
 
-OWN_PTR : '$' ;
-PTR : '&' ;
 AT : '@' ;
 BIT_NOT : '~' ;
 NOT : '!' ;
 
-PLUS : '+' ;
-MINUS : '-' ;
+POW : '^' ;
 TIMES : '*' ;
 DIVIDE : '/' ;
 REM : '%' ;
+PLUS : '+' ;
+MINUS : '-' ;
+LSHIFT : '<<' ;
+RSHIFT : '>>' ;
+LT : '<' ;
+GT : '>' ;
+LTE : '<=' ;
+GTE : '>=' ;
+EQ : '==' ;
+NEQ : '!=' ;
 
 IF : 'if' ;
 ELSE : 'else' ;
@@ -70,6 +77,9 @@ fragment HEX_DIGIT : [0-9a-fA-F] ;
 
 ID : [_a-zA-Z][_a-zA-Z0-9]* ;
 
+AND : '&' ;
+DOLLAR : '$' ;
+PIPE : '|' ;
 LPAREN : '(' ;
 RPAREN : ')' ;
 LBRACE : '{' ;

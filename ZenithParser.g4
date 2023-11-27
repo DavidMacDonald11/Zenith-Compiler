@@ -7,8 +7,7 @@ fileStat : endedStat+
 
 endedStat : NL? stat lineEnd ;
 
-lineEnd : SEMICOLON (NL | SEMICOLON)*
-        | NL (NL | SEMICOLON)*
+lineEnd : (NL | SEMICOLON)+
         | EOF
         ;
 
@@ -18,7 +17,7 @@ stat : ID type? INIT_ASSIGN NL? expr #defineStat
      ;
 
 type : TYPE #baseType
-     | Ptr=(OWN_PTR | PTR) type #ptrType
+     | Ptr=(DOLLAR | AND) type #ptrType
      ;
 
 expr : NUM #numExpr
@@ -26,9 +25,15 @@ expr : NUM #numExpr
      | Key=(TRUE | FALSE | NULL) #keyExpr
      | LPAREN NL? expr NL? RPAREN #parenExpr
      | TYPE LPAREN NL? expr NL? RPAREN #castExpr
-     | Op=(OWN_PTR | PTR | AT) Right=expr #ptrExpr
+     | Op=(DOLLAR | AND | AT) Right=expr #ptrExpr
      | Op=(PLUS | MINUS | NOT) Right=expr #prefixExpr
+     | Left=expr (POW NL? Right=expr)+ #powExpr
      | Left=expr Op=(TIMES | DIVIDE | REM) NL? Right=expr #mulExpr
      | Left=expr Op=(PLUS | MINUS) NL? Right=expr #addExpr
+     | Left=expr Op=(LSHIFT | RSHIFT) NL? Right=expr #shiftExpr
+     | Left=expr AND NL? Right=expr #bitAndExpr
+     | Left=expr DOLLAR NL? Right=expr #bitXorExpr
+     | Left=expr PIPE NL? Right=expr #bitOrExpr
+     | Left=expr Op=(LT | GT | LTE | GTE | EQ | NEQ) NL? Right=expr #compExpr
      | Left=expr IF NL? Condition=expr NL? ELSE NL? Right=expr #ifExpr
      ;
