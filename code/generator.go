@@ -151,9 +151,10 @@ func (g *Generator) VisitPrefixExpr(ctx *parser.PrefixExprContext) any {
 func (g *Generator) VisitPowExpr(ctx *parser.PowExprContext) any {
     left := g.Visit(ctx.Left)
     right := g.Visit(ctx.Right)
+    exprType := getCType(g.Analyzer.ExprTypes[ctx])
 
-    // TODO implement correctly
-    return fmt.Sprintf("/*%v^%v*/", left, right)
+    // TODO implement better
+    return fmt.Sprintf("(%v)powl(%v, %v)", exprType, left, right)
 }
 
 func (g *Generator) VisitMulExpr(ctx *parser.MulExprContext) any {
