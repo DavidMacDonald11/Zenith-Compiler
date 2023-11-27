@@ -18,7 +18,7 @@ stat : ID type? INIT_ASSIGN NL? expr #defineStat
      ;
 
 type : TYPE #baseType
-     | Ptr=(OWN_PTR | PTR | NULL_OWN_PTR | NULL_PTR) type #ptrType
+     | Ptr=(OWN_PTR | PTR) type #ptrType
      ;
 
 expr : NUM #numExpr
@@ -26,7 +26,7 @@ expr : NUM #numExpr
      | Key=(TRUE | FALSE | NULL) #keyExpr
      | LPAREN NL? expr NL? RPAREN #parenExpr
      | TYPE LPAREN NL? expr NL? RPAREN #castExpr
-     | Op=(OWN_PTR | PTR | NULL_OWN_PTR | NULL_PTR) Right=expr #ptrExpr
+     | Op=(OWN_PTR | PTR | AT) Right=expr #ptrExpr
      | Op=(PLUS | MINUS | NOT) Right=expr #prefixExpr
      | Left=expr Op=(TIMES | DIVIDE | REM) NL? Right=expr #mulExpr
      | Left=expr Op=(PLUS | MINUS) NL? Right=expr #addExpr

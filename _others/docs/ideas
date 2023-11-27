@@ -73,3 +73,5 @@ type Node struct {
 
 next and prev must be nullable to allow head and tail
 $ - cannot be transfered or freed until end of scope
+
+idea: null safety is great, but syntax sucks

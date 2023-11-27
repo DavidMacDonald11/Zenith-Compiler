@@ -5,15 +5,6 @@ import (
 	"strings"
 )
 
-type PtrKind string
-
-const (
-    PtrKindOwn = "$"
-    PtrKindNullOwn = "$?"
-    PtrKindBorrow = "&"
-    PtrKindNullBorrow = "&?"
-)
-
 type Type interface {
     FullType() string
     InferType() Type
@@ -65,15 +56,15 @@ func (b BaseType) IsBool() bool { return b.Name == "Bool" }
 
 type PtrType struct {
     Base Type
-    Kind PtrKind
+    IsOwn bool
 }
 
 func (p PtrType) FullType() string {
     if p.Base == nil { return "NullType" }
     base := p.Base.FullType()
 
-    if base == "NullType" { return "NullType" }
-    return string(p.Kind) + base
+    if p.IsOwn { return "$" + base }
+    return "&" + base
 }
 
 func (p PtrType) InferType() Type {
@@ -81,22 +72,14 @@ func (p PtrType) InferType() Type {
     base := p.Base.InferType()
 
     if base == nil { return nil }
-    return PtrType{Base: base, Kind: p.Kind}
+    return PtrType{Base: base, IsOwn: p.IsOwn}
 }
 
 func (p PtrType) MayBeAssignedTo(t Type) bool {
     ptr, isPtr := t.(PtrType)
     if !isPtr { return false }
 
-    if p.Base == nil {
-        return ptr.Kind == PtrKindNullOwn || ptr.Kind == PtrKindNullBorrow
-    }
-
-    sameKind := p.Kind == ptr.Kind
-    nullFromOwn := p.Kind == PtrKindOwn && ptr.Kind == PtrKindNullOwn
-    nullFromBorrow := p.Kind == PtrKindBorrow && ptr.Kind == PtrKindNullBorrow
-
-    if sameKind || nullFromOwn || nullFromBorrow {
+    if p.IsOwn == ptr.IsOwn {
         return p.Base.MayBeAssignedTo(ptr.Base)
     }
 

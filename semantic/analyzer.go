@@ -96,9 +96,9 @@ func (a *Analyzer) VisitBaseType(ctx *parser.BaseTypeContext) any {
 
 func (a *Analyzer) VisitPtrType(ctx *parser.PtrTypeContext) any {
     base := a.Visit(ctx.Type_()).(result).exprType
-    ptr := ctx.Ptr.GetText()
+    isOwn := ctx.Ptr.GetText() == "$"
 
-    t := PtrType{Base: base, Kind: PtrKind(ptr)}
+    t := PtrType{Base: base, IsOwn: isOwn}
     return result{exprType: t}
 }
 
@@ -157,17 +157,31 @@ func (a *Analyzer) VisitCastExpr(ctx *parser.CastExprContext) any {
 func (a *Analyzer) VisitPtrExpr(ctx *parser.PtrExprContext) any {
     res := a.Visit(ctx.Right).(result)
 
+    if ctx.Op.GetText() == "@" {
+        ptr, isPtr := res.exprType.(PtrType)
+
+        if !isPtr {
+            panic("Cannot dereference non-pointer")
+        }
+
+        if ptr.Base == nil {
+            panic("Cannot dereference null")
+        }
+
+        return result{exprType: ptr.Base}
+    }
+
     if !res.isVar {
         panic("Cannot make pointer to non-variable")
     }
 
-    kind := ctx.Op.GetText()
+    isOwn := ctx.Op.GetText() == "$"
 
-    if kind[0] == '$' {
+    if isOwn {
         panic("Cannot take ownership of variable")
     }
 
-    t := PtrType{Base: res.exprType, Kind: PtrKind(kind)}
+    t := PtrType{Base: res.exprType, IsOwn: isOwn}
     return result{exprType: t}
 }
 

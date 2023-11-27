@@ -129,8 +129,16 @@ func (g *Generator) VisitCastExpr(ctx *parser.CastExprContext) any {
 }
 
 func (g *Generator) VisitPtrExpr(ctx *parser.PtrExprContext) any {
+    var op string
+
+    if ctx.Op.GetText() == "@" {
+        op = "*"
+    } else {
+        op = "&"
+    }
+
     right := g.Visit(ctx.Right)
-    return fmt.Sprintf("&%v", right)
+    return fmt.Sprintf("%v%v", op, right)
 }
 
 func (g *Generator) VisitPrefixExpr(ctx *parser.PrefixExprContext) any {

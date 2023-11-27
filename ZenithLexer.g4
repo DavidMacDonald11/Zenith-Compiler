@@ -1,9 +1,7 @@
 lexer grammar ZenithLexer;
 
 OWN_PTR : '$' ;
-NULL_OWN_PTR : '$?' ;
 PTR : '&' ;
-NULL_PTR : '&?' ;
 AT : '@' ;
 BIT_NOT : '~' ;
 NOT : '!' ;
