@@ -17,16 +17,16 @@ stat : ID type? INIT_ASSIGN NL? expr #defineStat
      ;
 
 type : TYPE #baseType
-     | Ptr=(DOLLAR | AND) type #ptrType
+     | type Ref=(EXCLAIM | QUESTION) #refType
      ;
 
 expr : NUM #numExpr
      | ID #idExpr
      | Key=(TRUE | FALSE | NULL) #keyExpr
      | LPAREN NL? expr NL? RPAREN #parenExpr
+     | Left=expr Op=(EXCLAIM | QUESTION) #refExpr
      | TYPE LPAREN NL? expr NL? RPAREN #castExpr
-     | Op=(DOLLAR | AND | AT) Right=expr #ptrExpr
-     | Op=(PLUS | MINUS | NOT) Right=expr #prefixExpr
+     | Op=(PLUS | MINUS | EXCLAIM) Right=expr #prefixExpr
      | Left=expr (POW NL? Right=expr)+ #powExpr
      | Left=expr Op=(TIMES | DIVIDE | REM) NL? Right=expr #mulExpr
      | Left=expr Op=(PLUS | MINUS) NL? Right=expr #addExpr

@@ -33,106 +33,108 @@ var ZenithParserParserStaticData struct {
 func zenithparserParserInit() {
 	staticData := &ZenithParserParserStaticData
 	staticData.LiteralNames = []string{
-		"", "'@'", "'~'", "'!'", "'^'", "'*'", "'/'", "'%'", "'+'", "'-'", "'<<'",
-		"'>>'", "'<'", "'>'", "'<='", "'>='", "'=='", "'!='", "'if'", "'else'",
-		"'true'", "'false'", "'null'", "'='", "':='", "", "", "", "'&'", "'$'",
-		"'|'", "'('", "')'", "'{'", "'}'", "';'",
+		"", "'~'", "'^'", "'*'", "'/'", "'%'", "'+'", "'-'", "'<<'", "'>>'",
+		"'<'", "'>'", "'<='", "'>='", "'=='", "'!='", "'if'", "'else'", "'true'",
+		"'false'", "'null'", "'='", "':='", "", "", "", "'&'", "'$'", "'|'",
+		"'!'", "'?'", "'('", "')'", "'{'", "'}'", "'['", "']'", "';'",
 	}
 	staticData.SymbolicNames = []string{
-		"", "AT", "BIT_NOT", "NOT", "POW", "TIMES", "DIVIDE", "REM", "PLUS",
-		"MINUS", "LSHIFT", "RSHIFT", "LT", "GT", "LTE", "GTE", "EQ", "NEQ",
-		"IF", "ELSE", "TRUE", "FALSE", "NULL", "ASSIGN", "INIT_ASSIGN", "TYPE",
-		"NUM", "ID", "AND", "DOLLAR", "PIPE", "LPAREN", "RPAREN", "LBRACE",
-		"RBRACE", "SEMICOLON", "NL", "IGNORED",
+		"", "BIT_NOT", "POW", "TIMES", "DIVIDE", "REM", "PLUS", "MINUS", "LSHIFT",
+		"RSHIFT", "LT", "GT", "LTE", "GTE", "EQ", "NEQ", "IF", "ELSE", "TRUE",
+		"FALSE", "NULL", "ASSIGN", "INIT_ASSIGN", "TYPE", "NUM", "ID", "AND",
+		"DOLLAR", "PIPE", "EXCLAIM", "QUESTION", "LPAREN", "RPAREN", "LBRACE",
+		"RBRACE", "LBRACK", "RBRACK", "SEMICOLON", "NL", "IGNORED",
 	}
 	staticData.RuleNames = []string{
 		"fileStat", "endedStat", "lineEnd", "stat", "type", "expr",
 	}
 	staticData.PredictionContextCache = antlr.NewPredictionContextCache()
 	staticData.serializedATN = []int32{
-		4, 1, 37, 172, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
+		4, 1, 39, 177, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
 		4, 2, 5, 7, 5, 1, 0, 4, 0, 14, 8, 0, 11, 0, 12, 0, 15, 1, 0, 3, 0, 19,
 		8, 0, 1, 1, 3, 1, 22, 8, 1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 2, 28, 8, 2, 11,
 		2, 12, 2, 29, 1, 2, 3, 2, 33, 8, 2, 1, 3, 1, 3, 3, 3, 37, 8, 3, 1, 3, 1,
 		3, 3, 3, 41, 8, 3, 1, 3, 1, 3, 1, 3, 3, 3, 46, 8, 3, 1, 3, 5, 3, 49, 8,
 		3, 10, 3, 12, 3, 52, 9, 3, 1, 3, 3, 3, 55, 8, 3, 1, 3, 3, 3, 58, 8, 3,
-		1, 3, 1, 3, 3, 3, 62, 8, 3, 1, 4, 1, 4, 1, 4, 3, 4, 67, 8, 4, 1, 5, 1,
-		5, 1, 5, 1, 5, 1, 5, 1, 5, 3, 5, 75, 8, 5, 1, 5, 1, 5, 3, 5, 79, 8, 5,
-		1, 5, 1, 5, 1, 5, 1, 5, 1, 5, 3, 5, 86, 8, 5, 1, 5, 1, 5, 3, 5, 90, 8,
-		5, 1, 5, 1, 5, 1, 5, 1, 5, 1, 5, 1, 5, 3, 5, 98, 8, 5, 1, 5, 1, 5, 1, 5,
-		3, 5, 103, 8, 5, 1, 5, 1, 5, 1, 5, 1, 5, 3, 5, 109, 8, 5, 1, 5, 1, 5, 1,
-		5, 1, 5, 3, 5, 115, 8, 5, 1, 5, 1, 5, 1, 5, 1, 5, 3, 5, 121, 8, 5, 1, 5,
-		1, 5, 1, 5, 1, 5, 3, 5, 127, 8, 5, 1, 5, 1, 5, 1, 5, 1, 5, 3, 5, 133, 8,
-		5, 1, 5, 1, 5, 1, 5, 1, 5, 3, 5, 139, 8, 5, 1, 5, 1, 5, 1, 5, 1, 5, 3,
-		5, 145, 8, 5, 1, 5, 1, 5, 3, 5, 149, 8, 5, 1, 5, 1, 5, 3, 5, 153, 8, 5,
-		1, 5, 1, 5, 1, 5, 1, 5, 1, 5, 3, 5, 160, 8, 5, 1, 5, 4, 5, 163, 8, 5, 11,
-		5, 12, 5, 164, 5, 5, 167, 8, 5, 10, 5, 12, 5, 170, 9, 5, 1, 5, 0, 1, 10,
-		6, 0, 2, 4, 6, 8, 10, 0, 9, 1, 0, 35, 36, 1, 0, 28, 29, 1, 0, 20, 22, 2,
-		0, 1, 1, 28, 29, 2, 0, 3, 3, 8, 9, 1, 0, 5, 7, 1, 0, 8, 9, 1, 0, 10, 11,
-		1, 0, 12, 17, 210, 0, 18, 1, 0, 0, 0, 2, 21, 1, 0, 0, 0, 4, 32, 1, 0, 0,
-		0, 6, 61, 1, 0, 0, 0, 8, 66, 1, 0, 0, 0, 10, 97, 1, 0, 0, 0, 12, 14, 3,
-		2, 1, 0, 13, 12, 1, 0, 0, 0, 14, 15, 1, 0, 0, 0, 15, 13, 1, 0, 0, 0, 15,
-		16, 1, 0, 0, 0, 16, 19, 1, 0, 0, 0, 17, 19, 5, 0, 0, 1, 18, 13, 1, 0, 0,
-		0, 18, 17, 1, 0, 0, 0, 19, 1, 1, 0, 0, 0, 20, 22, 5, 36, 0, 0, 21, 20,
-		1, 0, 0, 0, 21, 22, 1, 0, 0, 0, 22, 23, 1, 0, 0, 0, 23, 24, 3, 6, 3, 0,
-		24, 25, 3, 4, 2, 0, 25, 3, 1, 0, 0, 0, 26, 28, 7, 0, 0, 0, 27, 26, 1, 0,
-		0, 0, 28, 29, 1, 0, 0, 0, 29, 27, 1, 0, 0, 0, 29, 30, 1, 0, 0, 0, 30, 33,
-		1, 0, 0, 0, 31, 33, 5, 0, 0, 1, 32, 27, 1, 0, 0, 0, 32, 31, 1, 0, 0, 0,
-		33, 5, 1, 0, 0, 0, 34, 36, 5, 27, 0, 0, 35, 37, 3, 8, 4, 0, 36, 35, 1,
-		0, 0, 0, 36, 37, 1, 0, 0, 0, 37, 38, 1, 0, 0, 0, 38, 40, 5, 24, 0, 0, 39,
-		41, 5, 36, 0, 0, 40, 39, 1, 0, 0, 0, 40, 41, 1, 0, 0, 0, 41, 42, 1, 0,
-		0, 0, 42, 62, 3, 10, 5, 0, 43, 45, 5, 33, 0, 0, 44, 46, 5, 36, 0, 0, 45,
-		44, 1, 0, 0, 0, 45, 46, 1, 0, 0, 0, 46, 50, 1, 0, 0, 0, 47, 49, 3, 2, 1,
-		0, 48, 47, 1, 0, 0, 0, 49, 52, 1, 0, 0, 0, 50, 48, 1, 0, 0, 0, 50, 51,
-		1, 0, 0, 0, 51, 54, 1, 0, 0, 0, 52, 50, 1, 0, 0, 0, 53, 55, 3, 6, 3, 0,
-		54, 53, 1, 0, 0, 0, 54, 55, 1, 0, 0, 0, 55, 57, 1, 0, 0, 0, 56, 58, 3,
-		4, 2, 0, 57, 56, 1, 0, 0, 0, 57, 58, 1, 0, 0, 0, 58, 59, 1, 0, 0, 0, 59,
-		62, 5, 34, 0, 0, 60, 62, 3, 10, 5, 0, 61, 34, 1, 0, 0, 0, 61, 43, 1, 0,
-		0, 0, 61, 60, 1, 0, 0, 0, 62, 7, 1, 0, 0, 0, 63, 67, 5, 25, 0, 0, 64, 65,
-		7, 1, 0, 0, 65, 67, 3, 8, 4, 0, 66, 63, 1, 0, 0, 0, 66, 64, 1, 0, 0, 0,
-		67, 9, 1, 0, 0, 0, 68, 69, 6, 5, -1, 0, 69, 98, 5, 26, 0, 0, 70, 98, 5,
-		27, 0, 0, 71, 98, 7, 2, 0, 0, 72, 74, 5, 31, 0, 0, 73, 75, 5, 36, 0, 0,
-		74, 73, 1, 0, 0, 0, 74, 75, 1, 0, 0, 0, 75, 76, 1, 0, 0, 0, 76, 78, 3,
-		10, 5, 0, 77, 79, 5, 36, 0, 0, 78, 77, 1, 0, 0, 0, 78, 79, 1, 0, 0, 0,
-		79, 80, 1, 0, 0, 0, 80, 81, 5, 32, 0, 0, 81, 98, 1, 0, 0, 0, 82, 83, 5,
-		25, 0, 0, 83, 85, 5, 31, 0, 0, 84, 86, 5, 36, 0, 0, 85, 84, 1, 0, 0, 0,
-		85, 86, 1, 0, 0, 0, 86, 87, 1, 0, 0, 0, 87, 89, 3, 10, 5, 0, 88, 90, 5,
-		36, 0, 0, 89, 88, 1, 0, 0, 0, 89, 90, 1, 0, 0, 0, 90, 91, 1, 0, 0, 0, 91,
-		92, 5, 32, 0, 0, 92, 98, 1, 0, 0, 0, 93, 94, 7, 3, 0, 0, 94, 98, 3, 10,
-		5, 11, 95, 96, 7, 4, 0, 0, 96, 98, 3, 10, 5, 10, 97, 68, 1, 0, 0, 0, 97,
-		70, 1, 0, 0, 0, 97, 71, 1, 0, 0, 0, 97, 72, 1, 0, 0, 0, 97, 82, 1, 0, 0,
-		0, 97, 93, 1, 0, 0, 0, 97, 95, 1, 0, 0, 0, 98, 168, 1, 0, 0, 0, 99, 100,
-		10, 8, 0, 0, 100, 102, 7, 5, 0, 0, 101, 103, 5, 36, 0, 0, 102, 101, 1,
-		0, 0, 0, 102, 103, 1, 0, 0, 0, 103, 104, 1, 0, 0, 0, 104, 167, 3, 10, 5,
-		9, 105, 106, 10, 7, 0, 0, 106, 108, 7, 6, 0, 0, 107, 109, 5, 36, 0, 0,
-		108, 107, 1, 0, 0, 0, 108, 109, 1, 0, 0, 0, 109, 110, 1, 0, 0, 0, 110,
-		167, 3, 10, 5, 8, 111, 112, 10, 6, 0, 0, 112, 114, 7, 7, 0, 0, 113, 115,
-		5, 36, 0, 0, 114, 113, 1, 0, 0, 0, 114, 115, 1, 0, 0, 0, 115, 116, 1, 0,
-		0, 0, 116, 167, 3, 10, 5, 7, 117, 118, 10, 5, 0, 0, 118, 120, 5, 28, 0,
-		0, 119, 121, 5, 36, 0, 0, 120, 119, 1, 0, 0, 0, 120, 121, 1, 0, 0, 0, 121,
-		122, 1, 0, 0, 0, 122, 167, 3, 10, 5, 6, 123, 124, 10, 4, 0, 0, 124, 126,
-		5, 29, 0, 0, 125, 127, 5, 36, 0, 0, 126, 125, 1, 0, 0, 0, 126, 127, 1,
-		0, 0, 0, 127, 128, 1, 0, 0, 0, 128, 167, 3, 10, 5, 5, 129, 130, 10, 3,
-		0, 0, 130, 132, 5, 30, 0, 0, 131, 133, 5, 36, 0, 0, 132, 131, 1, 0, 0,
-		0, 132, 133, 1, 0, 0, 0, 133, 134, 1, 0, 0, 0, 134, 167, 3, 10, 5, 4, 135,
-		136, 10, 2, 0, 0, 136, 138, 7, 8, 0, 0, 137, 139, 5, 36, 0, 0, 138, 137,
-		1, 0, 0, 0, 138, 139, 1, 0, 0, 0, 139, 140, 1, 0, 0, 0, 140, 167, 3, 10,
-		5, 3, 141, 142, 10, 1, 0, 0, 142, 144, 5, 18, 0, 0, 143, 145, 5, 36, 0,
-		0, 144, 143, 1, 0, 0, 0, 144, 145, 1, 0, 0, 0, 145, 146, 1, 0, 0, 0, 146,
-		148, 3, 10, 5, 0, 147, 149, 5, 36, 0, 0, 148, 147, 1, 0, 0, 0, 148, 149,
-		1, 0, 0, 0, 149, 150, 1, 0, 0, 0, 150, 152, 5, 19, 0, 0, 151, 153, 5, 36,
-		0, 0, 152, 151, 1, 0, 0, 0, 152, 153, 1, 0, 0, 0, 153, 154, 1, 0, 0, 0,
-		154, 155, 3, 10, 5, 2, 155, 167, 1, 0, 0, 0, 156, 162, 10, 9, 0, 0, 157,
-		159, 5, 4, 0, 0, 158, 160, 5, 36, 0, 0, 159, 158, 1, 0, 0, 0, 159, 160,
-		1, 0, 0, 0, 160, 161, 1, 0, 0, 0, 161, 163, 3, 10, 5, 0, 162, 157, 1, 0,
-		0, 0, 163, 164, 1, 0, 0, 0, 164, 162, 1, 0, 0, 0, 164, 165, 1, 0, 0, 0,
-		165, 167, 1, 0, 0, 0, 166, 99, 1, 0, 0, 0, 166, 105, 1, 0, 0, 0, 166, 111,
-		1, 0, 0, 0, 166, 117, 1, 0, 0, 0, 166, 123, 1, 0, 0, 0, 166, 129, 1, 0,
-		0, 0, 166, 135, 1, 0, 0, 0, 166, 141, 1, 0, 0, 0, 166, 156, 1, 0, 0, 0,
-		167, 170, 1, 0, 0, 0, 168, 166, 1, 0, 0, 0, 168, 169, 1, 0, 0, 0, 169,
-		11, 1, 0, 0, 0, 170, 168, 1, 0, 0, 0, 32, 15, 18, 21, 29, 32, 36, 40, 45,
-		50, 54, 57, 61, 66, 74, 78, 85, 89, 97, 102, 108, 114, 120, 126, 132, 138,
-		144, 148, 152, 159, 164, 166, 168,
+		1, 3, 1, 3, 3, 3, 62, 8, 3, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 5, 4, 69, 8,
+		4, 10, 4, 12, 4, 72, 9, 4, 1, 5, 1, 5, 1, 5, 1, 5, 1, 5, 1, 5, 3, 5, 80,
+		8, 5, 1, 5, 1, 5, 3, 5, 84, 8, 5, 1, 5, 1, 5, 1, 5, 1, 5, 1, 5, 3, 5, 91,
+		8, 5, 1, 5, 1, 5, 3, 5, 95, 8, 5, 1, 5, 1, 5, 1, 5, 1, 5, 3, 5, 101, 8,
+		5, 1, 5, 1, 5, 1, 5, 3, 5, 106, 8, 5, 1, 5, 1, 5, 1, 5, 1, 5, 3, 5, 112,
+		8, 5, 1, 5, 1, 5, 1, 5, 1, 5, 3, 5, 118, 8, 5, 1, 5, 1, 5, 1, 5, 1, 5,
+		3, 5, 124, 8, 5, 1, 5, 1, 5, 1, 5, 1, 5, 3, 5, 130, 8, 5, 1, 5, 1, 5, 1,
+		5, 1, 5, 3, 5, 136, 8, 5, 1, 5, 1, 5, 1, 5, 1, 5, 3, 5, 142, 8, 5, 1, 5,
+		1, 5, 1, 5, 1, 5, 3, 5, 148, 8, 5, 1, 5, 1, 5, 3, 5, 152, 8, 5, 1, 5, 1,
+		5, 3, 5, 156, 8, 5, 1, 5, 1, 5, 1, 5, 1, 5, 1, 5, 1, 5, 1, 5, 3, 5, 165,
+		8, 5, 1, 5, 4, 5, 168, 8, 5, 11, 5, 12, 5, 169, 5, 5, 172, 8, 5, 10, 5,
+		12, 5, 175, 9, 5, 1, 5, 0, 2, 8, 10, 6, 0, 2, 4, 6, 8, 10, 0, 8, 1, 0,
+		37, 38, 1, 0, 29, 30, 1, 0, 18, 20, 2, 0, 6, 7, 29, 29, 1, 0, 3, 5, 1,
+		0, 6, 7, 1, 0, 8, 9, 1, 0, 10, 15, 215, 0, 18, 1, 0, 0, 0, 2, 21, 1, 0,
+		0, 0, 4, 32, 1, 0, 0, 0, 6, 61, 1, 0, 0, 0, 8, 63, 1, 0, 0, 0, 10, 100,
+		1, 0, 0, 0, 12, 14, 3, 2, 1, 0, 13, 12, 1, 0, 0, 0, 14, 15, 1, 0, 0, 0,
+		15, 13, 1, 0, 0, 0, 15, 16, 1, 0, 0, 0, 16, 19, 1, 0, 0, 0, 17, 19, 5,
+		0, 0, 1, 18, 13, 1, 0, 0, 0, 18, 17, 1, 0, 0, 0, 19, 1, 1, 0, 0, 0, 20,
+		22, 5, 38, 0, 0, 21, 20, 1, 0, 0, 0, 21, 22, 1, 0, 0, 0, 22, 23, 1, 0,
+		0, 0, 23, 24, 3, 6, 3, 0, 24, 25, 3, 4, 2, 0, 25, 3, 1, 0, 0, 0, 26, 28,
+		7, 0, 0, 0, 27, 26, 1, 0, 0, 0, 28, 29, 1, 0, 0, 0, 29, 27, 1, 0, 0, 0,
+		29, 30, 1, 0, 0, 0, 30, 33, 1, 0, 0, 0, 31, 33, 5, 0, 0, 1, 32, 27, 1,
+		0, 0, 0, 32, 31, 1, 0, 0, 0, 33, 5, 1, 0, 0, 0, 34, 36, 5, 25, 0, 0, 35,
+		37, 3, 8, 4, 0, 36, 35, 1, 0, 0, 0, 36, 37, 1, 0, 0, 0, 37, 38, 1, 0, 0,
+		0, 38, 40, 5, 22, 0, 0, 39, 41, 5, 38, 0, 0, 40, 39, 1, 0, 0, 0, 40, 41,
+		1, 0, 0, 0, 41, 42, 1, 0, 0, 0, 42, 62, 3, 10, 5, 0, 43, 45, 5, 33, 0,
+		0, 44, 46, 5, 38, 0, 0, 45, 44, 1, 0, 0, 0, 45, 46, 1, 0, 0, 0, 46, 50,
+		1, 0, 0, 0, 47, 49, 3, 2, 1, 0, 48, 47, 1, 0, 0, 0, 49, 52, 1, 0, 0, 0,
+		50, 48, 1, 0, 0, 0, 50, 51, 1, 0, 0, 0, 51, 54, 1, 0, 0, 0, 52, 50, 1,
+		0, 0, 0, 53, 55, 3, 6, 3, 0, 54, 53, 1, 0, 0, 0, 54, 55, 1, 0, 0, 0, 55,
+		57, 1, 0, 0, 0, 56, 58, 3, 4, 2, 0, 57, 56, 1, 0, 0, 0, 57, 58, 1, 0, 0,
+		0, 58, 59, 1, 0, 0, 0, 59, 62, 5, 34, 0, 0, 60, 62, 3, 10, 5, 0, 61, 34,
+		1, 0, 0, 0, 61, 43, 1, 0, 0, 0, 61, 60, 1, 0, 0, 0, 62, 7, 1, 0, 0, 0,
+		63, 64, 6, 4, -1, 0, 64, 65, 5, 23, 0, 0, 65, 70, 1, 0, 0, 0, 66, 67, 10,
+		1, 0, 0, 67, 69, 7, 1, 0, 0, 68, 66, 1, 0, 0, 0, 69, 72, 1, 0, 0, 0, 70,
+		68, 1, 0, 0, 0, 70, 71, 1, 0, 0, 0, 71, 9, 1, 0, 0, 0, 72, 70, 1, 0, 0,
+		0, 73, 74, 6, 5, -1, 0, 74, 101, 5, 24, 0, 0, 75, 101, 5, 25, 0, 0, 76,
+		101, 7, 2, 0, 0, 77, 79, 5, 31, 0, 0, 78, 80, 5, 38, 0, 0, 79, 78, 1, 0,
+		0, 0, 79, 80, 1, 0, 0, 0, 80, 81, 1, 0, 0, 0, 81, 83, 3, 10, 5, 0, 82,
+		84, 5, 38, 0, 0, 83, 82, 1, 0, 0, 0, 83, 84, 1, 0, 0, 0, 84, 85, 1, 0,
+		0, 0, 85, 86, 5, 32, 0, 0, 86, 101, 1, 0, 0, 0, 87, 88, 5, 23, 0, 0, 88,
+		90, 5, 31, 0, 0, 89, 91, 5, 38, 0, 0, 90, 89, 1, 0, 0, 0, 90, 91, 1, 0,
+		0, 0, 91, 92, 1, 0, 0, 0, 92, 94, 3, 10, 5, 0, 93, 95, 5, 38, 0, 0, 94,
+		93, 1, 0, 0, 0, 94, 95, 1, 0, 0, 0, 95, 96, 1, 0, 0, 0, 96, 97, 5, 32,
+		0, 0, 97, 101, 1, 0, 0, 0, 98, 99, 7, 3, 0, 0, 99, 101, 3, 10, 5, 10, 100,
+		73, 1, 0, 0, 0, 100, 75, 1, 0, 0, 0, 100, 76, 1, 0, 0, 0, 100, 77, 1, 0,
+		0, 0, 100, 87, 1, 0, 0, 0, 100, 98, 1, 0, 0, 0, 101, 173, 1, 0, 0, 0, 102,
+		103, 10, 8, 0, 0, 103, 105, 7, 4, 0, 0, 104, 106, 5, 38, 0, 0, 105, 104,
+		1, 0, 0, 0, 105, 106, 1, 0, 0, 0, 106, 107, 1, 0, 0, 0, 107, 172, 3, 10,
+		5, 9, 108, 109, 10, 7, 0, 0, 109, 111, 7, 5, 0, 0, 110, 112, 5, 38, 0,
+		0, 111, 110, 1, 0, 0, 0, 111, 112, 1, 0, 0, 0, 112, 113, 1, 0, 0, 0, 113,
+		172, 3, 10, 5, 8, 114, 115, 10, 6, 0, 0, 115, 117, 7, 6, 0, 0, 116, 118,
+		5, 38, 0, 0, 117, 116, 1, 0, 0, 0, 117, 118, 1, 0, 0, 0, 118, 119, 1, 0,
+		0, 0, 119, 172, 3, 10, 5, 7, 120, 121, 10, 5, 0, 0, 121, 123, 5, 26, 0,
+		0, 122, 124, 5, 38, 0, 0, 123, 122, 1, 0, 0, 0, 123, 124, 1, 0, 0, 0, 124,
+		125, 1, 0, 0, 0, 125, 172, 3, 10, 5, 6, 126, 127, 10, 4, 0, 0, 127, 129,
+		5, 27, 0, 0, 128, 130, 5, 38, 0, 0, 129, 128, 1, 0, 0, 0, 129, 130, 1,
+		0, 0, 0, 130, 131, 1, 0, 0, 0, 131, 172, 3, 10, 5, 5, 132, 133, 10, 3,
+		0, 0, 133, 135, 5, 28, 0, 0, 134, 136, 5, 38, 0, 0, 135, 134, 1, 0, 0,
+		0, 135, 136, 1, 0, 0, 0, 136, 137, 1, 0, 0, 0, 137, 172, 3, 10, 5, 4, 138,
+		139, 10, 2, 0, 0, 139, 141, 7, 7, 0, 0, 140, 142, 5, 38, 0, 0, 141, 140,
+		1, 0, 0, 0, 141, 142, 1, 0, 0, 0, 142, 143, 1, 0, 0, 0, 143, 172, 3, 10,
+		5, 3, 144, 145, 10, 1, 0, 0, 145, 147, 5, 16, 0, 0, 146, 148, 5, 38, 0,
+		0, 147, 146, 1, 0, 0, 0, 147, 148, 1, 0, 0, 0, 148, 149, 1, 0, 0, 0, 149,
+		151, 3, 10, 5, 0, 150, 152, 5, 38, 0, 0, 151, 150, 1, 0, 0, 0, 151, 152,
+		1, 0, 0, 0, 152, 153, 1, 0, 0, 0, 153, 155, 5, 17, 0, 0, 154, 156, 5, 38,
+		0, 0, 155, 154, 1, 0, 0, 0, 155, 156, 1, 0, 0, 0, 156, 157, 1, 0, 0, 0,
+		157, 158, 3, 10, 5, 2, 158, 172, 1, 0, 0, 0, 159, 160, 10, 12, 0, 0, 160,
+		172, 7, 1, 0, 0, 161, 167, 10, 9, 0, 0, 162, 164, 5, 2, 0, 0, 163, 165,
+		5, 38, 0, 0, 164, 163, 1, 0, 0, 0, 164, 165, 1, 0, 0, 0, 165, 166, 1, 0,
+		0, 0, 166, 168, 3, 10, 5, 0, 167, 162, 1, 0, 0, 0, 168, 169, 1, 0, 0, 0,
+		169, 167, 1, 0, 0, 0, 169, 170, 1, 0, 0, 0, 170, 172, 1, 0, 0, 0, 171,
+		102, 1, 0, 0, 0, 171, 108, 1, 0, 0, 0, 171, 114, 1, 0, 0, 0, 171, 120,
+		1, 0, 0, 0, 171, 126, 1, 0, 0, 0, 171, 132, 1, 0, 0, 0, 171, 138, 1, 0,
+		0, 0, 171, 144, 1, 0, 0, 0, 171, 159, 1, 0, 0, 0, 171, 161, 1, 0, 0, 0,
+		172, 175, 1, 0, 0, 0, 173, 171, 1, 0, 0, 0, 173, 174, 1, 0, 0, 0, 174,
+		11, 1, 0, 0, 0, 175, 173, 1, 0, 0, 0, 32, 15, 18, 21, 29, 32, 36, 40, 45,
+		50, 54, 57, 61, 70, 79, 83, 90, 94, 100, 105, 111, 117, 123, 129, 135,
+		141, 147, 151, 155, 164, 169, 171, 173,
 	}
 	deserializer := antlr.NewATNDeserializer(nil)
 	staticData.atn = deserializer.Deserialize(staticData.serializedATN)
@@ -171,43 +173,45 @@ func NewZenithParser(input antlr.TokenStream) *ZenithParser {
 // ZenithParser tokens.
 const (
 	ZenithParserEOF         = antlr.TokenEOF
-	ZenithParserAT          = 1
-	ZenithParserBIT_NOT     = 2
-	ZenithParserNOT         = 3
-	ZenithParserPOW         = 4
-	ZenithParserTIMES       = 5
-	ZenithParserDIVIDE      = 6
-	ZenithParserREM         = 7
-	ZenithParserPLUS        = 8
-	ZenithParserMINUS       = 9
-	ZenithParserLSHIFT      = 10
-	ZenithParserRSHIFT      = 11
-	ZenithParserLT          = 12
-	ZenithParserGT          = 13
-	ZenithParserLTE         = 14
-	ZenithParserGTE         = 15
-	ZenithParserEQ          = 16
-	ZenithParserNEQ         = 17
-	ZenithParserIF          = 18
-	ZenithParserELSE        = 19
-	ZenithParserTRUE        = 20
-	ZenithParserFALSE       = 21
-	ZenithParserNULL        = 22
-	ZenithParserASSIGN      = 23
-	ZenithParserINIT_ASSIGN = 24
-	ZenithParserTYPE        = 25
-	ZenithParserNUM         = 26
-	ZenithParserID          = 27
-	ZenithParserAND         = 28
-	ZenithParserDOLLAR      = 29
-	ZenithParserPIPE        = 30
+	ZenithParserBIT_NOT     = 1
+	ZenithParserPOW         = 2
+	ZenithParserTIMES       = 3
+	ZenithParserDIVIDE      = 4
+	ZenithParserREM         = 5
+	ZenithParserPLUS        = 6
+	ZenithParserMINUS       = 7
+	ZenithParserLSHIFT      = 8
+	ZenithParserRSHIFT      = 9
+	ZenithParserLT          = 10
+	ZenithParserGT          = 11
+	ZenithParserLTE         = 12
+	ZenithParserGTE         = 13
+	ZenithParserEQ          = 14
+	ZenithParserNEQ         = 15
+	ZenithParserIF          = 16
+	ZenithParserELSE        = 17
+	ZenithParserTRUE        = 18
+	ZenithParserFALSE       = 19
+	ZenithParserNULL        = 20
+	ZenithParserASSIGN      = 21
+	ZenithParserINIT_ASSIGN = 22
+	ZenithParserTYPE        = 23
+	ZenithParserNUM         = 24
+	ZenithParserID          = 25
+	ZenithParserAND         = 26
+	ZenithParserDOLLAR      = 27
+	ZenithParserPIPE        = 28
+	ZenithParserEXCLAIM     = 29
+	ZenithParserQUESTION    = 30
 	ZenithParserLPAREN      = 31
 	ZenithParserRPAREN      = 32
 	ZenithParserLBRACE      = 33
 	ZenithParserRBRACE      = 34
-	ZenithParserSEMICOLON   = 35
-	ZenithParserNL          = 36
-	ZenithParserIGNORED     = 37
+	ZenithParserLBRACK      = 35
+	ZenithParserRBRACK      = 36
+	ZenithParserSEMICOLON   = 37
+	ZenithParserNL          = 38
+	ZenithParserIGNORED     = 39
 )
 
 // ZenithParser rules.
@@ -355,7 +359,7 @@ func (p *ZenithParser) FileStat() (localctx IFileStatContext) {
 	}
 
 	switch p.GetTokenStream().LA(1) {
-	case ZenithParserAT, ZenithParserNOT, ZenithParserPLUS, ZenithParserMINUS, ZenithParserTRUE, ZenithParserFALSE, ZenithParserNULL, ZenithParserTYPE, ZenithParserNUM, ZenithParserID, ZenithParserAND, ZenithParserDOLLAR, ZenithParserLPAREN, ZenithParserLBRACE, ZenithParserNL:
+	case ZenithParserPLUS, ZenithParserMINUS, ZenithParserTRUE, ZenithParserFALSE, ZenithParserNULL, ZenithParserTYPE, ZenithParserNUM, ZenithParserID, ZenithParserEXCLAIM, ZenithParserLPAREN, ZenithParserLBRACE, ZenithParserNL:
 		p.EnterOuterAlt(localctx, 1)
 		p.SetState(13)
 		p.GetErrorHandler().Sync(p)
@@ -364,7 +368,7 @@ func (p *ZenithParser) FileStat() (localctx IFileStatContext) {
 		}
 		_la = p.GetTokenStream().LA(1)
 
-		for ok := true; ok; ok = ((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&80504423178) != 0) {
+		for ok := true; ok; ok = ((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&286212751552) != 0) {
 			{
 				p.SetState(12)
 				p.EndedStat()
@@ -1097,10 +1101,10 @@ func (p *ZenithParser) Stat() (localctx IStatContext) {
 		}
 		_la = p.GetTokenStream().LA(1)
 
-		if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&838860800) != 0 {
+		if _la == ZenithParserTYPE {
 			{
 				p.SetState(35)
-				p.Type_()
+				p.type_(0)
 			}
 
 		}
@@ -1196,7 +1200,7 @@ func (p *ZenithParser) Stat() (localctx IStatContext) {
 		}
 		_la = p.GetTokenStream().LA(1)
 
-		if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&11784946442) != 0 {
+		if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&11334844608) != 0 {
 			{
 				p.SetState(53)
 				p.Stat()
@@ -1210,7 +1214,7 @@ func (p *ZenithParser) Stat() (localctx IStatContext) {
 		}
 		_la = p.GetTokenStream().LA(1)
 
-		if (int64((_la - -1)) & ^0x3f) == 0 && ((int64(1)<<(_la - -1))&206158430209) != 0 {
+		if (int64((_la - -1)) & ^0x3f) == 0 && ((int64(1)<<(_la - -1))&824633720833) != 0 {
 			{
 				p.SetState(56)
 				p.LineEnd()
@@ -1305,13 +1309,13 @@ func (s *TypeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) s
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-type PtrTypeContext struct {
+type RefTypeContext struct {
 	TypeContext
-	Ptr antlr.Token
+	Ref antlr.Token
 }
 
-func NewPtrTypeContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *PtrTypeContext {
-	var p = new(PtrTypeContext)
+func NewRefTypeContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *RefTypeContext {
+	var p = new(RefTypeContext)
 
 	InitEmptyTypeContext(&p.TypeContext)
 	p.parser = parser
@@ -1320,15 +1324,15 @@ func NewPtrTypeContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *PtrTyp
 	return p
 }
 
-func (s *PtrTypeContext) GetPtr() antlr.Token { return s.Ptr }
+func (s *RefTypeContext) GetRef() antlr.Token { return s.Ref }
 
-func (s *PtrTypeContext) SetPtr(v antlr.Token) { s.Ptr = v }
+func (s *RefTypeContext) SetRef(v antlr.Token) { s.Ref = v }
 
-func (s *PtrTypeContext) GetRuleContext() antlr.RuleContext {
+func (s *RefTypeContext) GetRuleContext() antlr.RuleContext {
 	return s
 }
 
-func (s *PtrTypeContext) Type_() ITypeContext {
+func (s *RefTypeContext) Type_() ITypeContext {
 	var t antlr.RuleContext
 	for _, ctx := range s.GetChildren() {
 		if _, ok := ctx.(ITypeContext); ok {
@@ -1344,30 +1348,30 @@ func (s *PtrTypeContext) Type_() ITypeContext {
 	return t.(ITypeContext)
 }
 
-func (s *PtrTypeContext) DOLLAR() antlr.TerminalNode {
-	return s.GetToken(ZenithParserDOLLAR, 0)
+func (s *RefTypeContext) EXCLAIM() antlr.TerminalNode {
+	return s.GetToken(ZenithParserEXCLAIM, 0)
 }
 
-func (s *PtrTypeContext) AND() antlr.TerminalNode {
-	return s.GetToken(ZenithParserAND, 0)
+func (s *RefTypeContext) QUESTION() antlr.TerminalNode {
+	return s.GetToken(ZenithParserQUESTION, 0)
 }
 
-func (s *PtrTypeContext) EnterRule(listener antlr.ParseTreeListener) {
+func (s *RefTypeContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(ZenithParserListener); ok {
-		listenerT.EnterPtrType(s)
+		listenerT.EnterRefType(s)
 	}
 }
 
-func (s *PtrTypeContext) ExitRule(listener antlr.ParseTreeListener) {
+func (s *RefTypeContext) ExitRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(ZenithParserListener); ok {
-		listenerT.ExitPtrType(s)
+		listenerT.ExitRefType(s)
 	}
 }
 
-func (s *PtrTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+func (s *RefTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
 	case ZenithParserVisitor:
-		return t.VisitPtrType(s)
+		return t.VisitRefType(s)
 
 	default:
 		return t.VisitChildren(s)
@@ -1419,58 +1423,89 @@ func (s *BaseTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 }
 
 func (p *ZenithParser) Type_() (localctx ITypeContext) {
-	localctx = NewTypeContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 8, ZenithParserRULE_type)
+	return p.type_(0)
+}
+
+func (p *ZenithParser) type_(_p int) (localctx ITypeContext) {
+	var _parentctx antlr.ParserRuleContext = p.GetParserRuleContext()
+
+	_parentState := p.GetState()
+	localctx = NewTypeContext(p, p.GetParserRuleContext(), _parentState)
+	var _prevctx ITypeContext = localctx
+	var _ antlr.ParserRuleContext = _prevctx // TODO: To prevent unused variable warning.
+	_startState := 8
+	p.EnterRecursionRule(localctx, 8, ZenithParserRULE_type, _p)
 	var _la int
 
-	p.SetState(66)
+	var _alt int
+
+	p.EnterOuterAlt(localctx, 1)
+	localctx = NewBaseTypeContext(p, localctx)
+	p.SetParserRuleContext(localctx)
+	_prevctx = localctx
+
+	{
+		p.SetState(64)
+		p.Match(ZenithParserTYPE)
+		if p.HasError() {
+			// Recognition error - abort rule
+			goto errorExit
+		}
+	}
+
+	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
+	p.SetState(70)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
 	}
+	_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 12, p.GetParserRuleContext())
+	if p.HasError() {
+		goto errorExit
+	}
+	for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
+		if _alt == 1 {
+			if p.GetParseListeners() != nil {
+				p.TriggerExitRuleEvent()
+			}
+			_prevctx = localctx
+			localctx = NewRefTypeContext(p, NewTypeContext(p, _parentctx, _parentState))
+			p.PushNewRecursionContext(localctx, _startState, ZenithParserRULE_type)
+			p.SetState(66)
 
-	switch p.GetTokenStream().LA(1) {
-	case ZenithParserTYPE:
-		localctx = NewBaseTypeContext(p, localctx)
-		p.EnterOuterAlt(localctx, 1)
-		{
-			p.SetState(63)
-			p.Match(ZenithParserTYPE)
-			if p.HasError() {
-				// Recognition error - abort rule
+			if !(p.Precpred(p.GetParserRuleContext(), 1)) {
+				p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 1)", ""))
 				goto errorExit
 			}
-		}
+			{
+				p.SetState(67)
 
-	case ZenithParserAND, ZenithParserDOLLAR:
-		localctx = NewPtrTypeContext(p, localctx)
-		p.EnterOuterAlt(localctx, 2)
-		{
-			p.SetState(64)
+				var _lt = p.GetTokenStream().LT(1)
 
-			var _lt = p.GetTokenStream().LT(1)
+				localctx.(*RefTypeContext).Ref = _lt
 
-			localctx.(*PtrTypeContext).Ptr = _lt
+				_la = p.GetTokenStream().LA(1)
 
-			_la = p.GetTokenStream().LA(1)
+				if !(_la == ZenithParserEXCLAIM || _la == ZenithParserQUESTION) {
+					var _ri = p.GetErrorHandler().RecoverInline(p)
 
-			if !(_la == ZenithParserAND || _la == ZenithParserDOLLAR) {
-				var _ri = p.GetErrorHandler().RecoverInline(p)
-
-				localctx.(*PtrTypeContext).Ptr = _ri
-			} else {
-				p.GetErrorHandler().ReportMatch(p)
-				p.Consume()
+					localctx.(*RefTypeContext).Ref = _ri
+				} else {
+					p.GetErrorHandler().ReportMatch(p)
+					p.Consume()
+				}
 			}
-		}
-		{
-			p.SetState(65)
-			p.Type_()
-		}
 
-	default:
-		p.SetError(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
-		goto errorExit
+		}
+		p.SetState(72)
+		p.GetErrorHandler().Sync(p)
+		if p.HasError() {
+			goto errorExit
+		}
+		_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 12, p.GetParserRuleContext())
+		if p.HasError() {
+			goto errorExit
+		}
 	}
 
 errorExit:
@@ -1481,7 +1516,7 @@ errorExit:
 		p.GetErrorHandler().Recover(p, v)
 		p.SetError(nil)
 	}
-	p.ExitRule()
+	p.UnrollRecursionContexts(_parentctx)
 	return localctx
 	goto errorExit // Trick to prevent compiler error if the label is not used
 }
@@ -1996,84 +2031,6 @@ func (s *ShiftExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	}
 }
 
-type PtrExprContext struct {
-	ExprContext
-	Op    antlr.Token
-	Right IExprContext
-}
-
-func NewPtrExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *PtrExprContext {
-	var p = new(PtrExprContext)
-
-	InitEmptyExprContext(&p.ExprContext)
-	p.parser = parser
-	p.CopyAll(ctx.(*ExprContext))
-
-	return p
-}
-
-func (s *PtrExprContext) GetOp() antlr.Token { return s.Op }
-
-func (s *PtrExprContext) SetOp(v antlr.Token) { s.Op = v }
-
-func (s *PtrExprContext) GetRight() IExprContext { return s.Right }
-
-func (s *PtrExprContext) SetRight(v IExprContext) { s.Right = v }
-
-func (s *PtrExprContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *PtrExprContext) Expr() IExprContext {
-	var t antlr.RuleContext
-	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IExprContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
-		}
-	}
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IExprContext)
-}
-
-func (s *PtrExprContext) DOLLAR() antlr.TerminalNode {
-	return s.GetToken(ZenithParserDOLLAR, 0)
-}
-
-func (s *PtrExprContext) AND() antlr.TerminalNode {
-	return s.GetToken(ZenithParserAND, 0)
-}
-
-func (s *PtrExprContext) AT() antlr.TerminalNode {
-	return s.GetToken(ZenithParserAT, 0)
-}
-
-func (s *PtrExprContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(ZenithParserListener); ok {
-		listenerT.EnterPtrExpr(s)
-	}
-}
-
-func (s *PtrExprContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(ZenithParserListener); ok {
-		listenerT.ExitPtrExpr(s)
-	}
-}
-
-func (s *PtrExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case ZenithParserVisitor:
-		return t.VisitPtrExpr(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
-}
-
 type PrefixExprContext struct {
 	ExprContext
 	Op    antlr.Token
@@ -2126,8 +2083,8 @@ func (s *PrefixExprContext) MINUS() antlr.TerminalNode {
 	return s.GetToken(ZenithParserMINUS, 0)
 }
 
-func (s *PrefixExprContext) NOT() antlr.TerminalNode {
-	return s.GetToken(ZenithParserNOT, 0)
+func (s *PrefixExprContext) EXCLAIM() antlr.TerminalNode {
+	return s.GetToken(ZenithParserEXCLAIM, 0)
 }
 
 func (s *PrefixExprContext) EnterRule(listener antlr.ParseTreeListener) {
@@ -2353,6 +2310,80 @@ func (s *AddExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
 	case ZenithParserVisitor:
 		return t.VisitAddExpr(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
+type RefExprContext struct {
+	ExprContext
+	Left IExprContext
+	Op   antlr.Token
+}
+
+func NewRefExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *RefExprContext {
+	var p = new(RefExprContext)
+
+	InitEmptyExprContext(&p.ExprContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*ExprContext))
+
+	return p
+}
+
+func (s *RefExprContext) GetOp() antlr.Token { return s.Op }
+
+func (s *RefExprContext) SetOp(v antlr.Token) { s.Op = v }
+
+func (s *RefExprContext) GetLeft() IExprContext { return s.Left }
+
+func (s *RefExprContext) SetLeft(v IExprContext) { s.Left = v }
+
+func (s *RefExprContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *RefExprContext) Expr() IExprContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IExprContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExprContext)
+}
+
+func (s *RefExprContext) EXCLAIM() antlr.TerminalNode {
+	return s.GetToken(ZenithParserEXCLAIM, 0)
+}
+
+func (s *RefExprContext) QUESTION() antlr.TerminalNode {
+	return s.GetToken(ZenithParserQUESTION, 0)
+}
+
+func (s *RefExprContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(ZenithParserListener); ok {
+		listenerT.EnterRefExpr(s)
+	}
+}
+
+func (s *RefExprContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(ZenithParserListener); ok {
+		listenerT.ExitRefExpr(s)
+	}
+}
+
+func (s *RefExprContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case ZenithParserVisitor:
+		return t.VisitRefExpr(s)
 
 	default:
 		return t.VisitChildren(s)
@@ -2975,7 +3006,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 	var _alt int
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(97)
+	p.SetState(100)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -2988,7 +3019,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 		_prevctx = localctx
 
 		{
-			p.SetState(69)
+			p.SetState(74)
 			p.Match(ZenithParserNUM)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -3001,7 +3032,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(70)
+			p.SetState(75)
 			p.Match(ZenithParserID)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -3014,7 +3045,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(71)
+			p.SetState(76)
 
 			var _lt = p.GetTokenStream().LT(1)
 
@@ -3022,7 +3053,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 			_la = p.GetTokenStream().LA(1)
 
-			if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&7340032) != 0) {
+			if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&1835008) != 0) {
 				var _ri = p.GetErrorHandler().RecoverInline(p)
 
 				localctx.(*KeyExprContext).Key = _ri
@@ -3037,14 +3068,14 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(72)
+			p.SetState(77)
 			p.Match(ZenithParserLPAREN)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
-		p.SetState(74)
+		p.SetState(79)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -3053,7 +3084,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 		if _la == ZenithParserNL {
 			{
-				p.SetState(73)
+				p.SetState(78)
 				p.Match(ZenithParserNL)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -3063,10 +3094,10 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 		}
 		{
-			p.SetState(76)
+			p.SetState(81)
 			p.expr(0)
 		}
-		p.SetState(78)
+		p.SetState(83)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -3075,7 +3106,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 		if _la == ZenithParserNL {
 			{
-				p.SetState(77)
+				p.SetState(82)
 				p.Match(ZenithParserNL)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -3085,7 +3116,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 		}
 		{
-			p.SetState(80)
+			p.SetState(85)
 			p.Match(ZenithParserRPAREN)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -3098,7 +3129,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(82)
+			p.SetState(87)
 			p.Match(ZenithParserTYPE)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -3106,14 +3137,14 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 			}
 		}
 		{
-			p.SetState(83)
+			p.SetState(88)
 			p.Match(ZenithParserLPAREN)
 			if p.HasError() {
 				// Recognition error - abort rule
 				goto errorExit
 			}
 		}
-		p.SetState(85)
+		p.SetState(90)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -3122,7 +3153,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 		if _la == ZenithParserNL {
 			{
-				p.SetState(84)
+				p.SetState(89)
 				p.Match(ZenithParserNL)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -3132,10 +3163,10 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 		}
 		{
-			p.SetState(87)
+			p.SetState(92)
 			p.expr(0)
 		}
-		p.SetState(89)
+		p.SetState(94)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -3144,7 +3175,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 		if _la == ZenithParserNL {
 			{
-				p.SetState(88)
+				p.SetState(93)
 				p.Match(ZenithParserNL)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -3154,7 +3185,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 		}
 		{
-			p.SetState(91)
+			p.SetState(96)
 			p.Match(ZenithParserRPAREN)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -3162,42 +3193,12 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 			}
 		}
 
-	case ZenithParserAT, ZenithParserAND, ZenithParserDOLLAR:
-		localctx = NewPtrExprContext(p, localctx)
-		p.SetParserRuleContext(localctx)
-		_prevctx = localctx
-		{
-			p.SetState(93)
-
-			var _lt = p.GetTokenStream().LT(1)
-
-			localctx.(*PtrExprContext).Op = _lt
-
-			_la = p.GetTokenStream().LA(1)
-
-			if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&805306370) != 0) {
-				var _ri = p.GetErrorHandler().RecoverInline(p)
-
-				localctx.(*PtrExprContext).Op = _ri
-			} else {
-				p.GetErrorHandler().ReportMatch(p)
-				p.Consume()
-			}
-		}
-		{
-			p.SetState(94)
-
-			var _x = p.expr(11)
-
-			localctx.(*PtrExprContext).Right = _x
-		}
-
-	case ZenithParserNOT, ZenithParserPLUS, ZenithParserMINUS:
+	case ZenithParserPLUS, ZenithParserMINUS, ZenithParserEXCLAIM:
 		localctx = NewPrefixExprContext(p, localctx)
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(95)
+			p.SetState(98)
 
 			var _lt = p.GetTokenStream().LT(1)
 
@@ -3205,7 +3206,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 			_la = p.GetTokenStream().LA(1)
 
-			if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&776) != 0) {
+			if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&536871104) != 0) {
 				var _ri = p.GetErrorHandler().RecoverInline(p)
 
 				localctx.(*PrefixExprContext).Op = _ri
@@ -3215,7 +3216,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 			}
 		}
 		{
-			p.SetState(96)
+			p.SetState(99)
 
 			var _x = p.expr(10)
 
@@ -3227,7 +3228,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 		goto errorExit
 	}
 	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
-	p.SetState(168)
+	p.SetState(173)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -3242,7 +3243,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 				p.TriggerExitRuleEvent()
 			}
 			_prevctx = localctx
-			p.SetState(166)
+			p.SetState(171)
 			p.GetErrorHandler().Sync(p)
 			if p.HasError() {
 				goto errorExit
@@ -3254,14 +3255,14 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*MulExprContext).Left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, ZenithParserRULE_expr)
-				p.SetState(99)
+				p.SetState(102)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 8)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 8)", ""))
 					goto errorExit
 				}
 				{
-					p.SetState(100)
+					p.SetState(103)
 
 					var _lt = p.GetTokenStream().LT(1)
 
@@ -3269,7 +3270,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 					_la = p.GetTokenStream().LA(1)
 
-					if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&224) != 0) {
+					if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&56) != 0) {
 						var _ri = p.GetErrorHandler().RecoverInline(p)
 
 						localctx.(*MulExprContext).Op = _ri
@@ -3278,7 +3279,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 						p.Consume()
 					}
 				}
-				p.SetState(102)
+				p.SetState(105)
 				p.GetErrorHandler().Sync(p)
 				if p.HasError() {
 					goto errorExit
@@ -3287,7 +3288,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				if _la == ZenithParserNL {
 					{
-						p.SetState(101)
+						p.SetState(104)
 						p.Match(ZenithParserNL)
 						if p.HasError() {
 							// Recognition error - abort rule
@@ -3297,7 +3298,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				}
 				{
-					p.SetState(104)
+					p.SetState(107)
 
 					var _x = p.expr(9)
 
@@ -3309,14 +3310,14 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*AddExprContext).Left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, ZenithParserRULE_expr)
-				p.SetState(105)
+				p.SetState(108)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 7)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 7)", ""))
 					goto errorExit
 				}
 				{
-					p.SetState(106)
+					p.SetState(109)
 
 					var _lt = p.GetTokenStream().LT(1)
 
@@ -3333,7 +3334,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 						p.Consume()
 					}
 				}
-				p.SetState(108)
+				p.SetState(111)
 				p.GetErrorHandler().Sync(p)
 				if p.HasError() {
 					goto errorExit
@@ -3342,7 +3343,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				if _la == ZenithParserNL {
 					{
-						p.SetState(107)
+						p.SetState(110)
 						p.Match(ZenithParserNL)
 						if p.HasError() {
 							// Recognition error - abort rule
@@ -3352,7 +3353,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				}
 				{
-					p.SetState(110)
+					p.SetState(113)
 
 					var _x = p.expr(8)
 
@@ -3364,14 +3365,14 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*ShiftExprContext).Left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, ZenithParserRULE_expr)
-				p.SetState(111)
+				p.SetState(114)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 6)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 6)", ""))
 					goto errorExit
 				}
 				{
-					p.SetState(112)
+					p.SetState(115)
 
 					var _lt = p.GetTokenStream().LT(1)
 
@@ -3388,7 +3389,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 						p.Consume()
 					}
 				}
-				p.SetState(114)
+				p.SetState(117)
 				p.GetErrorHandler().Sync(p)
 				if p.HasError() {
 					goto errorExit
@@ -3397,7 +3398,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				if _la == ZenithParserNL {
 					{
-						p.SetState(113)
+						p.SetState(116)
 						p.Match(ZenithParserNL)
 						if p.HasError() {
 							// Recognition error - abort rule
@@ -3407,7 +3408,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				}
 				{
-					p.SetState(116)
+					p.SetState(119)
 
 					var _x = p.expr(7)
 
@@ -3419,21 +3420,21 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*BitAndExprContext).Left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, ZenithParserRULE_expr)
-				p.SetState(117)
+				p.SetState(120)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 5)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 5)", ""))
 					goto errorExit
 				}
 				{
-					p.SetState(118)
+					p.SetState(121)
 					p.Match(ZenithParserAND)
 					if p.HasError() {
 						// Recognition error - abort rule
 						goto errorExit
 					}
 				}
-				p.SetState(120)
+				p.SetState(123)
 				p.GetErrorHandler().Sync(p)
 				if p.HasError() {
 					goto errorExit
@@ -3442,7 +3443,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				if _la == ZenithParserNL {
 					{
-						p.SetState(119)
+						p.SetState(122)
 						p.Match(ZenithParserNL)
 						if p.HasError() {
 							// Recognition error - abort rule
@@ -3452,7 +3453,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				}
 				{
-					p.SetState(122)
+					p.SetState(125)
 
 					var _x = p.expr(6)
 
@@ -3464,21 +3465,21 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*BitXorExprContext).Left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, ZenithParserRULE_expr)
-				p.SetState(123)
+				p.SetState(126)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 4)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 4)", ""))
 					goto errorExit
 				}
 				{
-					p.SetState(124)
+					p.SetState(127)
 					p.Match(ZenithParserDOLLAR)
 					if p.HasError() {
 						// Recognition error - abort rule
 						goto errorExit
 					}
 				}
-				p.SetState(126)
+				p.SetState(129)
 				p.GetErrorHandler().Sync(p)
 				if p.HasError() {
 					goto errorExit
@@ -3487,7 +3488,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				if _la == ZenithParserNL {
 					{
-						p.SetState(125)
+						p.SetState(128)
 						p.Match(ZenithParserNL)
 						if p.HasError() {
 							// Recognition error - abort rule
@@ -3497,7 +3498,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				}
 				{
-					p.SetState(128)
+					p.SetState(131)
 
 					var _x = p.expr(5)
 
@@ -3509,21 +3510,21 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*BitOrExprContext).Left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, ZenithParserRULE_expr)
-				p.SetState(129)
+				p.SetState(132)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 3)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 3)", ""))
 					goto errorExit
 				}
 				{
-					p.SetState(130)
+					p.SetState(133)
 					p.Match(ZenithParserPIPE)
 					if p.HasError() {
 						// Recognition error - abort rule
 						goto errorExit
 					}
 				}
-				p.SetState(132)
+				p.SetState(135)
 				p.GetErrorHandler().Sync(p)
 				if p.HasError() {
 					goto errorExit
@@ -3532,7 +3533,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				if _la == ZenithParserNL {
 					{
-						p.SetState(131)
+						p.SetState(134)
 						p.Match(ZenithParserNL)
 						if p.HasError() {
 							// Recognition error - abort rule
@@ -3542,7 +3543,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				}
 				{
-					p.SetState(134)
+					p.SetState(137)
 
 					var _x = p.expr(4)
 
@@ -3554,14 +3555,14 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*CompExprContext).Left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, ZenithParserRULE_expr)
-				p.SetState(135)
+				p.SetState(138)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 2)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 2)", ""))
 					goto errorExit
 				}
 				{
-					p.SetState(136)
+					p.SetState(139)
 
 					var _lt = p.GetTokenStream().LT(1)
 
@@ -3569,7 +3570,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 					_la = p.GetTokenStream().LA(1)
 
-					if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&258048) != 0) {
+					if !((int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&64512) != 0) {
 						var _ri = p.GetErrorHandler().RecoverInline(p)
 
 						localctx.(*CompExprContext).Op = _ri
@@ -3578,7 +3579,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 						p.Consume()
 					}
 				}
-				p.SetState(138)
+				p.SetState(141)
 				p.GetErrorHandler().Sync(p)
 				if p.HasError() {
 					goto errorExit
@@ -3587,7 +3588,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				if _la == ZenithParserNL {
 					{
-						p.SetState(137)
+						p.SetState(140)
 						p.Match(ZenithParserNL)
 						if p.HasError() {
 							// Recognition error - abort rule
@@ -3597,7 +3598,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				}
 				{
-					p.SetState(140)
+					p.SetState(143)
 
 					var _x = p.expr(3)
 
@@ -3609,21 +3610,21 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 				localctx.(*IfExprContext).Left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, ZenithParserRULE_expr)
-				p.SetState(141)
+				p.SetState(144)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 1)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 1)", ""))
 					goto errorExit
 				}
 				{
-					p.SetState(142)
+					p.SetState(145)
 					p.Match(ZenithParserIF)
 					if p.HasError() {
 						// Recognition error - abort rule
 						goto errorExit
 					}
 				}
-				p.SetState(144)
+				p.SetState(147)
 				p.GetErrorHandler().Sync(p)
 				if p.HasError() {
 					goto errorExit
@@ -3632,7 +3633,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				if _la == ZenithParserNL {
 					{
-						p.SetState(143)
+						p.SetState(146)
 						p.Match(ZenithParserNL)
 						if p.HasError() {
 							// Recognition error - abort rule
@@ -3642,13 +3643,13 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				}
 				{
-					p.SetState(146)
+					p.SetState(149)
 
 					var _x = p.expr(0)
 
 					localctx.(*IfExprContext).Condition = _x
 				}
-				p.SetState(148)
+				p.SetState(151)
 				p.GetErrorHandler().Sync(p)
 				if p.HasError() {
 					goto errorExit
@@ -3657,7 +3658,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				if _la == ZenithParserNL {
 					{
-						p.SetState(147)
+						p.SetState(150)
 						p.Match(ZenithParserNL)
 						if p.HasError() {
 							// Recognition error - abort rule
@@ -3667,14 +3668,14 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				}
 				{
-					p.SetState(150)
+					p.SetState(153)
 					p.Match(ZenithParserELSE)
 					if p.HasError() {
 						// Recognition error - abort rule
 						goto errorExit
 					}
 				}
-				p.SetState(152)
+				p.SetState(155)
 				p.GetErrorHandler().Sync(p)
 				if p.HasError() {
 					goto errorExit
@@ -3683,7 +3684,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				if _la == ZenithParserNL {
 					{
-						p.SetState(151)
+						p.SetState(154)
 						p.Match(ZenithParserNL)
 						if p.HasError() {
 							// Recognition error - abort rule
@@ -3693,7 +3694,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 				}
 				{
-					p.SetState(154)
+					p.SetState(157)
 
 					var _x = p.expr(2)
 
@@ -3701,17 +3702,47 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 				}
 
 			case 9:
+				localctx = NewRefExprContext(p, NewExprContext(p, _parentctx, _parentState))
+				localctx.(*RefExprContext).Left = _prevctx
+
+				p.PushNewRecursionContext(localctx, _startState, ZenithParserRULE_expr)
+				p.SetState(159)
+
+				if !(p.Precpred(p.GetParserRuleContext(), 12)) {
+					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 12)", ""))
+					goto errorExit
+				}
+				{
+					p.SetState(160)
+
+					var _lt = p.GetTokenStream().LT(1)
+
+					localctx.(*RefExprContext).Op = _lt
+
+					_la = p.GetTokenStream().LA(1)
+
+					if !(_la == ZenithParserEXCLAIM || _la == ZenithParserQUESTION) {
+						var _ri = p.GetErrorHandler().RecoverInline(p)
+
+						localctx.(*RefExprContext).Op = _ri
+					} else {
+						p.GetErrorHandler().ReportMatch(p)
+						p.Consume()
+					}
+				}
+
+			case 10:
 				localctx = NewPowExprContext(p, NewExprContext(p, _parentctx, _parentState))
 				localctx.(*PowExprContext).Left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, ZenithParserRULE_expr)
-				p.SetState(156)
+				p.SetState(161)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 9)) {
 					p.SetError(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 9)", ""))
 					goto errorExit
 				}
-				p.SetState(162)
+				p.SetState(167)
 				p.GetErrorHandler().Sync(p)
 				if p.HasError() {
 					goto errorExit
@@ -3721,14 +3752,14 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 					switch _alt {
 					case 1:
 						{
-							p.SetState(157)
+							p.SetState(162)
 							p.Match(ZenithParserPOW)
 							if p.HasError() {
 								// Recognition error - abort rule
 								goto errorExit
 							}
 						}
-						p.SetState(159)
+						p.SetState(164)
 						p.GetErrorHandler().Sync(p)
 						if p.HasError() {
 							goto errorExit
@@ -3737,7 +3768,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 						if _la == ZenithParserNL {
 							{
-								p.SetState(158)
+								p.SetState(163)
 								p.Match(ZenithParserNL)
 								if p.HasError() {
 									// Recognition error - abort rule
@@ -3747,7 +3778,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 
 						}
 						{
-							p.SetState(161)
+							p.SetState(166)
 
 							var _x = p.expr(0)
 
@@ -3759,7 +3790,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 						goto errorExit
 					}
 
-					p.SetState(164)
+					p.SetState(169)
 					p.GetErrorHandler().Sync(p)
 					_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 29, p.GetParserRuleContext())
 					if p.HasError() {
@@ -3772,7 +3803,7 @@ func (p *ZenithParser) expr(_p int) (localctx IExprContext) {
 			}
 
 		}
-		p.SetState(170)
+		p.SetState(175)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -3798,6 +3829,13 @@ errorExit:
 
 func (p *ZenithParser) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex int) bool {
 	switch ruleIndex {
+	case 4:
+		var t *TypeContext = nil
+		if localctx != nil {
+			t = localctx.(*TypeContext)
+		}
+		return p.Type__Sempred(t, predIndex)
+
 	case 5:
 		var t *ExprContext = nil
 		if localctx != nil {
@@ -3810,33 +3848,46 @@ func (p *ZenithParser) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex 
 	}
 }
 
-func (p *ZenithParser) Expr_Sempred(localctx antlr.RuleContext, predIndex int) bool {
+func (p *ZenithParser) Type__Sempred(localctx antlr.RuleContext, predIndex int) bool {
 	switch predIndex {
 	case 0:
-		return p.Precpred(p.GetParserRuleContext(), 8)
-
-	case 1:
-		return p.Precpred(p.GetParserRuleContext(), 7)
-
-	case 2:
-		return p.Precpred(p.GetParserRuleContext(), 6)
-
-	case 3:
-		return p.Precpred(p.GetParserRuleContext(), 5)
-
-	case 4:
-		return p.Precpred(p.GetParserRuleContext(), 4)
-
-	case 5:
-		return p.Precpred(p.GetParserRuleContext(), 3)
-
-	case 6:
-		return p.Precpred(p.GetParserRuleContext(), 2)
-
-	case 7:
 		return p.Precpred(p.GetParserRuleContext(), 1)
 
+	default:
+		panic("No predicate with index: " + fmt.Sprint(predIndex))
+	}
+}
+
+func (p *ZenithParser) Expr_Sempred(localctx antlr.RuleContext, predIndex int) bool {
+	switch predIndex {
+	case 1:
+		return p.Precpred(p.GetParserRuleContext(), 8)
+
+	case 2:
+		return p.Precpred(p.GetParserRuleContext(), 7)
+
+	case 3:
+		return p.Precpred(p.GetParserRuleContext(), 6)
+
+	case 4:
+		return p.Precpred(p.GetParserRuleContext(), 5)
+
+	case 5:
+		return p.Precpred(p.GetParserRuleContext(), 4)
+
+	case 6:
+		return p.Precpred(p.GetParserRuleContext(), 3)
+
+	case 7:
+		return p.Precpred(p.GetParserRuleContext(), 2)
+
 	case 8:
+		return p.Precpred(p.GetParserRuleContext(), 1)
+
+	case 9:
+		return p.Precpred(p.GetParserRuleContext(), 12)
+
+	case 10:
 		return p.Precpred(p.GetParserRuleContext(), 9)
 
 	default:

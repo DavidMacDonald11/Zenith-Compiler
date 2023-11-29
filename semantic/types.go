@@ -9,9 +9,35 @@ type Type interface {
     FullType() string
     InferType() Type
     MayBeAssignedTo(Type) bool
-    IsBool() bool
-    IsInt() bool
-    IsNumeric() bool
+}
+
+func IsBool(t Type) bool {
+    base, isBase := t.(BaseType)
+    if !isBase { return false }
+
+    return base.Name == "Bool"
+}
+
+func IsInt(t Type) bool {
+    base, isBase := t.(BaseType)
+    if !isBase { return false }
+
+    return base.Name == "AnyNum" || strings.Contains(base.Name, "Int")
+}
+
+func IsNumeric(t Type) bool {
+    base, isBase := t.(BaseType)
+    if !isBase { return false }
+
+    return !slices.Contains([]string {
+        "Bool",
+    }, base.Name)
+}
+
+func DeduceType(left, right Type) Type {
+    if left.MayBeAssignedTo(right) { return right }
+    if right.MayBeAssignedTo(left) { return left }
+    return nil
 }
 
 type BaseType struct {
@@ -31,11 +57,10 @@ func (b BaseType) InferType() Type {
 }
 
 func (b BaseType) MayBeAssignedTo(t Type) bool {
-    if _, isPtr := t.(PtrType); isPtr {
-        return false
-    }
+    base, isBase := t.(BaseType)
+    if !isBase { return false }
 
-    name := t.(BaseType).Name
+    name := base.Name
     isFloat := strings.Contains(name, "Float")
     isNum := strings.Contains(name, "Int") || isFloat
 
@@ -47,57 +72,34 @@ func (b BaseType) MayBeAssignedTo(t Type) bool {
     }
 }
 
-func (b BaseType) IsBool() bool { return b.Name == "Bool" }
-
-func (b BaseType) IsInt() bool {
-    if b.Name == "AnyNum" { return true }
-    return strings.Contains(b.Name, "Int")
-}
-
-func (b BaseType) IsNumeric() bool {
-    return !slices.Contains([]string {
-        "Bool",
-    }, b.Name)
-}
-
-type PtrType struct {
+type RefType struct {
     Base Type
-    IsOwn bool
+    IsNullable bool
 }
 
-func (p PtrType) FullType() string {
-    if p.Base == nil { return "NullType" }
-    base := p.Base.FullType()
+func (r RefType) FullType() string {
+    if r.Base == nil { return "NullType" }
+    base := r.Base.FullType()
 
-    if p.IsOwn { return "$" + base }
-    return "&" + base
+    if r.IsNullable { return base + "?" }
+    return base + "!"
 }
 
-func (p PtrType) InferType() Type {
-    if p.Base == nil { return nil }
-    base := p.Base.InferType()
+func (r RefType) InferType() Type {
+    if r.Base == nil { return nil }
+    base := r.Base.InferType()
 
     if base == nil { return nil }
-    return PtrType{Base: base, IsOwn: p.IsOwn}
+    return RefType{Base: base, IsNullable: r.IsNullable}
 }
 
-func (p PtrType) MayBeAssignedTo(t Type) bool {
-    ptr, isPtr := t.(PtrType)
-    if !isPtr { return false }
+func (r RefType) MayBeAssignedTo(t Type) bool {
+    ref, isRef := t.(RefType)
+    if !isRef { return false }
 
-    if p.IsOwn == ptr.IsOwn {
-        return p.Base.MayBeAssignedTo(ptr.Base)
+    if r.IsNullable == ref.IsNullable || ref.IsNullable {
+        return r.Base.MayBeAssignedTo(ref.Base)
     }
 
     return false
-}
-
-func (p PtrType) IsBool() bool { return false }
-func (p PtrType) IsInt() bool { return false }
-func (p PtrType) IsNumeric() bool { return false }
-
-func DeduceType(left, right Type) Type {
-    if left.MayBeAssignedTo(right) { return right }
-    if right.MayBeAssignedTo(left) { return left }
-    return nil
 }

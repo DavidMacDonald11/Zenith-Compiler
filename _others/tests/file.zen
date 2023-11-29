@@ -2,13 +2,7 @@
     x UInt64 := 14 if !Bool(0) else 15
     y := x + -7
 
-    z &UInt64 := &x
-    zp := &z
-    zv := @zp
-    xv := @zv
-
-    newVar := -2 >> 1&2|3$1
-
-    val := 1 if 1 < 2 < 3 else 0
-    pow := 2^.5
+    z UInt64! := x!
+    zp := z!
+    zp + 17
 }

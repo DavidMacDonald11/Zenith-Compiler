@@ -1,77 +1,28 @@
-Two pointer types: exclusive pointers and borrow pointers
-Exclusive pointers are responsible for deallocating.
-Borrow pointers will last at least as long as their usage.
+Manual Memory Management Made Easier
 
-var a int = 4
-var aPtr &int = &a - a borrow pointer to an int
-var b int = dyn(5)
-var bPtr $int = $b - an exclusive ponter to an int; b is unusable now
+x Int := 15 // creates an int on the stack
+x2 Int! := alloc(16)! // creates an int on the heap (must be not null)
+x3 Int? := alloc(16) // Creates an int on the heap
+y1 Int! := x! // creates a non-nullable int ref
+y2 Int? := x? // creates a nullable int ref
 
-@aPtr gives 4
-@bPtr gives 5
+z Int := 7
+y1 = 7  // should set x to 7
+y1! = z! // sets y1 to reference to z
 
-a := 4
-aPtr := &a
-b := dyn(5)
-bPtr := $b
+func inc(n Int!) { n++ }
+func fakeInc(n Int) := n + 1
 
-type Node struct {
-    value int
-    next $Node
-}
+inc(y1!) // passes y1 as a reference
+fakeInc(y1) // passes y1 by value
 
-AddNode(v int) {
-    seek...
-    next = $dyn(Node{v, nil})
-}
+y1! = null // error because y1 is not nullable
+y2? = null // valid
 
-node = Node{10, nil}
-node.AddNode(11)
+inc(y2?) // error because inc expects non-nullable Int ref
+inc(y2? ?? y1!) // inputs y2 if not null, otherwise y1 as ref
+inc(y2!) // asserts that y2 is not null as ref
 
-nodes will be chain deallocated
-reassagning next will deallocate previous assign
-transfering next will set it to nil
-
-type Node struct {
-    value int
-    next $Node
-    prev &Node
-}
-
-new idea: psuedo smart pointers
-$exclusive - cleans up when scope ends. Cannot be copied; only moved - *
-#shared - cleans up when scope ends. Sets all other ptrs to nil - **
-&borrow - may be set to nil by something else. Temp copy of data - **
-
-type Node struct {
-    value int
-    next #Node
-    prev &Node
-}
-
-new idea: ptr to exclusive ptr
-$exclusive - cleans up automatically. Sets itself to nil; - *
-&borrow - temp copy of data - *
-&$shared - ptr to exclusive. If cleaned up, val is nil; - **
-
-type Node struct {
-    value int
-    next $Node
-    prev &$Node
-}
-
-idea: null safety
-$? and &? - allowed to be null
-x1 := $Int{16} // New dynamic integer. Panics if malloc returns null
-x2 := $?Int{16} // New nullable dynamic integer.
-
-type Node struct {
-    value int
-    next $?Node
-    prev &?$?Node
-}
-
-next and prev must be nullable to allow head and tail
-$ - cannot be transfered or freed until end of scope
-
-idea: null safety is great, but syntax sucks
+fakeInc(y2) // not valid because y2 may be null
+fakeInc(y2 ?? 1) // inputs y2 or 1 if it is null
+fakeInc(y2!!) // asserts that y2 is not null

@@ -18,7 +18,16 @@ type Analyzer struct {
 type result struct {
     exprType Type
     isVar bool
+    isNullable bool
     right Type
+}
+
+func (r result) isNotNullable() result {
+    if r.isNullable {
+        panic("Expression cannot be nullable")
+    }
+
+    return r
 }
 
 func MakeAnalyzer() Analyzer {
@@ -95,11 +104,11 @@ func (a *Analyzer) VisitBaseType(ctx *parser.BaseTypeContext) any {
     return result{exprType: t}
 }
 
-func (a *Analyzer) VisitPtrType(ctx *parser.PtrTypeContext) any {
+func (a *Analyzer) VisitRefType(ctx *parser.RefTypeContext) any {
     base := a.Visit(ctx.Type_()).(result).exprType
-    isOwn := ctx.Ptr.GetText() == "$"
+    isNullable := ctx.Ref.GetText() == "?"
 
-    t := PtrType{Base: base, IsOwn: isOwn}
+    t := RefType{Base: base, IsNullable: isNullable}
     return result{exprType: t}
 }
 
@@ -128,6 +137,14 @@ func (a *Analyzer) VisitIdExpr(ctx *parser.IdExprContext) any {
         panic("No such identifier")
     }
 
+    a.ExprTypes[ctx] = exprType
+
+    if ref, isRef := exprType.(RefType); isRef {
+        t := ref.Base
+        isNullable := ref.IsNullable
+        return result{exprType: t, isNullable: isNullable, isVar: true}
+    }
+
     return result{exprType: exprType, isVar: true}
 }
 
@@ -135,7 +152,7 @@ func (a *Analyzer) VisitKeyExpr(ctx *parser.KeyExprContext) any {
     var t Type
 
     if ctx.Key.GetText() == "null" {
-        t = PtrType{Base: nil}
+        t = RefType{Base: nil}
     } else {
         t = BaseType{Name: "Bool"}
     }
@@ -148,53 +165,43 @@ func (a *Analyzer) VisitParenExpr(ctx *parser.ParenExprContext) any {
 }
 
 func (a *Analyzer) VisitCastExpr(ctx *parser.CastExprContext) any {
-    a.Visit(ctx.Expr())
+    res := a.Visit(ctx.Expr()).(result).isNotNullable()
+
+    if _, isBase := res.exprType.(BaseType); !isBase {
+        panic("Cannot cast non-base type")
+    }
+
     t := BaseType{Name: ctx.TYPE().GetText()}
 
     a.ExprTypes[ctx] = t
     return result{exprType: t}
 }
 
-func (a *Analyzer) VisitPtrExpr(ctx *parser.PtrExprContext) any {
-    res := a.Visit(ctx.Right).(result)
+func (a *Analyzer) VisitRefExpr(ctx *parser.RefExprContext) any {
+    res := a.Visit(ctx.Left).(result)
+    isNullable := ctx.Op.GetText() == "?"
 
-    if ctx.Op.GetText() == "@" {
-        ptr, isPtr := res.exprType.(PtrType)
-
-        if !isPtr {
-            panic("Cannot dereference non-pointer")
-        }
-
-        if ptr.Base == nil {
-            panic("Cannot dereference null")
-        }
-
-        return result{exprType: ptr.Base}
+    if _, isRef := res.exprType.(RefType); isRef {
+        panic("Cannot create reference to reference")
     }
 
     if !res.isVar {
-        panic("Cannot make pointer to non-variable")
+        panic("Cannot make reference to non-variable")
     }
 
-    isOwn := ctx.Op.GetText() == "$"
-
-    if isOwn {
-        panic("Cannot take ownership of variable")
-    }
-
-    t := PtrType{Base: res.exprType, IsOwn: isOwn}
+    t := RefType{Base: res.exprType, IsNullable: isNullable}
     return result{exprType: t}
 }
 
 func (a *Analyzer) VisitPrefixExpr(ctx *parser.PrefixExprContext) any {
     op := ctx.GetOp().GetText()
-    exprType := a.Visit(ctx.Right).(result).exprType
+    exprType := a.Visit(ctx.Right).(result).isNotNullable().exprType
 
-    if op == "!" && !exprType.IsBool() {
+    if op == "!" && !IsBool(exprType) {
         panic("Cannot negate non-boolean value")
     }
 
-    if (op == "+" || op == "-") && !exprType.IsNumeric() {
+    if (op == "+" || op == "-") && !IsNumeric(exprType) {
         panic("Cannot plus or minus non-numeric value")
     }
 
@@ -202,15 +209,15 @@ func (a *Analyzer) VisitPrefixExpr(ctx *parser.PrefixExprContext) any {
 }
 
 func (a *Analyzer) VisitPowExpr(ctx *parser.PowExprContext) any {
-    left := a.Visit(ctx.Left).(result)
-    right := a.Visit(ctx.Right).(result)
+    left := a.Visit(ctx.Left).(result).isNotNullable()
+    right := a.Visit(ctx.Right).(result).isNotNullable()
     t := DeduceType(left.exprType, right.exprType)
 
     if t == nil {
         panic("Cannot pow different types")
     }
 
-    if !t.IsNumeric() {
+    if !IsNumeric(t) {
         panic("Cannot pow non-numeric types")
     }
 
@@ -219,15 +226,15 @@ func (a *Analyzer) VisitPowExpr(ctx *parser.PowExprContext) any {
 }
 
 func (a *Analyzer) VisitMulExpr(ctx *parser.MulExprContext) any {
-    left := a.Visit(ctx.Left).(result)
-    right := a.Visit(ctx.Right).(result)
+    left := a.Visit(ctx.Left).(result).isNotNullable()
+    right := a.Visit(ctx.Right).(result).isNotNullable()
     t := DeduceType(left.exprType, right.exprType)
 
     if t == nil {
         panic("Cannot mul/div/rem different types")
     }
 
-    if !t.IsNumeric() {
+    if !IsNumeric(t) {
         panic("Cannot mul/div/rem non-numeric types")
     }
 
@@ -236,15 +243,15 @@ func (a *Analyzer) VisitMulExpr(ctx *parser.MulExprContext) any {
 }
 
 func (a *Analyzer) VisitAddExpr(ctx *parser.AddExprContext) any {
-    left := a.Visit(ctx.Left).(result)
-    right := a.Visit(ctx.Right).(result)
+    left := a.Visit(ctx.Left).(result).isNotNullable()
+    right := a.Visit(ctx.Right).(result).isNotNullable()
     t := DeduceType(left.exprType, right.exprType)
 
     if t == nil {
         panic("Cannot add/sub different types")
     }
 
-    if !t.IsNumeric() {
+    if !IsNumeric(t) {
         panic("Cannot add/sub non-numeric types")
     }
 
@@ -252,15 +259,15 @@ func (a *Analyzer) VisitAddExpr(ctx *parser.AddExprContext) any {
 }
 
 func (a *Analyzer) VisitShiftExpr(ctx *parser.ShiftExprContext) any {
-    left := a.Visit(ctx.Left).(result)
-    right := a.Visit(ctx.Right).(result)
+    left := a.Visit(ctx.Left).(result).isNotNullable()
+    right := a.Visit(ctx.Right).(result).isNotNullable()
     t := DeduceType(left.exprType, right.exprType)
 
     if t == nil {
         panic("Cannot shift different types")
     }
 
-    if !t.IsInt() {
+    if !IsInt(t) {
         panic("Cannot shift non-integer types")
     }
 
@@ -268,15 +275,15 @@ func (a *Analyzer) VisitShiftExpr(ctx *parser.ShiftExprContext) any {
 }
 
 func (a *Analyzer) VisitBitAndExpr(ctx *parser.BitAndExprContext) any {
-    left := a.Visit(ctx.Left).(result)
-    right := a.Visit(ctx.Right).(result)
+    left := a.Visit(ctx.Left).(result).isNotNullable()
+    right := a.Visit(ctx.Right).(result).isNotNullable()
     t := DeduceType(left.exprType, right.exprType)
 
     if t == nil {
         panic("Cannot bitwise-and different types")
     }
 
-    if !t.IsInt() {
+    if !IsInt(t) {
         panic("Cannot bitwise-and non-integer types")
     }
 
@@ -284,15 +291,15 @@ func (a *Analyzer) VisitBitAndExpr(ctx *parser.BitAndExprContext) any {
 }
 
 func (a *Analyzer) VisitBitXorExpr(ctx *parser.BitXorExprContext) any {
-    left := a.Visit(ctx.Left).(result)
-    right := a.Visit(ctx.Right).(result)
+    left := a.Visit(ctx.Left).(result).isNotNullable()
+    right := a.Visit(ctx.Right).(result).isNotNullable()
     t := DeduceType(left.exprType, right.exprType)
 
     if t == nil {
         panic("Cannot bitwise-xor different types")
     }
 
-    if !t.IsInt() {
+    if !IsInt(t) {
         panic("Cannot bitwise-xor non-integer types")
     }
 
@@ -300,15 +307,15 @@ func (a *Analyzer) VisitBitXorExpr(ctx *parser.BitXorExprContext) any {
 }
 
 func (a *Analyzer) VisitBitOrExpr(ctx *parser.BitOrExprContext) any {
-    left := a.Visit(ctx.Left).(result)
-    right := a.Visit(ctx.Right).(result)
+    left := a.Visit(ctx.Left).(result).isNotNullable()
+    right := a.Visit(ctx.Right).(result).isNotNullable()
     t := DeduceType(left.exprType, right.exprType)
 
     if t == nil {
         panic("Cannot bitwise-or different types")
     }
 
-    if !t.IsInt() {
+    if !IsInt(t) {
         panic("Cannot bitwise-or non-integer types")
     }
 
@@ -321,10 +328,10 @@ func (a *Analyzer) VisitCompExpr(ctx *parser.CompExprContext) any {
     if comp, isComp := ctx.Left.(*parser.CompExprContext); isComp {
         leftType = a.Visit(comp).(result).right
     } else {
-        leftType = a.Visit(ctx.Left).(result).exprType
+        leftType = a.Visit(ctx.Left).(result).isNotNullable().exprType
     }
 
-    right := a.Visit(ctx.Right).(result)
+    right := a.Visit(ctx.Right).(result).isNotNullable()
     t := DeduceType(leftType, right.exprType)
 
     if t == nil {
@@ -336,11 +343,11 @@ func (a *Analyzer) VisitCompExpr(ctx *parser.CompExprContext) any {
 }
 
 func (a *Analyzer) VisitIfExpr(ctx *parser.IfExprContext) any {
-    left := a.Visit(ctx.Left).(result)
-    condition := a.Visit(ctx.Condition).(result)
-    right := a.Visit(ctx.Right).(result)
+    left := a.Visit(ctx.Left).(result).isNotNullable()
+    condition := a.Visit(ctx.Condition).(result).isNotNullable()
+    right := a.Visit(ctx.Right).(result).isNotNullable()
 
-    if !condition.exprType.IsBool() {
+    if !IsBool(condition.exprType) {
         panic("Condition must be a boolean expression")
     }
 

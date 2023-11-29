@@ -106,7 +106,14 @@ func (g *Generator) VisitNumExpr(ctx *parser.NumExprContext) any {
 }
 
 func (g *Generator) VisitIdExpr(ctx *parser.IdExprContext) any {
-    return getCId(ctx.ID().GetText())
+    id := getCId(ctx.ID().GetText())
+    exprType := g.Analyzer.ExprTypes[ctx]
+
+    if _, isRef := exprType.(semantic.RefType); isRef {
+        return "*" + id
+    }
+
+    return id
 }
 
 func (g *Generator) VisitKeyExpr(ctx *parser.KeyExprContext) any {
@@ -128,17 +135,9 @@ func (g *Generator) VisitCastExpr(ctx *parser.CastExprContext) any {
     return fmt.Sprintf("(%v)(%v)", exprType, inner)
 }
 
-func (g *Generator) VisitPtrExpr(ctx *parser.PtrExprContext) any {
-    var op string
-
-    if ctx.Op.GetText() == "@" {
-        op = "*"
-    } else {
-        op = "&"
-    }
-
-    right := g.Visit(ctx.Right)
-    return fmt.Sprintf("%v%v", op, right)
+func (g *Generator) VisitRefExpr(ctx *parser.RefExprContext) any {
+    left := g.Visit(ctx.Left)
+    return fmt.Sprintf("(&%v)", left)
 }
 
 func (g *Generator) VisitPrefixExpr(ctx *parser.PrefixExprContext) any {
@@ -239,8 +238,8 @@ func getCId(id string) string {
 }
 
 func getCType(t semantic.Type) string {
-    if ptr, isPtr := t.(semantic.PtrType); isPtr {
-        return getCType(ptr.Base) + "*"
+    if ref, isRef := t.(semantic.RefType); isRef {
+        return getCType(ref.Base) + "*"
     }
 
     name := t.(semantic.BaseType).Name

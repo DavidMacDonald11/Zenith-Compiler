@@ -1,9 +1,6 @@
 lexer grammar ZenithLexer;
 
-AT : '@' ;
 BIT_NOT : '~' ;
-NOT : '!' ;
-
 POW : '^' ;
 TIMES : '*' ;
 DIVIDE : '/' ;
@@ -80,10 +77,14 @@ ID : [_a-zA-Z][_a-zA-Z0-9]* ;
 AND : '&' ;
 DOLLAR : '$' ;
 PIPE : '|' ;
+EXCLAIM : '!' ;
+QUESTION : '?' ;
 LPAREN : '(' ;
 RPAREN : ')' ;
 LBRACE : '{' ;
 RBRACE : '}' ;
+LBRACK : '[' ;
+RBRACK : ']' ;
 SEMICOLON : ';' ;
 NL : ([\r]? [\n])+ ;
 IGNORED : ([ \t] | '/*' .*? '*/' | '//' ~[\n]*) -> skip ;
