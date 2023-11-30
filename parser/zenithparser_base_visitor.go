@@ -60,6 +60,10 @@ func (v *BaseZenithParserVisitor) VisitBitXorExpr(ctx *BitXorExprContext) interf
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseZenithParserVisitor) VisitCoalesceExpr(ctx *CoalesceExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseZenithParserVisitor) VisitShiftExpr(ctx *ShiftExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -97,6 +101,10 @@ func (v *BaseZenithParserVisitor) VisitBitAndExpr(ctx *BitAndExprContext) interf
 }
 
 func (v *BaseZenithParserVisitor) VisitPowExpr(ctx *PowExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitNotNullExpr(ctx *NotNullExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

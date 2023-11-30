@@ -5,4 +5,10 @@
     z UInt64! := x!
     zp := z!
     zp + 17
+
+    v Int := 5
+    v1 Int? := null
+    v2 := v?
+
+    (v1 ?? v2)!! + 2
 }

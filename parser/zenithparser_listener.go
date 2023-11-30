@@ -47,6 +47,9 @@ type ZenithParserListener interface {
 	// EnterBitXorExpr is called when entering the bitXorExpr production.
 	EnterBitXorExpr(c *BitXorExprContext)
 
+	// EnterCoalesceExpr is called when entering the coalesceExpr production.
+	EnterCoalesceExpr(c *CoalesceExprContext)
+
 	// EnterShiftExpr is called when entering the shiftExpr production.
 	EnterShiftExpr(c *ShiftExprContext)
 
@@ -76,6 +79,9 @@ type ZenithParserListener interface {
 
 	// EnterPowExpr is called when entering the powExpr production.
 	EnterPowExpr(c *PowExprContext)
+
+	// EnterNotNullExpr is called when entering the notNullExpr production.
+	EnterNotNullExpr(c *NotNullExprContext)
 
 	// EnterIdExpr is called when entering the idExpr production.
 	EnterIdExpr(c *IdExprContext)
@@ -119,6 +125,9 @@ type ZenithParserListener interface {
 	// ExitBitXorExpr is called when exiting the bitXorExpr production.
 	ExitBitXorExpr(c *BitXorExprContext)
 
+	// ExitCoalesceExpr is called when exiting the coalesceExpr production.
+	ExitCoalesceExpr(c *CoalesceExprContext)
+
 	// ExitShiftExpr is called when exiting the shiftExpr production.
 	ExitShiftExpr(c *ShiftExprContext)
 
@@ -148,6 +157,9 @@ type ZenithParserListener interface {
 
 	// ExitPowExpr is called when exiting the powExpr production.
 	ExitPowExpr(c *PowExprContext)
+
+	// ExitNotNullExpr is called when exiting the notNullExpr production.
+	ExitNotNullExpr(c *NotNullExprContext)
 
 	// ExitIdExpr is called when exiting the idExpr production.
 	ExitIdExpr(c *IdExprContext)

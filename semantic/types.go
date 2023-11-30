@@ -97,6 +97,8 @@ func (r RefType) MayBeAssignedTo(t Type) bool {
     ref, isRef := t.(RefType)
     if !isRef { return false }
 
+    if r.Base == nil { return ref.IsNullable }
+
     if r.IsNullable == ref.IsNullable || ref.IsNullable {
         return r.Base.MayBeAssignedTo(ref.Base)
     }

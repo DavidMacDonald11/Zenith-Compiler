@@ -25,6 +25,7 @@ expr : NUM #numExpr
      | Key=(TRUE | FALSE | NULL) #keyExpr
      | LPAREN NL? expr NL? RPAREN #parenExpr
      | Left=expr Op=(EXCLAIM | QUESTION) #refExpr
+     | Left=expr NOT_NULL #notNullExpr
      | TYPE LPAREN NL? expr NL? RPAREN #castExpr
      | Op=(PLUS | MINUS | EXCLAIM) Right=expr #prefixExpr
      | Left=expr (POW NL? Right=expr)+ #powExpr
@@ -35,5 +36,6 @@ expr : NUM #numExpr
      | Left=expr DOLLAR NL? Right=expr #bitXorExpr
      | Left=expr PIPE NL? Right=expr #bitOrExpr
      | Left=expr Op=(LT | GT | LTE | GTE | EQ | NEQ) NL? Right=expr #compExpr
+     | Left=expr COALESCE Right=expr #coalesceExpr
      | Left=expr IF NL? Condition=expr NL? ELSE NL? Right=expr #ifExpr
      ;

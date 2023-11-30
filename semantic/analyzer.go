@@ -152,7 +152,7 @@ func (a *Analyzer) VisitKeyExpr(ctx *parser.KeyExprContext) any {
     var t Type
 
     if ctx.Key.GetText() == "null" {
-        t = RefType{Base: nil}
+        t = RefType{Base: nil, IsNullable: true}
     } else {
         t = BaseType{Name: "Bool"}
     }
@@ -162,19 +162,6 @@ func (a *Analyzer) VisitKeyExpr(ctx *parser.KeyExprContext) any {
 
 func (a *Analyzer) VisitParenExpr(ctx *parser.ParenExprContext) any {
     return a.Visit(ctx.Expr())
-}
-
-func (a *Analyzer) VisitCastExpr(ctx *parser.CastExprContext) any {
-    res := a.Visit(ctx.Expr()).(result).isNotNullable()
-
-    if _, isBase := res.exprType.(BaseType); !isBase {
-        panic("Cannot cast non-base type")
-    }
-
-    t := BaseType{Name: ctx.TYPE().GetText()}
-
-    a.ExprTypes[ctx] = t
-    return result{exprType: t}
 }
 
 func (a *Analyzer) VisitRefExpr(ctx *parser.RefExprContext) any {
@@ -190,6 +177,33 @@ func (a *Analyzer) VisitRefExpr(ctx *parser.RefExprContext) any {
     }
 
     t := RefType{Base: res.exprType, IsNullable: isNullable}
+    return result{exprType: t}
+}
+
+func (a *Analyzer) VisitNotNullExpr(ctx *parser.NotNullExprContext) any {
+    res := a.Visit(ctx.Left).(result)
+
+    if !res.isNullable {
+        panic("May only assert nullable reference value to be not null")
+    }
+
+    if res.exprType.InferType() == nil {
+        panic("Cannot assert null to be not null")
+    }
+
+    return result{exprType: res.exprType}
+}
+
+func (a *Analyzer) VisitCastExpr(ctx *parser.CastExprContext) any {
+    res := a.Visit(ctx.Expr()).(result).isNotNullable()
+
+    if _, isBase := res.exprType.(BaseType); !isBase {
+        panic("Cannot cast non-base type")
+    }
+
+    t := BaseType{Name: ctx.TYPE().GetText()}
+
+    a.ExprTypes[ctx] = t
     return result{exprType: t}
 }
 
@@ -340,6 +354,18 @@ func (a *Analyzer) VisitCompExpr(ctx *parser.CompExprContext) any {
 
     b := BaseType{Name: "Bool"}
     return result{exprType: b, right: right.exprType}
+}
+
+func (a *Analyzer) VisitCoalesceExpr(ctx *parser.CoalesceExprContext) any {
+    left := a.Visit(ctx.Left).(result)
+    right := a.Visit(ctx.Right).(result)
+    t := DeduceType(left.exprType, right.exprType)
+
+    if t == nil {
+        panic("Both sides of coalecse expression must be the same type")
+    }
+
+    return result{exprType: t, isNullable: right.isNullable}
 }
 
 func (a *Analyzer) VisitIfExpr(ctx *parser.IfExprContext) any {

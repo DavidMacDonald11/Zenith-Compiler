@@ -140,6 +140,10 @@ func (g *Generator) VisitRefExpr(ctx *parser.RefExprContext) any {
     return fmt.Sprintf("(&%v)", left)
 }
 
+func (g *Generator) VisitNotNullExpr(ctx *parser.NotNullExprContext) any {
+    return g.Visit(ctx.Left)
+}
+
 func (g *Generator) VisitPrefixExpr(ctx *parser.PrefixExprContext) any {
     op := ctx.Op.GetText()
     right := g.Visit(ctx.Right)
@@ -207,6 +211,13 @@ func (g *Generator) VisitCompExpr(ctx *parser.CompExprContext) any {
 
     // TODO implement correctly
     return fmt.Sprintf("%v %v %v", left, op, right)
+}
+
+func (g *Generator) VisitCoalesceExpr(ctx *parser.CoalesceExprContext) any {
+    left := g.Visit(ctx.Left)
+    right := g.Visit(ctx.Right)
+
+    return fmt.Sprintf("((&%v)? %v : %v)", left, left, right)
 }
 
 func (g *Generator) VisitIfExpr(ctx *parser.IfExprContext) any {

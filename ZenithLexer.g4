@@ -1,5 +1,6 @@
 lexer grammar ZenithLexer;
 
+NOT_NULL : '!!' ;
 BIT_NOT : '~' ;
 POW : '^' ;
 TIMES : '*' ;
@@ -15,6 +16,7 @@ LTE : '<=' ;
 GTE : '>=' ;
 EQ : '==' ;
 NEQ : '!=' ;
+COALESCE : '??';
 
 IF : 'if' ;
 ELSE : 'else' ;

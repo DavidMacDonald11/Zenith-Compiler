@@ -47,6 +47,9 @@ type ZenithParserVisitor interface {
 	// Visit a parse tree produced by ZenithParser#bitXorExpr.
 	VisitBitXorExpr(ctx *BitXorExprContext) interface{}
 
+	// Visit a parse tree produced by ZenithParser#coalesceExpr.
+	VisitCoalesceExpr(ctx *CoalesceExprContext) interface{}
+
 	// Visit a parse tree produced by ZenithParser#shiftExpr.
 	VisitShiftExpr(ctx *ShiftExprContext) interface{}
 
@@ -76,6 +79,9 @@ type ZenithParserVisitor interface {
 
 	// Visit a parse tree produced by ZenithParser#powExpr.
 	VisitPowExpr(ctx *PowExprContext) interface{}
+
+	// Visit a parse tree produced by ZenithParser#notNullExpr.
+	VisitNotNullExpr(ctx *NotNullExprContext) interface{}
 
 	// Visit a parse tree produced by ZenithParser#idExpr.
 	VisitIdExpr(ctx *IdExprContext) interface{}
