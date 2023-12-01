@@ -1,8 +1,6 @@
 Manual Memory Management Made Easier
 
 x Int := 15 // creates an int on the stack
-x2 Int! := alloc(16)! // creates an int on the heap (must be not null)
-x3 Int? := alloc(16) // Creates an int on the heap
 y1 Int! := x! // creates a non-nullable int ref
 y2 Int? := x? // creates a nullable int ref
 
@@ -26,3 +24,16 @@ inc(y2!) // asserts that y2 is not null as ref
 fakeInc(y2) // not valid because y2 may be null
 fakeInc(y2 ?? 1) // inputs y2 or 1 if it is null
 fakeInc(y2!!) // asserts that y2 is not null
+
+Heap Allocation
+
+# reference modifier
+Int#? or Int#! // heap int
+
+a1 Int#? = ...alloc... // heap value; is superset of Int?
+inc(a1!) // asserts that a1 is not null ref
+
+a2 Int#! = a1#! // asserts a1 not null heap ref
+
+behaves exactly like refs and can be used as one
+only these may be freed. assignment works one way (Int#? -> Int?)

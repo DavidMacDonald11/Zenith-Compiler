@@ -17,15 +17,17 @@ stat : ID type? INIT_ASSIGN NL? expr #defineStat
      ;
 
 type : TYPE #baseType
-     | type Ref=(EXCLAIM | QUESTION) #refType
+     | type HASH? Ref=(EXCLAIM | QUESTION) #refType
      ;
 
 expr : NUM #numExpr
      | ID #idExpr
      | Key=(TRUE | FALSE | NULL) #keyExpr
      | LPAREN NL? expr NL? RPAREN #parenExpr
-     | Left=expr Op=(EXCLAIM | QUESTION) #refExpr
+     | Left=expr HASH? Op=(EXCLAIM | QUESTION) #refExpr
      | Left=expr NOT_NULL #notNullExpr
+     | ALLOC Ref=(EXCLAIM | QUESTION) LPAREN NL? expr NL? RPAREN #allocExpr
+     | DEALLOC LPAREN NL? expr NL? RPAREN #deallocExpr
      | TYPE LPAREN NL? expr NL? RPAREN #castExpr
      | Op=(PLUS | MINUS | EXCLAIM) Right=expr #prefixExpr
      | Left=expr (POW NL? Right=expr)+ #powExpr

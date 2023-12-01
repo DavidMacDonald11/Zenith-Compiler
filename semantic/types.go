@@ -40,6 +40,15 @@ func DeduceType(left, right Type) Type {
     return nil
 }
 
+type NoneType struct{}
+
+func (n NoneType) FullType() string { return "None" }
+func (n NoneType) InferType() Type { return n }
+
+func (n NoneType) MayBeAssignedTo(t Type) bool {
+    return false
+}
+
 type BaseType struct {
     Name string
 }
@@ -74,15 +83,19 @@ func (b BaseType) MayBeAssignedTo(t Type) bool {
 
 type RefType struct {
     Base Type
+    IsDynamic bool
     IsNullable bool
 }
 
 func (r RefType) FullType() string {
     if r.Base == nil { return "NullType" }
-    base := r.Base.FullType()
+    s := strings.Builder{}
 
-    if r.IsNullable { return base + "?" }
-    return base + "!"
+    s.WriteString(r.Base.FullType())
+    if r.IsDynamic { s.WriteRune('#') }
+    if r.IsNullable { s.WriteRune('?') } else { s.WriteRune('!') }
+
+    return s.String()
 }
 
 func (r RefType) InferType() Type {
@@ -90,7 +103,7 @@ func (r RefType) InferType() Type {
     base := r.Base.InferType()
 
     if base == nil { return nil }
-    return RefType{Base: base, IsNullable: r.IsNullable}
+    return RefType{Base: base, IsDynamic: r.IsDynamic, IsNullable: r.IsNullable}
 }
 
 func (r RefType) MayBeAssignedTo(t Type) bool {
@@ -98,10 +111,8 @@ func (r RefType) MayBeAssignedTo(t Type) bool {
     if !isRef { return false }
 
     if r.Base == nil { return ref.IsNullable }
+    if !r.IsDynamic && ref.IsDynamic { return false }
+    if r.IsNullable && !ref.IsNullable { return false }
 
-    if r.IsNullable == ref.IsNullable || ref.IsNullable {
-        return r.Base.MayBeAssignedTo(ref.Base)
-    }
-
-    return false
+    return r.Base.MayBeAssignedTo(ref.Base)
 }

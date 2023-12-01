@@ -35,6 +35,9 @@ type ZenithParserListener interface {
 	// EnterCastExpr is called when entering the castExpr production.
 	EnterCastExpr(c *CastExprContext)
 
+	// EnterAllocExpr is called when entering the allocExpr production.
+	EnterAllocExpr(c *AllocExprContext)
+
 	// EnterKeyExpr is called when entering the keyExpr production.
 	EnterKeyExpr(c *KeyExprContext)
 
@@ -55,6 +58,9 @@ type ZenithParserListener interface {
 
 	// EnterPrefixExpr is called when entering the prefixExpr production.
 	EnterPrefixExpr(c *PrefixExprContext)
+
+	// EnterDeallocExpr is called when entering the deallocExpr production.
+	EnterDeallocExpr(c *DeallocExprContext)
 
 	// EnterBitOrExpr is called when entering the bitOrExpr production.
 	EnterBitOrExpr(c *BitOrExprContext)
@@ -113,6 +119,9 @@ type ZenithParserListener interface {
 	// ExitCastExpr is called when exiting the castExpr production.
 	ExitCastExpr(c *CastExprContext)
 
+	// ExitAllocExpr is called when exiting the allocExpr production.
+	ExitAllocExpr(c *AllocExprContext)
+
 	// ExitKeyExpr is called when exiting the keyExpr production.
 	ExitKeyExpr(c *KeyExprContext)
 
@@ -133,6 +142,9 @@ type ZenithParserListener interface {
 
 	// ExitPrefixExpr is called when exiting the prefixExpr production.
 	ExitPrefixExpr(c *PrefixExprContext)
+
+	// ExitDeallocExpr is called when exiting the deallocExpr production.
+	ExitDeallocExpr(c *DeallocExprContext)
 
 	// ExitBitOrExpr is called when exiting the bitOrExpr production.
 	ExitBitOrExpr(c *BitOrExprContext)

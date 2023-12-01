@@ -75,6 +75,12 @@ func (s *BaseZenithParserListener) EnterCastExpr(ctx *CastExprContext) {}
 // ExitCastExpr is called when production castExpr is exited.
 func (s *BaseZenithParserListener) ExitCastExpr(ctx *CastExprContext) {}
 
+// EnterAllocExpr is called when production allocExpr is entered.
+func (s *BaseZenithParserListener) EnterAllocExpr(ctx *AllocExprContext) {}
+
+// ExitAllocExpr is called when production allocExpr is exited.
+func (s *BaseZenithParserListener) ExitAllocExpr(ctx *AllocExprContext) {}
+
 // EnterKeyExpr is called when production keyExpr is entered.
 func (s *BaseZenithParserListener) EnterKeyExpr(ctx *KeyExprContext) {}
 
@@ -116,6 +122,12 @@ func (s *BaseZenithParserListener) EnterPrefixExpr(ctx *PrefixExprContext) {}
 
 // ExitPrefixExpr is called when production prefixExpr is exited.
 func (s *BaseZenithParserListener) ExitPrefixExpr(ctx *PrefixExprContext) {}
+
+// EnterDeallocExpr is called when production deallocExpr is entered.
+func (s *BaseZenithParserListener) EnterDeallocExpr(ctx *DeallocExprContext) {}
+
+// ExitDeallocExpr is called when production deallocExpr is exited.
+func (s *BaseZenithParserListener) ExitDeallocExpr(ctx *DeallocExprContext) {}
 
 // EnterBitOrExpr is called when production bitOrExpr is entered.
 func (s *BaseZenithParserListener) EnterBitOrExpr(ctx *BitOrExprContext) {}

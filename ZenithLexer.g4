@@ -18,11 +18,13 @@ EQ : '==' ;
 NEQ : '!=' ;
 COALESCE : '??';
 
+NULL : 'null' ;
+TRUE : 'true' ;
+ALLOC : 'alloc' ;
+DEALLOC : 'dealloc' ;
+FALSE : 'false' ;
 IF : 'if' ;
 ELSE : 'else' ;
-TRUE : 'true' ;
-FALSE : 'false' ;
-NULL : 'null' ;
 
 ASSIGN : '=' ;
 INIT_ASSIGN : ':=' ;
@@ -81,6 +83,7 @@ DOLLAR : '$' ;
 PIPE : '|' ;
 EXCLAIM : '!' ;
 QUESTION : '?' ;
+HASH : '#' ;
 LPAREN : '(' ;
 RPAREN : ')' ;
 LBRACE : '{' ;

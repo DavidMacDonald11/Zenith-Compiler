@@ -11,4 +11,11 @@
     v2 := v?
 
     (v1 ?? v2)!! + 2
+
+    heap Float64#? := null
+    anyref Float64? := heap#?
+    // fails heap2 Float64#? := anyref#?
+
+    t := alloc?(16)
+    dealloc(t#?)
 }

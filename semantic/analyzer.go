@@ -17,8 +17,9 @@ type Analyzer struct {
 
 type result struct {
     exprType Type
-    isVar bool
+    hasAddress bool
     isNullable bool
+    isDynamic bool
     right Type
 }
 
@@ -106,9 +107,10 @@ func (a *Analyzer) VisitBaseType(ctx *parser.BaseTypeContext) any {
 
 func (a *Analyzer) VisitRefType(ctx *parser.RefTypeContext) any {
     base := a.Visit(ctx.Type_()).(result).exprType
+    isDynamic := ctx.HASH() != nil
     isNullable := ctx.Ref.GetText() == "?"
 
-    t := RefType{Base: base, IsNullable: isNullable}
+    t := RefType{Base: base, IsDynamic: isDynamic, IsNullable: isNullable}
     return result{exprType: t}
 }
 
@@ -140,19 +142,22 @@ func (a *Analyzer) VisitIdExpr(ctx *parser.IdExprContext) any {
     a.ExprTypes[ctx] = exprType
 
     if ref, isRef := exprType.(RefType); isRef {
-        t := ref.Base
-        isNullable := ref.IsNullable
-        return result{exprType: t, isNullable: isNullable, isVar: true}
+        return result{
+            exprType: ref.Base,
+            isDynamic: ref.IsDynamic,
+            isNullable: ref.IsNullable,
+            hasAddress: true,
+        }
     }
 
-    return result{exprType: exprType, isVar: true}
+    return result{exprType: exprType, hasAddress: true}
 }
 
 func (a *Analyzer) VisitKeyExpr(ctx *parser.KeyExprContext) any {
     var t Type
 
     if ctx.Key.GetText() == "null" {
-        t = RefType{Base: nil, IsNullable: true}
+        t = RefType{Base: nil, IsDynamic: true, IsNullable: true}
     } else {
         t = BaseType{Name: "Bool"}
     }
@@ -166,17 +171,23 @@ func (a *Analyzer) VisitParenExpr(ctx *parser.ParenExprContext) any {
 
 func (a *Analyzer) VisitRefExpr(ctx *parser.RefExprContext) any {
     res := a.Visit(ctx.Left).(result)
+    isDynamic := ctx.HASH() != nil
     isNullable := ctx.Op.GetText() == "?"
 
     if _, isRef := res.exprType.(RefType); isRef {
         panic("Cannot create reference to reference")
     }
 
-    if !res.isVar {
+    if !res.hasAddress {
         panic("Cannot make reference to non-variable")
     }
 
-    t := RefType{Base: res.exprType, IsNullable: isNullable}
+    if isDynamic && !res.isDynamic {
+        panic("Cannot create dynamic reference to non-dynamic variable")
+    }
+
+    t := res.exprType
+    t = RefType{Base: t, IsDynamic: isDynamic, IsNullable: isNullable}
     return result{exprType: t}
 }
 
@@ -192,6 +203,30 @@ func (a *Analyzer) VisitNotNullExpr(ctx *parser.NotNullExprContext) any {
     }
 
     return result{exprType: res.exprType}
+}
+
+func (a *Analyzer) VisitAllocExpr(ctx *parser.AllocExprContext) any {
+    res := a.Visit(ctx.Expr()).(result)
+    isNullable := ctx.Ref.GetText() == "?"
+    base, isBase := res.exprType.(BaseType)
+
+    if !isBase {
+        panic("Cannot alloc non-base type")
+    }
+
+    t := RefType{Base: base, IsDynamic: true, IsNullable: isNullable}
+    return result{exprType: t}
+}
+
+func (a *Analyzer) VisitDeallocExpr(ctx *parser.DeallocExprContext) any {
+    res := a.Visit(ctx.Expr()).(result)
+    ref, isRef := res.exprType.(RefType)
+
+    if !isRef || !ref.IsDynamic {
+        panic("Can only dealloc dynamic reference type")
+    }
+
+    return result{exprType: NoneType{}}
 }
 
 func (a *Analyzer) VisitCastExpr(ctx *parser.CastExprContext) any {

@@ -128,6 +128,18 @@ func (g *Generator) VisitParenExpr(ctx *parser.ParenExprContext) any {
     return fmt.Sprintf("(%v)", inner)
 }
 
+func (g *Generator) VisitAllocExpr(ctx *parser.AllocExprContext) any {
+    expr := g.Visit(ctx.Expr())
+    // TODO change
+    return fmt.Sprintf("__Zenith_alloc(%v)", expr)
+}
+
+func (g *Generator) VisitDeallocExpr(ctx *parser.DeallocExprContext) any {
+    expr := g.Visit(ctx.Expr())
+    // TODO change
+    return fmt.Sprintf("__Zenith_dealloc(%v)", expr)
+}
+
 func (g *Generator) VisitCastExpr(ctx *parser.CastExprContext) any {
     exprType := getCType(g.Analyzer.ExprTypes[ctx])
     inner := g.Visit(ctx.Expr())
@@ -190,6 +202,7 @@ func (g *Generator) VisitBitAndExpr(ctx *parser.BitAndExprContext) any {
 
     return fmt.Sprintf("%v & %v", left, right)
 }
+
 func (g *Generator) VisitBitXorExpr(ctx *parser.BitXorExprContext) any {
     left := g.Visit(ctx.Left)
     right := g.Visit(ctx.Right)
@@ -245,7 +258,7 @@ func getDigit(c byte) *big.Float {
 }
 
 func getCId(id string) string {
-    return "__ZenithId" + id
+    return "__ZenithId_" + id
 }
 
 func getCType(t semantic.Type) string {

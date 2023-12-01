@@ -35,6 +35,9 @@ type ZenithParserVisitor interface {
 	// Visit a parse tree produced by ZenithParser#castExpr.
 	VisitCastExpr(ctx *CastExprContext) interface{}
 
+	// Visit a parse tree produced by ZenithParser#allocExpr.
+	VisitAllocExpr(ctx *AllocExprContext) interface{}
+
 	// Visit a parse tree produced by ZenithParser#keyExpr.
 	VisitKeyExpr(ctx *KeyExprContext) interface{}
 
@@ -55,6 +58,9 @@ type ZenithParserVisitor interface {
 
 	// Visit a parse tree produced by ZenithParser#prefixExpr.
 	VisitPrefixExpr(ctx *PrefixExprContext) interface{}
+
+	// Visit a parse tree produced by ZenithParser#deallocExpr.
+	VisitDeallocExpr(ctx *DeallocExprContext) interface{}
 
 	// Visit a parse tree produced by ZenithParser#bitOrExpr.
 	VisitBitOrExpr(ctx *BitOrExprContext) interface{}
