@@ -1,39 +1,23 @@
 Manual Memory Management Made Easier
+All based around type inference
 
-x Int := 15 // creates an int on the stack
-y1 Int! := x! // creates a non-nullable int ref
-y2 Int? := x? // creates a nullable int ref
+x := 15 // creates an int on the stack; Int
+stackx := &x // creates a int ptr; &Int
+heapx := alloc(x) // copies x onto the heap; #Int
 
-z Int := 7
-y1 = 7  // should set x to 7
-y1! = z! // sets y1 to reference to z
+func inc(n &Int) { n++ }
+inc(stackx) // valid
+inc(heapx) // valid
 
-func inc(n Int!) { n++ }
-func fakeInc(n Int) := n + 1
+// only #Types can be freed
+anyx &Int := heapx // valid; copies heapx as &Int; cannot be freed using anyx
+heapx2 #Int := anyx // invalid
 
-inc(y1!) // passes y1 as a reference
-fakeInc(y1) // passes y1 by value
+@anyx // gets value at address; Int
+@heapx // gets value at address; Int
 
-y1! = null // error because y1 is not nullable
-y2? = null // valid
+dealloc(anyx) // invalid
+dealloc(heapx) // vaild
 
-inc(y2?) // error because inc expects non-nullable Int ref
-inc(y2? ?? y1!) // inputs y2 if not null, otherwise y1 as ref
-inc(y2!) // asserts that y2 is not null as ref
-
-fakeInc(y2) // not valid because y2 may be null
-fakeInc(y2 ?? 1) // inputs y2 or 1 if it is null
-fakeInc(y2!!) // asserts that y2 is not null
-
-Heap Allocation
-
-# reference modifier
-Int#? or Int#! // heap int
-
-a1 Int#? = ...alloc... // heap value; is superset of Int?
-inc(a1!) // asserts that a1 is not null ref
-
-a2 Int#! = a1#! // asserts a1 not null heap ref
-
-behaves exactly like refs and can be used as one
-only these may be freed. assignment works one way (Int#? -> Int?)
+ptr := &x
+ptr? // returns ptr != null

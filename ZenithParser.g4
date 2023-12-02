@@ -17,19 +17,19 @@ stat : ID type? INIT_ASSIGN NL? expr #defineStat
      ;
 
 type : TYPE #baseType
-     | type HASH? Ref=(EXCLAIM | QUESTION) #refType
+     | Ptr=(HASH | AND) type #ptrType
      ;
 
 expr : NUM #numExpr
      | ID #idExpr
      | Key=(TRUE | FALSE | NULL) #keyExpr
      | LPAREN NL? expr NL? RPAREN #parenExpr
-     | Left=expr HASH? Op=(EXCLAIM | QUESTION) #refExpr
-     | Left=expr NOT_NULL #notNullExpr
-     | ALLOC Ref=(EXCLAIM | QUESTION) LPAREN NL? expr NL? RPAREN #allocExpr
+     | expr QUESTION #postfixExpr
+     | ALLOC LPAREN NL? expr NL? RPAREN #allocExpr
      | DEALLOC LPAREN NL? expr NL? RPAREN #deallocExpr
      | TYPE LPAREN NL? expr NL? RPAREN #castExpr
-     | Op=(PLUS | MINUS | EXCLAIM) Right=expr #prefixExpr
+     | Op=(AND | AT) expr #ptrExpr
+     | Op=(PLUS | MINUS | NOT) expr #prefixExpr
      | Left=expr (POW NL? Right=expr)+ #powExpr
      | Left=expr Op=(TIMES | DIVIDE | REM) NL? Right=expr #mulExpr
      | Left=expr Op=(PLUS | MINUS) NL? Right=expr #addExpr
@@ -38,6 +38,5 @@ expr : NUM #numExpr
      | Left=expr DOLLAR NL? Right=expr #bitXorExpr
      | Left=expr PIPE NL? Right=expr #bitOrExpr
      | Left=expr Op=(LT | GT | LTE | GTE | EQ | NEQ) NL? Right=expr #compExpr
-     | Left=expr COALESCE Right=expr #coalesceExpr
      | Left=expr IF NL? Condition=expr NL? ELSE NL? Right=expr #ifExpr
      ;

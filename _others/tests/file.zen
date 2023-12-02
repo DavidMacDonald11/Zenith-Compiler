@@ -1,21 +1,13 @@
 {
-    x UInt64 := 14 if !Bool(0) else 15
-    y := x + -7
+    a := 20
+    b := &a
 
-    z UInt64! := x!
-    zp := z!
-    zp + 17
+    c := alloc(21)
+    d := &c
+    dealloc(@d)
 
-    v Int := 5
-    v1 Int? := null
-    v2 := v?
-
-    (v1 ?? v2)!! + 2
-
-    heap Float64#? := null
-    anyref Float64? := heap#?
-    // fails heap2 Float64#? := anyref#?
-
-    t := alloc?(16)
-    dealloc(t#?)
+    num := alloc(300 / 3)
+    num2 := c if num? else num
+    num3 := null if num2? else num2
+    num4 := 10 if num3? else @num3
 }

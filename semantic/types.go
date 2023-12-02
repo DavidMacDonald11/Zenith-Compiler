@@ -40,6 +40,7 @@ func DeduceType(left, right Type) Type {
     return nil
 }
 
+
 type NoneType struct{}
 
 func (n NoneType) FullType() string { return "None" }
@@ -48,6 +49,7 @@ func (n NoneType) InferType() Type { return n }
 func (n NoneType) MayBeAssignedTo(t Type) bool {
     return false
 }
+
 
 type BaseType struct {
     Name string
@@ -81,38 +83,34 @@ func (b BaseType) MayBeAssignedTo(t Type) bool {
     }
 }
 
-type RefType struct {
+
+type PtrType struct {
     Base Type
-    IsDynamic bool
-    IsNullable bool
+    IsHeap bool
 }
 
-func (r RefType) FullType() string {
-    if r.Base == nil { return "NullType" }
-    s := strings.Builder{}
+func (p PtrType) FullType() string {
+    if p.Base == nil { return "NullType" }
+    base := p.Base.FullType()
 
-    s.WriteString(r.Base.FullType())
-    if r.IsDynamic { s.WriteRune('#') }
-    if r.IsNullable { s.WriteRune('?') } else { s.WriteRune('!') }
-
-    return s.String()
+    if p.IsHeap { return "#" + base  }
+    return "&" + base
 }
 
-func (r RefType) InferType() Type {
-    if r.Base == nil { return nil }
-    base := r.Base.InferType()
+func (p PtrType) InferType() Type {
+    if p.Base == nil { return nil }
+    base := p.Base.InferType()
 
     if base == nil { return nil }
-    return RefType{Base: base, IsDynamic: r.IsDynamic, IsNullable: r.IsNullable}
+    return PtrType{Base: base, IsHeap: p.IsHeap}
 }
 
-func (r RefType) MayBeAssignedTo(t Type) bool {
-    ref, isRef := t.(RefType)
-    if !isRef { return false }
+func (p PtrType) MayBeAssignedTo(t Type) bool {
+    ptr, isPtr := t.(PtrType)
+    if !isPtr { return false }
 
-    if r.Base == nil { return ref.IsNullable }
-    if !r.IsDynamic && ref.IsDynamic { return false }
-    if r.IsNullable && !ref.IsNullable { return false }
+    if p.Base == nil { return true }
+    if !p.IsHeap && ptr.IsHeap { return false }
 
-    return r.Base.MayBeAssignedTo(ref.Base)
+    return p.Base.MayBeAssignedTo(ptr.Base)
 }

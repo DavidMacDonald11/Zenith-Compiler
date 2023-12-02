@@ -26,11 +26,11 @@ type ZenithParserVisitor interface {
 	// Visit a parse tree produced by ZenithParser#exprStat.
 	VisitExprStat(ctx *ExprStatContext) interface{}
 
-	// Visit a parse tree produced by ZenithParser#refType.
-	VisitRefType(ctx *RefTypeContext) interface{}
-
 	// Visit a parse tree produced by ZenithParser#baseType.
 	VisitBaseType(ctx *BaseTypeContext) interface{}
+
+	// Visit a parse tree produced by ZenithParser#ptrType.
+	VisitPtrType(ctx *PtrTypeContext) interface{}
 
 	// Visit a parse tree produced by ZenithParser#castExpr.
 	VisitCastExpr(ctx *CastExprContext) interface{}
@@ -50,11 +50,11 @@ type ZenithParserVisitor interface {
 	// Visit a parse tree produced by ZenithParser#bitXorExpr.
 	VisitBitXorExpr(ctx *BitXorExprContext) interface{}
 
-	// Visit a parse tree produced by ZenithParser#coalesceExpr.
-	VisitCoalesceExpr(ctx *CoalesceExprContext) interface{}
-
 	// Visit a parse tree produced by ZenithParser#shiftExpr.
 	VisitShiftExpr(ctx *ShiftExprContext) interface{}
+
+	// Visit a parse tree produced by ZenithParser#ptrExpr.
+	VisitPtrExpr(ctx *PtrExprContext) interface{}
 
 	// Visit a parse tree produced by ZenithParser#prefixExpr.
 	VisitPrefixExpr(ctx *PrefixExprContext) interface{}
@@ -68,9 +68,6 @@ type ZenithParserVisitor interface {
 	// Visit a parse tree produced by ZenithParser#addExpr.
 	VisitAddExpr(ctx *AddExprContext) interface{}
 
-	// Visit a parse tree produced by ZenithParser#refExpr.
-	VisitRefExpr(ctx *RefExprContext) interface{}
-
 	// Visit a parse tree produced by ZenithParser#compExpr.
 	VisitCompExpr(ctx *CompExprContext) interface{}
 
@@ -80,14 +77,14 @@ type ZenithParserVisitor interface {
 	// Visit a parse tree produced by ZenithParser#ifExpr.
 	VisitIfExpr(ctx *IfExprContext) interface{}
 
+	// Visit a parse tree produced by ZenithParser#postfixExpr.
+	VisitPostfixExpr(ctx *PostfixExprContext) interface{}
+
 	// Visit a parse tree produced by ZenithParser#bitAndExpr.
 	VisitBitAndExpr(ctx *BitAndExprContext) interface{}
 
 	// Visit a parse tree produced by ZenithParser#powExpr.
 	VisitPowExpr(ctx *PowExprContext) interface{}
-
-	// Visit a parse tree produced by ZenithParser#notNullExpr.
-	VisitNotNullExpr(ctx *NotNullExprContext) interface{}
 
 	// Visit a parse tree produced by ZenithParser#idExpr.
 	VisitIdExpr(ctx *IdExprContext) interface{}

@@ -32,11 +32,11 @@ func (v *BaseZenithParserVisitor) VisitExprStat(ctx *ExprStatContext) interface{
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseZenithParserVisitor) VisitRefType(ctx *RefTypeContext) interface{} {
+func (v *BaseZenithParserVisitor) VisitBaseType(ctx *BaseTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseZenithParserVisitor) VisitBaseType(ctx *BaseTypeContext) interface{} {
+func (v *BaseZenithParserVisitor) VisitPtrType(ctx *PtrTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -64,11 +64,11 @@ func (v *BaseZenithParserVisitor) VisitBitXorExpr(ctx *BitXorExprContext) interf
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseZenithParserVisitor) VisitCoalesceExpr(ctx *CoalesceExprContext) interface{} {
+func (v *BaseZenithParserVisitor) VisitShiftExpr(ctx *ShiftExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseZenithParserVisitor) VisitShiftExpr(ctx *ShiftExprContext) interface{} {
+func (v *BaseZenithParserVisitor) VisitPtrExpr(ctx *PtrExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -88,10 +88,6 @@ func (v *BaseZenithParserVisitor) VisitAddExpr(ctx *AddExprContext) interface{} 
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseZenithParserVisitor) VisitRefExpr(ctx *RefExprContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseZenithParserVisitor) VisitCompExpr(ctx *CompExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -104,15 +100,15 @@ func (v *BaseZenithParserVisitor) VisitIfExpr(ctx *IfExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseZenithParserVisitor) VisitPostfixExpr(ctx *PostfixExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseZenithParserVisitor) VisitBitAndExpr(ctx *BitAndExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
 func (v *BaseZenithParserVisitor) VisitPowExpr(ctx *PowExprContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseZenithParserVisitor) VisitNotNullExpr(ctx *NotNullExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

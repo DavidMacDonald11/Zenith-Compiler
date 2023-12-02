@@ -26,11 +26,11 @@ type ZenithParserListener interface {
 	// EnterExprStat is called when entering the exprStat production.
 	EnterExprStat(c *ExprStatContext)
 
-	// EnterRefType is called when entering the refType production.
-	EnterRefType(c *RefTypeContext)
-
 	// EnterBaseType is called when entering the baseType production.
 	EnterBaseType(c *BaseTypeContext)
+
+	// EnterPtrType is called when entering the ptrType production.
+	EnterPtrType(c *PtrTypeContext)
 
 	// EnterCastExpr is called when entering the castExpr production.
 	EnterCastExpr(c *CastExprContext)
@@ -50,11 +50,11 @@ type ZenithParserListener interface {
 	// EnterBitXorExpr is called when entering the bitXorExpr production.
 	EnterBitXorExpr(c *BitXorExprContext)
 
-	// EnterCoalesceExpr is called when entering the coalesceExpr production.
-	EnterCoalesceExpr(c *CoalesceExprContext)
-
 	// EnterShiftExpr is called when entering the shiftExpr production.
 	EnterShiftExpr(c *ShiftExprContext)
+
+	// EnterPtrExpr is called when entering the ptrExpr production.
+	EnterPtrExpr(c *PtrExprContext)
 
 	// EnterPrefixExpr is called when entering the prefixExpr production.
 	EnterPrefixExpr(c *PrefixExprContext)
@@ -68,9 +68,6 @@ type ZenithParserListener interface {
 	// EnterAddExpr is called when entering the addExpr production.
 	EnterAddExpr(c *AddExprContext)
 
-	// EnterRefExpr is called when entering the refExpr production.
-	EnterRefExpr(c *RefExprContext)
-
 	// EnterCompExpr is called when entering the compExpr production.
 	EnterCompExpr(c *CompExprContext)
 
@@ -80,14 +77,14 @@ type ZenithParserListener interface {
 	// EnterIfExpr is called when entering the ifExpr production.
 	EnterIfExpr(c *IfExprContext)
 
+	// EnterPostfixExpr is called when entering the postfixExpr production.
+	EnterPostfixExpr(c *PostfixExprContext)
+
 	// EnterBitAndExpr is called when entering the bitAndExpr production.
 	EnterBitAndExpr(c *BitAndExprContext)
 
 	// EnterPowExpr is called when entering the powExpr production.
 	EnterPowExpr(c *PowExprContext)
-
-	// EnterNotNullExpr is called when entering the notNullExpr production.
-	EnterNotNullExpr(c *NotNullExprContext)
 
 	// EnterIdExpr is called when entering the idExpr production.
 	EnterIdExpr(c *IdExprContext)
@@ -110,11 +107,11 @@ type ZenithParserListener interface {
 	// ExitExprStat is called when exiting the exprStat production.
 	ExitExprStat(c *ExprStatContext)
 
-	// ExitRefType is called when exiting the refType production.
-	ExitRefType(c *RefTypeContext)
-
 	// ExitBaseType is called when exiting the baseType production.
 	ExitBaseType(c *BaseTypeContext)
+
+	// ExitPtrType is called when exiting the ptrType production.
+	ExitPtrType(c *PtrTypeContext)
 
 	// ExitCastExpr is called when exiting the castExpr production.
 	ExitCastExpr(c *CastExprContext)
@@ -134,11 +131,11 @@ type ZenithParserListener interface {
 	// ExitBitXorExpr is called when exiting the bitXorExpr production.
 	ExitBitXorExpr(c *BitXorExprContext)
 
-	// ExitCoalesceExpr is called when exiting the coalesceExpr production.
-	ExitCoalesceExpr(c *CoalesceExprContext)
-
 	// ExitShiftExpr is called when exiting the shiftExpr production.
 	ExitShiftExpr(c *ShiftExprContext)
+
+	// ExitPtrExpr is called when exiting the ptrExpr production.
+	ExitPtrExpr(c *PtrExprContext)
 
 	// ExitPrefixExpr is called when exiting the prefixExpr production.
 	ExitPrefixExpr(c *PrefixExprContext)
@@ -152,9 +149,6 @@ type ZenithParserListener interface {
 	// ExitAddExpr is called when exiting the addExpr production.
 	ExitAddExpr(c *AddExprContext)
 
-	// ExitRefExpr is called when exiting the refExpr production.
-	ExitRefExpr(c *RefExprContext)
-
 	// ExitCompExpr is called when exiting the compExpr production.
 	ExitCompExpr(c *CompExprContext)
 
@@ -164,14 +158,14 @@ type ZenithParserListener interface {
 	// ExitIfExpr is called when exiting the ifExpr production.
 	ExitIfExpr(c *IfExprContext)
 
+	// ExitPostfixExpr is called when exiting the postfixExpr production.
+	ExitPostfixExpr(c *PostfixExprContext)
+
 	// ExitBitAndExpr is called when exiting the bitAndExpr production.
 	ExitBitAndExpr(c *BitAndExprContext)
 
 	// ExitPowExpr is called when exiting the powExpr production.
 	ExitPowExpr(c *PowExprContext)
-
-	// ExitNotNullExpr is called when exiting the notNullExpr production.
-	ExitNotNullExpr(c *NotNullExprContext)
 
 	// ExitIdExpr is called when exiting the idExpr production.
 	ExitIdExpr(c *IdExprContext)

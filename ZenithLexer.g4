@@ -1,6 +1,6 @@
 lexer grammar ZenithLexer;
 
-NOT_NULL : '!!' ;
+NOT : '!' ;
 BIT_NOT : '~' ;
 POW : '^' ;
 TIMES : '*' ;
@@ -16,7 +16,6 @@ LTE : '<=' ;
 GTE : '>=' ;
 EQ : '==' ;
 NEQ : '!=' ;
-COALESCE : '??';
 
 NULL : 'null' ;
 TRUE : 'true' ;
@@ -78,10 +77,10 @@ fragment HEX_DIGIT : [0-9a-fA-F] ;
 
 ID : [_a-zA-Z][_a-zA-Z0-9]* ;
 
+AT : '@' ;
 AND : '&' ;
 DOLLAR : '$' ;
 PIPE : '|' ;
-EXCLAIM : '!' ;
 QUESTION : '?' ;
 HASH : '#' ;
 LPAREN : '(' ;
