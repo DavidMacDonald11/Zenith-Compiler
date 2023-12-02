@@ -10,4 +10,6 @@
     num2 := c if num? else num
     num3 := null if num2? else num2
     num4 := 10 if num3? else @num3
+
+    n := &UInt{10}
 }

@@ -11,18 +11,23 @@ lineEnd : (NL | SEMICOLON)+
         | EOF
         ;
 
-stat : ID type? INIT_ASSIGN NL? expr #defineStat
+stat : ID Type=fullType? INIT_ASSIGN NL? expr #defineStat
      | LBRACE NL? endedStat* stat? lineEnd? RBRACE #multiStat
      | expr #exprStat
      ;
 
-type : TYPE #baseType
-     | Ptr=(HASH | AND) type #ptrType
-     ;
+fullType : partType | ptrType ;
+
+ptrType : Ptr=(HASH | AND) Type=fullType ;
+
+partType : TYPE #baseType
+         | LBRACK expr RBRACK fullType #sliceType
+         ;
 
 expr : NUM #numExpr
      | ID #idExpr
      | Key=(TRUE | FALSE | NULL) #keyExpr
+     | Type=partType LBRACE expr RBRACE #initExpr
      | LPAREN NL? expr NL? RPAREN #parenExpr
      | expr QUESTION #postfixExpr
      | ALLOC LPAREN NL? expr NL? RPAREN #allocExpr

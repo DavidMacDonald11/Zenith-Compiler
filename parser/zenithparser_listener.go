@@ -26,11 +26,17 @@ type ZenithParserListener interface {
 	// EnterExprStat is called when entering the exprStat production.
 	EnterExprStat(c *ExprStatContext)
 
-	// EnterBaseType is called when entering the baseType production.
-	EnterBaseType(c *BaseTypeContext)
+	// EnterFullType is called when entering the fullType production.
+	EnterFullType(c *FullTypeContext)
 
 	// EnterPtrType is called when entering the ptrType production.
 	EnterPtrType(c *PtrTypeContext)
+
+	// EnterBaseType is called when entering the baseType production.
+	EnterBaseType(c *BaseTypeContext)
+
+	// EnterSliceType is called when entering the sliceType production.
+	EnterSliceType(c *SliceTypeContext)
 
 	// EnterCastExpr is called when entering the castExpr production.
 	EnterCastExpr(c *CastExprContext)
@@ -80,6 +86,9 @@ type ZenithParserListener interface {
 	// EnterPostfixExpr is called when entering the postfixExpr production.
 	EnterPostfixExpr(c *PostfixExprContext)
 
+	// EnterInitExpr is called when entering the initExpr production.
+	EnterInitExpr(c *InitExprContext)
+
 	// EnterBitAndExpr is called when entering the bitAndExpr production.
 	EnterBitAndExpr(c *BitAndExprContext)
 
@@ -107,11 +116,17 @@ type ZenithParserListener interface {
 	// ExitExprStat is called when exiting the exprStat production.
 	ExitExprStat(c *ExprStatContext)
 
-	// ExitBaseType is called when exiting the baseType production.
-	ExitBaseType(c *BaseTypeContext)
+	// ExitFullType is called when exiting the fullType production.
+	ExitFullType(c *FullTypeContext)
 
 	// ExitPtrType is called when exiting the ptrType production.
 	ExitPtrType(c *PtrTypeContext)
+
+	// ExitBaseType is called when exiting the baseType production.
+	ExitBaseType(c *BaseTypeContext)
+
+	// ExitSliceType is called when exiting the sliceType production.
+	ExitSliceType(c *SliceTypeContext)
 
 	// ExitCastExpr is called when exiting the castExpr production.
 	ExitCastExpr(c *CastExprContext)
@@ -160,6 +175,9 @@ type ZenithParserListener interface {
 
 	// ExitPostfixExpr is called when exiting the postfixExpr production.
 	ExitPostfixExpr(c *PostfixExprContext)
+
+	// ExitInitExpr is called when exiting the initExpr production.
+	ExitInitExpr(c *InitExprContext)
 
 	// ExitBitAndExpr is called when exiting the bitAndExpr production.
 	ExitBitAndExpr(c *BitAndExprContext)

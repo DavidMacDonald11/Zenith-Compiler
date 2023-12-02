@@ -49,7 +49,7 @@ func (a *Analyzer) VisitDefineStat(ctx *parser.DefineStatContext) any {
     expr := ctx.Expr()
     exprType := a.Visit(expr).(result).exprType
 
-    if t := ctx.Type_(); t != nil {
+    if t := ctx.Type; t != nil {
         declType := a.Visit(t).(result).exprType
 
         if !exprType.MayBeAssignedTo(declType) {
@@ -89,16 +89,21 @@ func (a *Analyzer) VisitMultiStat(ctx *parser.MultiStatContext) any {
     return nil
 }
 
-func (a *Analyzer) VisitBaseType(ctx *parser.BaseTypeContext) any {
-    t := BaseType{Name: ctx.TYPE().GetText()}
-    return result{exprType: t}
+func (a *Analyzer) VisitFullType(ctx *parser.FullTypeContext) any {
+    if ctx.PartType() != nil { return a.Visit(ctx.PartType()) }
+    return a.Visit(ctx.PtrType())
 }
 
 func (a *Analyzer) VisitPtrType(ctx *parser.PtrTypeContext) any {
-    base := a.Visit(ctx.Type_()).(result).exprType
+    base := a.Visit(ctx.Type).(result).exprType
     isHeap := ctx.Ptr.GetText() == "#"
 
     t := PtrType{Base: base, IsHeap: isHeap}
+    return result{exprType: t}
+}
+
+func (a *Analyzer) VisitBaseType(ctx *parser.BaseTypeContext) any {
+    t := BaseType{Name: ctx.TYPE().GetText()}
     return result{exprType: t}
 }
 

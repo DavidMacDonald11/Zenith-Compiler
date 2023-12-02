@@ -51,13 +51,19 @@ func (g *Generator) VisitIdExpr(ctx *parser.IdExprContext) any {
 func (g *Generator) VisitKeyExpr(ctx *parser.KeyExprContext) any {
     key := ctx.Key.GetText()
 
-    if key == "null" { return "0" }
+    if key == "null" { return "NULL" }
     return key
 }
 
+func (g *Generator) VisitInitExpr(ctx *parser.InitExprContext) any {
+    exprType := getCType(g.Analyzer.ExprTypes[ctx])
+    expr := g.Visit(ctx.Expr())
+    return fmt.Sprintf("(%v){%v}", exprType, expr)
+}
+
 func (g *Generator) VisitParenExpr(ctx *parser.ParenExprContext) any {
-    inner := g.Visit(ctx.Expr())
-    return fmt.Sprintf("(%v)", inner)
+    expr := g.Visit(ctx.Expr())
+    return fmt.Sprintf("(%v)", expr)
 }
 
 func (g *Generator) VisitPostfixExpr(ctx *parser.PostfixExprContext) any {

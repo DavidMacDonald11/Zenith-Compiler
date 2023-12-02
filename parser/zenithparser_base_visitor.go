@@ -32,11 +32,19 @@ func (v *BaseZenithParserVisitor) VisitExprStat(ctx *ExprStatContext) interface{
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseZenithParserVisitor) VisitBaseType(ctx *BaseTypeContext) interface{} {
+func (v *BaseZenithParserVisitor) VisitFullType(ctx *FullTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
 func (v *BaseZenithParserVisitor) VisitPtrType(ctx *PtrTypeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitBaseType(ctx *BaseTypeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitSliceType(ctx *SliceTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -101,6 +109,10 @@ func (v *BaseZenithParserVisitor) VisitIfExpr(ctx *IfExprContext) interface{} {
 }
 
 func (v *BaseZenithParserVisitor) VisitPostfixExpr(ctx *PostfixExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseZenithParserVisitor) VisitInitExpr(ctx *InitExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

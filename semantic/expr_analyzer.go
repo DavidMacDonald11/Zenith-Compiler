@@ -41,6 +41,19 @@ func (a *Analyzer) VisitKeyExpr(ctx *parser.KeyExprContext) any {
     return result{exprType: t}
 }
 
+func (a *Analyzer) VisitInitExpr(ctx *parser.InitExprContext) any {
+    t := a.Visit(ctx.Type).(result).exprType
+    exprType := a.Visit(ctx.Expr()).(result).exprType
+
+    if !exprType.MayBeAssignedTo(t) {
+        t1, t2 := t.FullType(), exprType.FullType()
+        panic("Cannot initialize " + t1 + " with " + t2)
+    }
+
+    a.ExprTypes[ctx] = t
+    return result{exprType: t, isVar: true}
+}
+
 func (a *Analyzer) VisitParenExpr(ctx *parser.ParenExprContext) any {
     return a.Visit(ctx.Expr())
 }
