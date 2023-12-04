@@ -2,6 +2,7 @@ package code
 
 import (
 	"bytes"
+	"fmt"
 	"math/big"
 	"strings"
 	"zenith/semantic"
@@ -23,34 +24,24 @@ func getDigit(c byte) *big.Float {
     return new(big.Float).SetInt64(int64(c - 'a' + 10))
 }
 
-func getCId(id string) string {
-    return "__ZenithId_" + id
-}
-
 func getCType(t semantic.Type) string {
     if ptr, isPtr := t.(semantic.PtrType); isPtr {
         return getCType(ptr.Base) + "*"
     }
 
-    name := t.(semantic.BaseType).Name
+    if slice, isSlice := t.(semantic.SliceType); isSlice {
+        base := getCType(slice.Base)
 
-    switch name {
-    case "UInt8": return "uint8_t"
-    case "UInt16": return "uint16_t"
-    case "UInt32": return "uint32_t"
-    case "UInt64": return "uint64_t"
-    case "Int8": return "int8_t"
-    case "Int16": return "int16_t"
-    case "Int32": return "int32_t"
-    case "Int64": return "int64_t"
-    case "UInt": return "uint_fast32_t"
-    case "AnyNum": fallthrough
-    case "Int": return "int_fast32_t"
-    case "Float32": return "float"
-    case "AnyFloat": fallthrough
-    case "Float64": return "double"
-    case "Bool": return "bool"
+        if slice.Size == 0 {
+            return fmt.Sprintf("Zenith::Slice<%v>", base)
+        }
+
+        return fmt.Sprintf("Zenith::Array<%v>", base)
     }
 
-    return "void"
+    name := t.(semantic.BaseType).Name
+
+    if name == "AnyNum" { return "Zenith::Int" }
+    if name == "AnyFloat" { return "Zenith::Float32" }
+    return "Zenith::" + name
 }

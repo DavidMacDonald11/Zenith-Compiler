@@ -43,15 +43,25 @@ func (a *Analyzer) VisitKeyExpr(ctx *parser.KeyExprContext) any {
 
 func (a *Analyzer) VisitInitExpr(ctx *parser.InitExprContext) any {
     t := a.Visit(ctx.Type).(result).exprType
-    exprType := a.Visit(ctx.Expr()).(result).exprType
+    types := a.Visit(ctx.InitArgs()).([]Type)
 
-    if !exprType.MayBeAssignedTo(t) {
-        t1, t2 := t.FullType(), exprType.FullType()
-        panic("Cannot initialize " + t1 + " with " + t2)
+    if !t.MayInitWith(types) {
+        panic("Cannot initialize this type with this initializer")
     }
 
     a.ExprTypes[ctx] = t
-    return result{exprType: t, isVar: true}
+    return result{exprType: t}
+}
+
+func (a *Analyzer) VisitInitArgs(ctx *parser.InitArgsContext) any {
+    exprs := ctx.AllExpr()
+    types := make([]Type, len(exprs))
+
+    for i, expr := range exprs {
+        types[i] = a.Visit(expr).(result).exprType
+    }
+
+    return types
 }
 
 func (a *Analyzer) VisitParenExpr(ctx *parser.ParenExprContext) any {
@@ -71,6 +81,8 @@ func (a *Analyzer) VisitPostfixExpr(ctx *parser.PostfixExprContext) any {
 
 func (a *Analyzer) VisitAllocExpr(ctx *parser.AllocExprContext) any {
     expr := a.Visit(ctx.Expr()).(result)
+    a.ExprTypes[ctx.Expr()] =  expr.exprType
+
     t := PtrType{Base: expr.exprType, IsHeap: true}
     return result{exprType: t}
 }

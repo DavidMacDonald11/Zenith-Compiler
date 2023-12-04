@@ -127,3 +127,7 @@ func (v *BaseZenithParserVisitor) VisitPowExpr(ctx *PowExprContext) interface{} 
 func (v *BaseZenithParserVisitor) VisitIdExpr(ctx *IdExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
+
+func (v *BaseZenithParserVisitor) VisitInitArgs(ctx *InitArgsContext) interface{} {
+	return v.VisitChildren(ctx)
+}

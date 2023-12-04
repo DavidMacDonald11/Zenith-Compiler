@@ -89,6 +89,10 @@ func (a *Analyzer) VisitMultiStat(ctx *parser.MultiStatContext) any {
     return nil
 }
 
+func (a *Analyzer) VisitExprStat(ctx *parser.ExprStatContext) any {
+    return a.Visit(ctx.Expr())
+}
+
 func (a *Analyzer) VisitFullType(ctx *parser.FullTypeContext) any {
     if ctx.PartType() != nil { return a.Visit(ctx.PartType()) }
     return a.Visit(ctx.PtrType())
@@ -107,6 +111,12 @@ func (a *Analyzer) VisitBaseType(ctx *parser.BaseTypeContext) any {
     return result{exprType: t}
 }
 
-func (a *Analyzer) VisitExprStat(ctx *parser.ExprStatContext) any {
-    return a.Visit(ctx.Expr())
+func (a *Analyzer) VisitSliceType(ctx *parser.SliceTypeContext) any {
+    var size uint
+    if ctx.Expr() != nil { a.Visit(ctx.Expr()); size = 1 }
+    // TODO interpret const values
+
+    base := a.Visit(ctx.Type).(result).exprType
+    t := SliceType{Base: base, Size: size}
+    return result{exprType: t}
 }

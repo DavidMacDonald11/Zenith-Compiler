@@ -21,13 +21,13 @@ fullType : partType | ptrType ;
 ptrType : Ptr=(HASH | AND) Type=fullType ;
 
 partType : TYPE #baseType
-         | LBRACK expr RBRACK fullType #sliceType
+         | LBRACK expr? RBRACK Type=fullType #sliceType
          ;
 
 expr : NUM #numExpr
      | ID #idExpr
      | Key=(TRUE | FALSE | NULL) #keyExpr
-     | Type=partType LBRACE expr RBRACE #initExpr
+     | Type=partType LBRACE initArgs RBRACE #initExpr
      | LPAREN NL? expr NL? RPAREN #parenExpr
      | expr QUESTION #postfixExpr
      | ALLOC LPAREN NL? expr NL? RPAREN #allocExpr
@@ -45,3 +45,5 @@ expr : NUM #numExpr
      | Left=expr Op=(LT | GT | LTE | GTE | EQ | NEQ) NL? Right=expr #compExpr
      | Left=expr IF NL? Condition=expr NL? ELSE NL? Right=expr #ifExpr
      ;
+
+initArgs : (expr (COMMA expr)* COMMA?)? ;

@@ -97,4 +97,7 @@ type ZenithParserVisitor interface {
 
 	// Visit a parse tree produced by ZenithParser#idExpr.
 	VisitIdExpr(ctx *IdExprContext) interface{}
+
+	// Visit a parse tree produced by ZenithParser#initArgs.
+	VisitInitArgs(ctx *InitArgsContext) interface{}
 }

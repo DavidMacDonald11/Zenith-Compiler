@@ -22,6 +22,7 @@ func (g *Generator) Visit(tree antlr.ParseTree) any {
 
 func (g *Generator) VisitFileStat(ctx *parser.FileStatContext) any {
     result := strings.Builder{}
+    result.WriteString(`#include "Zenith.h"` + "\n")
 
     for _, stat := range ctx.AllEndedStat() {
         result.WriteString(fmt.Sprintf("%s\n", g.Visit(stat).(string)))
@@ -36,7 +37,7 @@ func (g *Generator) VisitEndedStat(ctx *parser.EndedStatContext) any {
 }
 
 func (g *Generator) VisitDefineStat(ctx *parser.DefineStatContext) any {
-    id := getCId(ctx.ID().GetText())
+    id := ctx.ID().GetText()
     exprType := getCType(g.Analyzer.ExprTypes[ctx.Expr()])
 
     return fmt.Sprintf("%v %v = %v", exprType, id, g.Visit(ctx.Expr()))

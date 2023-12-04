@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"strings"
 	"zenith/parser"
+	"zenith/semantic"
 )
 
 func (g *Generator) VisitNumExpr(ctx *parser.NumExprContext) any {
@@ -45,20 +46,47 @@ func (g *Generator) VisitNumExpr(ctx *parser.NumExprContext) any {
 }
 
 func (g *Generator) VisitIdExpr(ctx *parser.IdExprContext) any {
-    return getCId(ctx.ID().GetText())
+    return ctx.ID().GetText()
 }
 
 func (g *Generator) VisitKeyExpr(ctx *parser.KeyExprContext) any {
     key := ctx.Key.GetText()
 
-    if key == "null" { return "NULL" }
+    if key == "null" { return "nullptr" }
     return key
 }
 
 func (g *Generator) VisitInitExpr(ctx *parser.InitExprContext) any {
-    exprType := getCType(g.Analyzer.ExprTypes[ctx])
-    expr := g.Visit(ctx.Expr())
-    return fmt.Sprintf("(%v){%v}", exprType, expr)
+    exprType := g.Analyzer.ExprTypes[ctx]
+    expr := g.Visit(ctx.InitArgs())
+    slice, isSlice := exprType.(semantic.SliceType)
+
+    if !isSlice {
+        return fmt.Sprintf("%v{%v}", getCType(exprType), expr)
+    }
+
+    size := slice.Size
+    arrType := getCType(slice.Base)
+
+    if size == 0 {
+        return fmt.Sprintf("Zenith::Slice<%v>{%v}", arrType, expr)
+    }
+
+    return fmt.Sprintf("Zenith::Array<%v, %v>{%v}", arrType, size, expr)
+}
+
+func (g *Generator) VisitInitArgs(ctx *parser.InitArgsContext) any {
+    exprs := ctx.AllExpr()
+    b := strings.Builder{}
+
+    for i, expr := range exprs {
+        str := g.Visit(expr).(string)
+        b.WriteString(str)
+
+        if i + 1 < len(exprs) { b.WriteString(", ") }
+    }
+
+    return b.String()
 }
 
 func (g *Generator) VisitParenExpr(ctx *parser.ParenExprContext) any {
@@ -68,19 +96,19 @@ func (g *Generator) VisitParenExpr(ctx *parser.ParenExprContext) any {
 
 func (g *Generator) VisitPostfixExpr(ctx *parser.PostfixExprContext) any {
     expr := g.Visit(ctx.Expr())
-    return fmt.Sprintf("(!%v)", expr)
+    return fmt.Sprintf("(%v != nullptr)", expr)
 }
 
 func (g *Generator) VisitAllocExpr(ctx *parser.AllocExprContext) any {
     expr := g.Visit(ctx.Expr())
-    // TODO change
-    return fmt.Sprintf("__Zenith_alloc(%v)", expr)
+    exprType := getCType(g.Analyzer.ExprTypes[ctx.Expr()])
+
+    return fmt.Sprintf("new %v(%v)", exprType, expr)
 }
 
 func (g *Generator) VisitDeallocExpr(ctx *parser.DeallocExprContext) any {
     expr := g.Visit(ctx.Expr())
-    // TODO change
-    return fmt.Sprintf("__Zenith_dealloc(%v)", expr)
+    return fmt.Sprintf("delete %v", expr)
 }
 
 func (g *Generator) VisitCastExpr(ctx *parser.CastExprContext) any {
@@ -108,10 +136,15 @@ func (g *Generator) VisitPrefixExpr(ctx *parser.PrefixExprContext) any {
 func (g *Generator) VisitPowExpr(ctx *parser.PowExprContext) any {
     left := g.Visit(ctx.Left)
     right := g.Visit(ctx.Right)
-    exprType := getCType(g.Analyzer.ExprTypes[ctx])
 
-    // TODO implement better
-    return fmt.Sprintf("(%v)powl(%v, %v)", exprType, left, right)
+    exprType := g.Analyzer.ExprTypes[ctx]
+    cType := getCType(exprType)
+
+    if semantic.IsInt(exprType) {
+        return fmt.Sprintf("Zenith::pow<%v>(%v, %v)", cType, left, right)
+    }
+
+    return fmt.Sprintf("std::pow(%v, %v)", left, right)
 }
 
 func (g *Generator) VisitMulExpr(ctx *parser.MulExprContext) any {

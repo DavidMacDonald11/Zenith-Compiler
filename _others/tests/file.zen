@@ -1,15 +1,9 @@
 {
-    a := 20
-    b := &a
+    p1 := alloc(10)
+    p2 := alloc(Int{10})
 
-    c := alloc(21)
-    d := &c
-    dealloc(@d)
+    s := [][1]Int{}
 
-    num := alloc(300 / 3)
-    num2 := c if num? else num
-    num3 := null if num2? else num2
-    num4 := 10 if num3? else @num3
-
-    n := &UInt{10}
+    1^100
+    2.0^1
 }

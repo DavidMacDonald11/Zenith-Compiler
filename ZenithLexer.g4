@@ -89,6 +89,7 @@ LBRACE : '{' ;
 RBRACE : '}' ;
 LBRACK : '[' ;
 RBRACK : ']' ;
+COMMA : ',' ;
 SEMICOLON : ';' ;
 NL : ([\r]? [\n])+ ;
 IGNORED : ([ \t] | '/*' .*? '*/' | '//' ~[\n]*) -> skip ;

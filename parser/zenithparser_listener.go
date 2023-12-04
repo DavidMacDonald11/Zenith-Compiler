@@ -98,6 +98,9 @@ type ZenithParserListener interface {
 	// EnterIdExpr is called when entering the idExpr production.
 	EnterIdExpr(c *IdExprContext)
 
+	// EnterInitArgs is called when entering the initArgs production.
+	EnterInitArgs(c *InitArgsContext)
+
 	// ExitFileStat is called when exiting the fileStat production.
 	ExitFileStat(c *FileStatContext)
 
@@ -187,4 +190,7 @@ type ZenithParserListener interface {
 
 	// ExitIdExpr is called when exiting the idExpr production.
 	ExitIdExpr(c *IdExprContext)
+
+	// ExitInitArgs is called when exiting the initArgs production.
+	ExitInitArgs(c *InitArgsContext)
 }

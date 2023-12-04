@@ -200,3 +200,9 @@ func (s *BaseZenithParserListener) EnterIdExpr(ctx *IdExprContext) {}
 
 // ExitIdExpr is called when production idExpr is exited.
 func (s *BaseZenithParserListener) ExitIdExpr(ctx *IdExprContext) {}
+
+// EnterInitArgs is called when production initArgs is entered.
+func (s *BaseZenithParserListener) EnterInitArgs(ctx *InitArgsContext) {}
+
+// ExitInitArgs is called when production initArgs is exited.
+func (s *BaseZenithParserListener) ExitInitArgs(ctx *InitArgsContext) {}

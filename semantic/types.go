@@ -1,6 +1,7 @@
 package semantic
 
 import (
+	"fmt"
 	"slices"
 	"strings"
 )
@@ -8,6 +9,7 @@ import (
 type Type interface {
     FullType() string
     InferType() Type
+    MayInitWith([]Type) bool
     MayBeAssignedTo(Type) bool
 }
 
@@ -45,10 +47,8 @@ type NoneType struct{}
 
 func (n NoneType) FullType() string { return "None" }
 func (n NoneType) InferType() Type { return n }
-
-func (n NoneType) MayBeAssignedTo(t Type) bool {
-    return false
-}
+func (n NoneType) MayInitWith(ts []Type) bool { return false }
+func (n NoneType) MayBeAssignedTo(t Type) bool { return false }
 
 
 type BaseType struct {
@@ -65,6 +65,11 @@ func (b BaseType) InferType() Type {
     case "AnyFloat": return BaseType{Name: "Float64"}
     default: return b
     }
+}
+
+func (b BaseType) MayInitWith(ts []Type) bool {
+    if len(ts) != 1 { return false }
+    return ts[0].MayBeAssignedTo(b)
 }
 
 func (b BaseType) MayBeAssignedTo(t Type) bool {
@@ -105,6 +110,8 @@ func (p PtrType) InferType() Type {
     return PtrType{Base: base, IsHeap: p.IsHeap}
 }
 
+func (p PtrType) MayInitWith(ts []Type) bool { return false }
+
 func (p PtrType) MayBeAssignedTo(t Type) bool {
     ptr, isPtr := t.(PtrType)
     if !isPtr { return false }
@@ -113,4 +120,40 @@ func (p PtrType) MayBeAssignedTo(t Type) bool {
     if !p.IsHeap && ptr.IsHeap { return false }
 
     return p.Base.MayBeAssignedTo(ptr.Base)
+}
+
+
+type SliceType struct {
+    Base Type
+    Size uint
+}
+
+func (s SliceType) FullType() string {
+    base := s.Base.FullType()
+
+    if s.Size == 0 { return "[]" + base }
+    return fmt.Sprintf("[%v]%v", s.Size, base)
+}
+
+func (s SliceType) InferType() Type {
+    base := s.Base.InferType()
+    return SliceType{Base: base, Size: s.Size}
+}
+
+func (s SliceType) MayInitWith(ts []Type) bool {
+    if s.Size > 0 && uint(len(ts)) > s.Size { return false }
+
+    for _, t := range ts {
+        if !t.MayBeAssignedTo(s.Base) { return false }
+    }
+
+    return true
+}
+
+func (s SliceType) MayBeAssignedTo(t Type) bool {
+    slice, isSlice := t.(SliceType)
+    if !isSlice { return false }
+
+    if s.Size != slice.Size { return false }
+    return s.Base.MayBeAssignedTo(slice.Base)
 }
