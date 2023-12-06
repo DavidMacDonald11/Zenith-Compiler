@@ -2,28 +2,32 @@ package semantic
 
 import (
 	"fmt"
+	"math/big"
 	"zenith/parser"
 
 	"github.com/antlr4-go/antlr/v4"
 )
 
+type exprCtx = parser.IExprContext
+
 type Analyzer struct {
     parser.BaseZenithParserVisitor
     table Table
 
-    ExprTypes map[parser.IExprContext]Type
+    ExprTypes map[exprCtx]Type
 }
 
 type result struct {
     exprType Type
     isVar bool
+    constValue *big.Float
     compRightType Type
 }
 
 func MakeAnalyzer() Analyzer {
     return Analyzer {
         table: MakeTable(),
-        ExprTypes: map[parser.IExprContext]Type{},
+        ExprTypes: map[exprCtx]Type{},
     }
 }
 
@@ -113,8 +117,25 @@ func (a *Analyzer) VisitBaseType(ctx *parser.BaseTypeContext) any {
 
 func (a *Analyzer) VisitSliceType(ctx *parser.SliceTypeContext) any {
     var size uint
-    if ctx.Expr() != nil { a.Visit(ctx.Expr()); size = 1 }
-    // TODO interpret const values
+
+    if ctx.Expr() != nil {
+        res := a.Visit(ctx.Expr()).(result)
+
+        if !IsInt(res.exprType) {
+            panic("Array size must be an integer")
+        }
+
+        if res.constValue == nil {
+            panic("Array size must be constant expression")
+        }
+
+        if res.constValue.Sign() < 1 {
+            panic("Array size must be at least 1")
+        }
+
+        n, _ := res.constValue.Uint64()
+        size = uint(n)
+    }
 
     base := a.Visit(ctx.Type).(result).exprType
     t := SliceType{Base: base, Size: size}

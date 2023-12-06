@@ -1,28 +1,9 @@
 package code
 
 import (
-	"bytes"
 	"fmt"
-	"math/big"
-	"strings"
 	"zenith/semantic"
 )
-
-func getBase(num string) int64 {
-    if strings.Contains(num, "0b") { return 2 }
-    if strings.Contains(num, "0o") { return 8 }
-    if strings.Contains(num, "0x") { return 16 }
-    return 10
-}
-
-func getDigit(c byte) *big.Float {
-    if c >= '0' && c <= '9' {
-        return new(big.Float).SetInt64(int64(c - '0'))
-    }
-
-    c = bytes.ToLower([]byte{c})[0]
-    return new(big.Float).SetInt64(int64(c - 'a' + 10))
-}
 
 func getCType(t semantic.Type) string {
     if ptr, isPtr := t.(semantic.PtrType); isPtr {
@@ -36,7 +17,7 @@ func getCType(t semantic.Type) string {
             return fmt.Sprintf("Zenith::Slice<%v>", base)
         }
 
-        return fmt.Sprintf("Zenith::Array<%v>", base)
+        return fmt.Sprintf("Zenith::Array<%v, %v>", base, slice.Size)
     }
 
     name := t.(semantic.BaseType).Name

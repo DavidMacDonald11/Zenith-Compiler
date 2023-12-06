@@ -2,47 +2,13 @@ package code
 
 import (
 	"fmt"
-	"math/big"
 	"strings"
 	"zenith/parser"
 	"zenith/semantic"
 )
 
 func (g *Generator) VisitNumExpr(ctx *parser.NumExprContext) any {
-    str := strings.ReplaceAll(ctx.NUM().GetText(), "_", "")
-    b := getBase(str)
-
-    base := new(big.Float).SetInt64(b)
-    num := new(big.Float).SetPrec(64)
-    i := 0
-
-    if b != 10 {
-        i = 2
-    }
-
-    for ; i < len(str) && str[i] != '.'; i++ {
-        num.Mul(num, base)
-        num.Add(num, getDigit(str[i]))
-    }
-
-    inv := new(big.Float).SetPrec(64).SetInt64(1)
-
-    for i++; i < len(str); i++ {
-        inv.Quo(inv, base)
-
-        digit := getDigit(str[i])
-        digit.Mul(digit, inv)
-        num.Add(num, digit)
-    }
-
-    isFloat := strings.ContainsRune(str, '.')
-    str = num.Text('g', 64)
-
-    if isFloat && num.IsInt() {
-        return str + ".0"
-    }
-
-    return str
+    return semantic.GetNum(ctx.NUM().GetText())
 }
 
 func (g *Generator) VisitIdExpr(ctx *parser.IdExprContext) any {
